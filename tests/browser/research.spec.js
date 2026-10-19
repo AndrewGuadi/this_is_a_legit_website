@@ -22,7 +22,7 @@ async function login(page) {
   await page.goto('/admin/login');
   await page.getByLabel('Administrator access token').fill(adminToken);
   await page.getByRole('button', { name: /Enter workspace/ }).click();
-  await expect(page).toHaveURL(/\/admin$/);
+  await expect(page).toHaveURL(/\/admin\/?$/);
 }
 async function fillForm(page) {
   await page.getByLabel(/Fictional name or organization/).fill('Example Studio');
@@ -130,7 +130,7 @@ test('investigator filters, pagination, export, detail, delete, logout', async (
   await screenshot(page, testInfo, 'admin-detail');
   await page.getByRole('checkbox', { name: /permanently delete this record/ }).check();
   await page.getByRole('button', { name: 'Permanently delete record' }).click();
-  await expect(page).toHaveURL(/\/admin$/);
+  await expect(page).toHaveURL(/\/admin\/?$/);
   await page.getByRole('button', { name: 'Sign out' }).click();
   await page.goto('/admin');
   await expect(page).toHaveURL(/\/admin\/login/);

@@ -15,7 +15,7 @@ Use Python 3.11+ and `pip install -r requirements.txt`. Configure the following 
 
 Generate secrets with `python -c "import secrets; print(secrets.token_urlsafe(48))"` and store them in the hosting environment. Do not paste them into GitHub.
 
-Start local development with `flask --app app:create_app run`. For PythonAnywhere, install dependencies into the site's virtualenv, configure the environment before importing the application, and use `application = create_app()` in its WSGI entrypoint. Do not use Flask's development server in production. Keep the database on persistent local storage; this is a single-instance prototype, not a multi-node service.
+Start local development with `flask --app app:create_app run`. For production, build the Dockerfile and run its `deployment.start` supervisor with persistent `/data` storage and the required environment. This starts Gunicorn, scheduled retention, and a watchdog. See [operations](docs/OPERATIONS.md) for configuration, readiness, backup, restore and host validation. Use a single application instance with local persistent SQLite storage.
 
 ## Evidence
 
@@ -30,7 +30,7 @@ Public pages are allowed in robots.txt. Automated form submissions require prior
 - Set the real privacy contact, PUBLIC_URL, secrets and persistent DB path before public launch.
 - Term text is an operational draft, not a determination of enforceability. Review the intended collection and consent basis before using records for claims against operators. Checkbox acceptance does not establish agency or identity.
 - Configure HTTPS and hosting access-log retention. Hosting logs may contain raw IP addresses independently of this app.
-- Schedule `flask --app app:create_app purge-events` daily in PythonAnywhere Tasks. Records older than 30 days are also removed during submissions and export. Include backups in the same retention/deletion policy; the application cannot erase host backups.
+- The production supervisor runs scheduled retention independently of requests. Managed backups expire within 24 hours; explicit restore revokes administrator sessions. Host snapshots and investigator exports require separate deletion controls.
 - The code intentionally ignores untrusted forwarding headers. Verify `REMOTE_ADDR` on the chosen host. If it is a shared reverse proxy, network identifiers/rate limits will group visitors until a host-specific trusted-proxy configuration is implemented. Do not blindly trust X-Forwarded-For.
 - The submission reservation limit is 30 attempts per observed network per minute, serialized with a SQLite write transaction. Login has a separate five-attempt/15-minute network bucket. Configure an edge/body/rate limit for hostile traffic and protect admin routes there as well. This prototype is not a DDoS sink.
 - Bearer export is limited to 1,000 recent records. Session-authenticated filtered export is also capped at 1,000; X-Export-Total and X-Export-Truncated headers indicate matched count and truncation. Use narrower date filters or controlled database tooling for larger investigations. Store exports privately and apply the same retention policy.
@@ -39,12 +39,12 @@ Public pages are allowed in robots.txt. Automated form submissions require prior
 
 ## Verification
 
-`python -m unittest -v` checks form rejection/recovery, replay protection, minimization, session/CSRF controls, login throttling, concurrency, filtering, bounded export, deletion, expiry, sitemap and configuration preflight. Run `python -m unittest discover -s orchestration -p 'test_*.py' -v` separately for offline candidate-review tests. Browser layout QA and production hosting are not yet verified. This implementation was authored directly in this session; OpenCode was not used.
+`python -m unittest -v` checks form rejection/recovery, replay protection, minimization, session/CSRF controls, login throttling, concurrency, filtering, bounded export, deletion, expiry, sitemap and configuration preflight. Run `python -m unittest discover -s orchestration -p 'test_*.py' -v` separately for offline candidate-review tests. GitHub Actions also executes browser/accessibility scenarios and isolated Docker runtime checks. Live hosting remains a separate launch gate; see the production review for current evidence. This implementation was authored directly in this session; OpenCode was not used.
 
 ## Quality gate
 
 See docs/QUALITY_SCORECARD.md for ten independent fronts, each requiring 85/100; passing unit tests alone does not satisfy release approval. docs/RESEARCH_PROTOCOL.md defines the controlled study and attribution limits. docs/OPERATIONS.md documents host verification and recovery. The OpenCode execution path is disabled pending verified isolation/egress; offline candidate comparison is implemented.
 
-### Rate-limit accounting (policy 2026-10-19-v2)
+### Rate-limit accounting (policy 2026-10-19-v3)
 
 Requests blocked by the submission limit increment a bounded aggregate row per observed network HMAC/minute, retained for 24 hours. The dashboard shows this global count separately from its filtered event records; it is not a visitor denominator or proof of identity. Aggregates contain counts, timestamps and network HMAC only, no form bodies. Ordinary observation records retain the 30-day policy. Purge tasks handle both lifecycles.

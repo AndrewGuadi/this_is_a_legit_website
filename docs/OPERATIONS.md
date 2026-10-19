@@ -1,29 +1,30 @@
 # Deployment and recovery runbook
 
-Status: prepared, not exercised on a live host. Do not call this production approved until the independent review gates pass.
+## Production launch
 
-## Configure and verify
+Set independent SECRET_KEY, NETWORK_KEY and ADMIN_TOKEN via host secrets, plus PUBLIC_URL, PRIVACY_CONTACT and an absolute DB_PATH on private persistent storage. Run `python preflight.py`. Start with `python -m deployment.start`; the nonroot container uses this supervisor. It runs a bounded initial purge before opening the listener, then maintains exactly two child services: Gunicorn and retention maintenance. Direct `create_app()` is a development/testing entrypoint and bypasses production preflight and readiness middleware. External WSGI hosts must use `wsgi:build_application()` and separately supervise required maintenance.
 
-Use a dedicated virtualenv and install requirements. Set independent SECRET_KEY, NETWORK_KEY and ADMIN_TOKEN through the hosting environment, not Git. Set PUBLIC_URL, PRIVACY_CONTACT and an absolute DB_PATH on persistent private storage. Run `python preflight.py`; a pass checks configuration shape only. Inspect the host's actual TLS, reverse-proxy trust and access-log retention. Do not enable Flask debugging.
+On SIGTERM/SIGINT, child exit or stale retention heartbeat, supervisor terminates both services. Startup purge has a 30-second limit; shutdown permits each child 10 seconds then kills and reaps it. Configure container termination grace at least 25 seconds. Host restart policy should restart failed service and alert after repeated failures. Public TLS, trusted proxy configuration, alert delivery and persistent storage must be verified on the actual host.
 
-Start the WSGI app with `from app import create_app; application = create_app()`. Use the host's WSGI service rather than the development server. Confirm HTTPS-only browser access and secure session cookies. Verify authentication, logout, filtered export and deletion with synthetic data before real traffic.
+## Readiness and retention
 
-## Retention
+`/healthz` returns 200 only when the database accepts a real write transaction (rolled back), event count is below MAX_EVENTS, and the retention heartbeat is fresh. It returns 503 on write locks/storage failures, full capacity or stale/missing heartbeat. Keep readiness out of public caching. PURGE_INTERVAL_SECONDS defaults to 900 and permits 30..3600. Freshness limit is twice that interval plus 60 seconds; supervisor checks every half-second. An expired heartbeat terminates the service, including when a maintenance process remains alive but hung. This endpoint intentionally tests readiness, not merely process liveness.
 
-Schedule `python -m flask --app app:create_app purge-events` daily under the same environment and persistent database. Verify its actual execution log, including after quiet periods. Apply the same retention window to backups, exports and host logs or disclose and justify differences. Application deletion cannot erase copies in exports or backups automatically.
+Maintenance purges expired records and managed backups before atomically updating heartbeat. Event retention follows configured application retention. Backup files can retain deleted records until their expiry; default/max backup lifetime is 24 hours, with deletion on the next successful maintenance cycle (up to one interval later in healthy operation). A stalled host cannot promise physical deletion; readiness fails and the supervisor stops serving after its heartbeat deadline. Host snapshots, external exports and logs are outside this mechanism and require separate deletion controls.
 
 ## Backup and recovery
 
-Use SQLite's online backup API rather than copying a live database file blindly. Encrypt/private-store backups, restrict operator access, record creation/expiry dates and delete expired copies. Before release, restore a synthetic backup into an isolated directory and run integrity_check and app smoke tests. Record the command, resulting counts, time and reviewer evidence. Do not restore production data into a developer/agent workspace.
+Only use synthetic data in developer/agent workspaces. Store production backups in the dedicated `backups` directory next to DB_PATH. That directory must contain only managed backup copies: unknown or malformed manifest copies are deleted by maintenance, not retained indefinitely. Restrict storage to the service owner and encrypt the underlying host volume. The helper creates mode-0600 database and expiry manifest files:
 
-## Rollback
+```
+python -m deployment.backup backup /private/events.sqlite3 /private/backups/checkpoint.sqlite3
+python -m deployment.backup restore /private/backups/checkpoint.sqlite3 /private/restored.sqlite3
+```
 
-Record the accepted commit and dependency versions. Back up safely before schema-changing releases; verify downgrade compatibility. To roll back code, deploy the prior approved commit using the host deployment mechanism and restart its WSGI workers. Do not automatically roll back the database: choose a compatible migration/restore plan based on verified data state. Test this on synthetic data before public release.
+Destination must not exist. Restore requires an unexpired, valid manifest and clears every admin session before releasing the restored database. This prevents a backup from reviving sessions revoked since it was created; all administrators log in again. Stop the supervisor before switching DB_PATH to a restored file. Start normally so initial purge runs before traffic. Never use the backup action as a substitute for restore. Backups restored before expiry may contain deleted records; any deletion receipts must be reapplied before exposing restored data. Production recovery must verify this explicitly.
 
-## Monitoring and incident handling
+## Rollback and incident handling
 
-Monitor HTTP 5xx, authentication failures, database growth, retention-task failures, disk capacity and rate-limit frequency through host tooling without logging request bodies or credentials. Record alert destination and test delivery. On suspected unauthorized access, restrict public/admin access, preserve a minimal incident record under an explicit retention basis, rotate affected credentials, and investigate actual exposure. Do not upload evidence to external agents.
+Record approved code and dependency versions. Restore backups only with a verified schema-compatible recovery plan; rolling back code does not imply rolling back data. Before release, exercise restore, schema integrity, authentication rejection, retention, health failure/recovery and service restart against synthetic data. On suspected exposure, restrict access, rotate affected credentials, preserve a minimal authorized incident record, and investigate. Monitor readiness/5xx, storage capacity, failed authentication and failed maintenance without recording credentials or form bodies.
 
-## Outstanding host evidence
-
-Docker worker execution and egress controls, browser rendering/accessibility, live TLS/proxy identity, scheduled retention, backup restoration, and rollback remain unverified in this workspace. These are release blockers, not documentation-complete checkboxes.
+Local tests verify these code paths. Actual host TLS, external snapshot expiry, proxy identity, alert delivery and deployment rollback require host-specific evidence; they are not implied by unit-test success.

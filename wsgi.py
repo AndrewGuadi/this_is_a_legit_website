@@ -6,6 +6,7 @@ import time
 from pathlib import Path
 from app import create_app
 from preflight import check
+from deployment.maintenance import heartbeat_fresh
 
 
 class HealthMiddleware:
@@ -15,11 +16,13 @@ class HealthMiddleware:
             return self.app(environ,start_response)
         okay=False
         try:
-            with sqlite3.connect(Path(self.app.config['DB_PATH']).resolve().as_uri()+'?mode=ro',uri=True,timeout=2) as conn:
-                conn.execute('SELECT 1 FROM events LIMIT 1').fetchall()
-            heartbeat=Path(self.app.config['DB_PATH']).parent/'retention-heartbeat.json'
-            age=time.time()-json.loads(heartbeat.read_text())['last_success']
-            okay=0<=age<=3600
+            with sqlite3.connect(Path(self.app.config['DB_PATH']).resolve().as_uri()+'?mode=rw',uri=True,timeout=2) as conn:
+                conn.execute('BEGIN IMMEDIATE')
+                conn.execute('CREATE TABLE IF NOT EXISTS readiness_probe (value INTEGER)')
+                conn.execute('INSERT INTO readiness_probe VALUES (1)')
+                capacity=conn.execute('SELECT count(*) FROM events').fetchone()[0]<self.app.config['MAX_EVENTS']
+                conn.rollback()
+            okay=capacity and heartbeat_fresh(self.app.config['DB_PATH'])
         except (OSError,ValueError,KeyError,sqlite3.Error,TypeError):
             pass
         body=b'{"status":"ok"}' if okay else b'{"status":"unavailable"}'

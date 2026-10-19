@@ -1,16 +1,21 @@
-"""Explicit SQLite online backup/restore operations, no production data export by default."""
+"""Private online copies with bounded expiry and explicit session-revoking restore."""
 import argparse
+import json
 import os
 import sqlite3
+import time
 from pathlib import Path
 
 
-def backup(source, destination):
+def manifest_path(path):
+    return Path(str(path)+'.manifest.json')
+
+
+def _copy(source, destination):
     source=Path(source).resolve(); destination=Path(destination).resolve()
-    if source==destination or destination.exists():
+    if source==destination or destination.exists() or manifest_path(destination).exists():
         raise ValueError('Destination must be new and different from source')
-    if not source.is_file():
-        raise ValueError('Source database does not exist')
+    if not source.is_file(): raise ValueError('Source database does not exist')
     destination.parent.mkdir(parents=True,exist_ok=True)
     fd=os.open(destination,os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600); os.close(fd)
     try:
@@ -21,9 +26,55 @@ def backup(source, destination):
     except BaseException:
         destination.unlink(missing_ok=True)
         raise
+    return destination
+
+
+def backup(source, destination, retention_seconds=86400):
+    if not 1<=retention_seconds<=86400: raise ValueError('Backup retention must be 1..86400 seconds')
+    dest=_copy(source,destination)
+    try:
+        now=time.time()
+        with os.fdopen(os.open(manifest_path(dest),os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600),'w') as stream:
+            json.dump({'version':1,'created_at':now,'expires_at':now+retention_seconds},stream)
+    except BaseException:
+        dest.unlink(missing_ok=True)
+        raise
+
+
+def _expiry(source):
+    data=json.loads(manifest_path(source).read_text())
+    created=float(data['created_at']); expires=float(data['expires_at'])
+    if data['version']!=1 or not 0<expires-created<=86400 or created>time.time():
+        raise ValueError('Invalid backup manifest')
+    return expires
+
+
+def restore(source,destination):
+    if _expiry(source)<=time.time(): raise ValueError('Backup has expired')
+    dest=_copy(source,destination)
+    try:
+        with sqlite3.connect(dest) as conn:
+            conn.execute('DELETE FROM admin_sessions')
+    except BaseException:
+        dest.unlink(missing_ok=True)
+        raise
+
+
+def purge_expired(directory):
+    """Only the dedicated backup directory is managed. Unknown/corrupt copies fail closed."""
+    directory=Path(directory)
+    if not directory.exists(): return
+    for source in directory.iterdir():
+        if not source.is_file() or source.name.endswith('.manifest.json'): continue
+        try: expired=_expiry(source)<=time.time()
+        except (OSError,ValueError,KeyError,TypeError): expired=True
+        if expired:
+            source.unlink(missing_ok=True)
+            manifest_path(source).unlink(missing_ok=True)
+
 
 if __name__=='__main__':
-    parser=argparse.ArgumentParser(description='Create a new private backup or restore into a new destination. Never overwrites an existing DB.')
-    parser.add_argument('source'); parser.add_argument('destination')
-    args=parser.parse_args(); backup(args.source,args.destination)
-    print('Private database copy created and integrity verified. Apply documented retention to this copy.')
+    parser=argparse.ArgumentParser(description='Private expiring backup or session-revoking restore into a new destination')
+    parser.add_argument('action',choices=['backup','restore']); parser.add_argument('source'); parser.add_argument('destination')
+    args=parser.parse_args(); globals()[args.action](args.source,args.destination)
+    print('Operation complete; database integrity verified.')
