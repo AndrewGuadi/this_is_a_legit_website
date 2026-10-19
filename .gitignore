@@ -218,3 +218,7 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Isolated agent artifacts and local evidence
+.agent-results/
+*.sqlite3*

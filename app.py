@@ -7,10 +7,11 @@ import secrets
 import sqlite3
 import time
 from pathlib import Path
-from flask import Flask, abort, jsonify, make_response, render_template_string, request
+from datetime import datetime, timezone, timedelta
+from flask import Flask, abort, jsonify, make_response, render_template, request, session, redirect, url_for
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 
-VERSION = '2026-10-19-v1'
+VERSION = '2026-10-19-v2'
 POLICY = '''This is a form-interaction research website operated by Authentic Dynamics LLC.
 No employment, grant, purchase, or service is offered through these forms. Use synthetic test details only.
 Public pages may be read and indexed. Automated submissions require prior written operator permission;
@@ -19,7 +20,8 @@ We record submission attempts for abuse analysis: UTC time, form type, field len
 consent checkbox state, terms version, elapsed time, HTTP outcome, and a pseudonymous network identifier.
 The identifier is an HMAC of the server-observed address; raw addresses and submitted names, emails, and
 messages are not stored by this application. The user-agent header is retained, limited to 300 characters.
-We use no advertising trackers, cross-site cookies, or device fingerprinting. Records expire after 30 days.
+We use no advertising trackers, cross-site cookies, or device fingerprinting. Records expire after 30 days. Rate-limited attempts are counted per pseudonymous network and minute;
+these aggregate counts expire after 24 hours. They are separate from submission records.
 Hosting providers may separately process access logs and IP addresses. No records are sold or published.
 A checked box records a request's assertion, not proof of identity, human consent, operator authority, or a legal violation.
 For privacy questions or deletion requests, use the operator contact configured on this page and include your receipt ID.
@@ -31,7 +33,8 @@ def create_app(config=None):
     app.config.update(SECRET_KEY=os.environ.get('SECRET_KEY'), ADMIN_TOKEN=os.environ.get('ADMIN_TOKEN'),
         NETWORK_KEY=os.environ.get('NETWORK_KEY'), DB_PATH=os.environ.get('DB_PATH', str(Path(__file__).parent / 'instance/events.sqlite3')),
         PUBLIC_URL=os.environ.get('PUBLIC_URL', '').rstrip('/'), CONTACT=os.environ.get('PRIVACY_CONTACT', ''),
-        MAX_CONTENT_LENGTH=16384)
+        MAX_CONTENT_LENGTH=16384, SESSION_COOKIE_HTTPONLY=True, SESSION_COOKIE_SAMESITE="Strict",
+        SESSION_COOKIE_SECURE=True, PERMANENT_SESSION_LIFETIME=timedelta(minutes=30))
     if config:
         app.config.update(config)
     for key in ('SECRET_KEY', 'NETWORK_KEY', 'ADMIN_TOKEN'):
@@ -46,32 +49,67 @@ def create_app(config=None):
         conn.execute('CREATE TABLE IF NOT EXISTS events (id TEXT PRIMARY KEY, at INTEGER, network TEXT, data TEXT)')
         conn.execute('CREATE INDEX IF NOT EXISTS events_at ON events(at)')
         conn.execute('CREATE TABLE IF NOT EXISTS used_tokens (nonce TEXT PRIMARY KEY, at INTEGER)')
+        conn.execute('CREATE TABLE IF NOT EXISTS rate_limits (bucket TEXT, at INTEGER)')
+        conn.execute('CREATE INDEX IF NOT EXISTS rates_bucket_at ON rate_limits(bucket, at)')
+        conn.execute('CREATE TABLE IF NOT EXISTS blocked_attempts (network TEXT, window INTEGER, count INTEGER, PRIMARY KEY(network,window))')
     signer = URLSafeTimedSerializer(app.config['SECRET_KEY'], salt='form-v1')
     def purge(conn):
         conn.execute('DELETE FROM events WHERE at < ?', (int(time.time())-30*86400,))
         conn.execute('DELETE FROM used_tokens WHERE at < ?', (int(time.time())-7200,))
+        conn.execute('DELETE FROM rate_limits WHERE at < ?', (int(time.time())-3600,))
+        conn.execute('DELETE FROM blocked_attempts WHERE window < ?', (int(time.time())-86400,))
     def network():
         # Deliberately do NOT trust arbitrary X-Forwarded-For headers.
         return hmac.new(app.config['NETWORK_KEY'].encode(), (request.remote_addr or 'unknown').encode(), hashlib.sha256).hexdigest()
     def record(kind, outcome, signals):
         receipt = secrets.token_hex(16)
-        data = dict(form=kind, outcome=outcome, terms_version=VERSION, terms_sha256=POLICY_HASH,
+        data = dict(schema_version=1, authorization_status="not_verified", form=kind, outcome=outcome, terms_version=VERSION, terms_sha256=POLICY_HASH,
                     user_agent=request.headers.get('User-Agent', '')[:300], **signals)
         with db() as conn:
             purge(conn)
             conn.execute('INSERT INTO events VALUES (?,?,?,?)', (receipt, int(time.time()), network(), json.dumps(data)))
         return receipt
     def page(body, **kwargs):
-        return render_template_string(SHELL, body=body, contact=app.config['CONTACT'], **kwargs)
+        return render_template('public.html', body=body, contact=app.config['CONTACT'], **kwargs)
     @app.after_request
     def headers(response):
-        response.headers['Content-Security-Policy'] = "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'"
+        response.headers['Content-Security-Policy'] = "default-src 'none'; style-src 'self'; script-src 'self'; img-src 'self' data:; form-action 'self'; base-uri 'none'; frame-ancestors 'none'"
         response.headers['X-Content-Type-Options'] = 'nosniff'
         response.headers['Referrer-Policy'] = 'no-referrer'
         response.headers['Cache-Control'] = 'no-store'
         if request.path.startswith('/admin'):
             response.headers['X-Robots-Tag'] = 'noindex, nofollow'
+        if request.is_secure:
+            response.headers['Strict-Transport-Security'] = 'max-age=31536000'
+        response.headers['Permissions-Policy'] = 'camera=(), microphone=(), geolocation=()'
         return response
+    def limited(bucket, maximum, seconds):
+        # Serialize reservation, not just counting: concurrent requests cannot overshoot.
+        with db() as conn:
+            conn.execute('BEGIN IMMEDIATE')
+            purge(conn)
+            now = int(time.time())
+            count = conn.execute('SELECT COUNT(*) FROM rate_limits WHERE bucket=? AND at>?', (bucket, now-seconds)).fetchone()[0]
+            if count >= maximum:
+                if bucket.startswith('submit:'):
+                    conn.execute('INSERT INTO blocked_attempts VALUES (?,?,1) ON CONFLICT(network,window) DO UPDATE SET count=count+1', (bucket[7:],now//60*60))
+                return True
+            conn.execute('INSERT INTO rate_limits VALUES (?,?)', (bucket, now))
+        return False
+    def request_error(error):
+        messages={400:('Check this request.','The request could not be verified. Refresh the form or check your date filters and try again.'),
+            401:('Authentication required.','An operator credential is required to access this resource.'),
+            403:('Access unavailable.','This request is not permitted.'),
+            404:('Page not found.','That page or observation is not available. Return home to continue.'),
+            405:('Request method unavailable.','Please use the controls on the page to perform this action.'),
+            413:('This submission is too large.','Please shorten your test content and submit a smaller form.'),
+            429:('A short pause.','Too many attempts. Please wait one minute before trying again.')}
+        title,message=messages[error.code]
+        response=make_response(page('error',title=title,message=message),error.code)
+        if error.code==429: response.headers['Retry-After']='60'
+        return response
+    for code in (400,401,403,404,405,413,429):
+        app.register_error_handler(code,request_error)
     @app.get('/')
     def home():
         return page('home')
@@ -84,13 +122,10 @@ def create_app(config=None):
             abort(404)
         if request.method == 'GET':
             token = signer.dumps(dict(nonce=secrets.token_hex(24), issued=time.time(), kind=kind, version=VERSION))
-            return page('form', kind=kind, token=token)
+            return page('form', kind=kind, token=token, values={}, error=None)
         now = int(time.time())
-        with db() as conn:
-            purge(conn)
-            count = conn.execute('SELECT COUNT(*) FROM events WHERE network=? AND at>?', (network(), now-60)).fetchone()[0]
-        if count >= 30:
-            response = make_response('Rate limit reached. Try again in one minute.', 429)
+        if limited('submit:'+network(), 30, 60):
+            response = make_response(page('error',title='A short pause.',message='Too many submission attempts. Please wait one minute before trying again.'), 429)
             response.headers['Retry-After'] = '60'
             return response
         fields = request.form
@@ -109,14 +144,120 @@ def create_app(config=None):
             status, outcome = 400, 'invalid_or_expired_form_token'
         except sqlite3.IntegrityError:
             status, outcome = 409, 'replayed_form_token'
-        if status == 200 and (not signals['consent_asserted'] or not fields.get('name') or not fields.get('message') or signals['automation_declared']=='unspecified'):
+        if status == 200 and (not signals['consent_asserted'] or not fields.get('name','').strip() or not fields.get('message','').strip() or signals['automation_declared']=='unspecified'):
             status, outcome = 400, 'missing_required_fields_or_acceptance'
+        if status == 200 and any(signals['field_lengths'][k] > limit for k,limit in [('name',120),('email',254),('message',2000)]):
+            status, outcome = 400, 'field_length_exceeded'
         receipt = record(kind, outcome, signals)
+        if status != 200:
+            token = signer.dumps(dict(nonce=secrets.token_hex(24), issued=time.time(), kind=kind, version=VERSION))
+            errors = {
+                'invalid_or_expired_form_token':'This form expired or could not be verified. Please review your entries and submit again.',
+                'replayed_form_token':'This form was already submitted. A new form token is ready if you intend another test.',
+                'missing_required_fields_or_acceptance':'Complete the test name, sample application, method, and terms acceptance.',
+                'field_length_exceeded':'Keep the name under 121 characters, email under 255, and application under 2001.',
+            }
+            # Reflect values only into this escaped response; never store them in logs or session.
+            values={key:fields.get(key,'') for key in ('name','email','message','automation','consent')}
+            return page('form',kind=kind,token=token,values=values,error=errors[outcome],receipt=receipt,outcome=outcome),status
         return page('receipt', receipt=receipt, outcome=outcome), status
     def authenticate():
         expected = 'Bearer ' + app.config['ADMIN_TOKEN']
-        if not hmac.compare_digest(request.headers.get('Authorization',''), expected):
+        if not hmac.compare_digest(request.headers.get('Authorization','').encode(), expected.encode()):
             abort(401)
+    def csrf():
+        if 'csrf_token' not in session:
+            session['csrf_token'] = secrets.token_urlsafe(32)
+        return session['csrf_token']
+    def check_csrf():
+        if not session.get('csrf_token') or not hmac.compare_digest(session['csrf_token'].encode(),request.form.get('csrf_token','').encode()):
+            abort(400)
+    def signed_in():
+        return session.get('admin') is True
+    def event_rows(page_number=None):
+        filters = {key:request.args.get(key,'') for key in ('form','outcome','since','until')}
+        where, args = [], []
+        for key in ('form','outcome'):
+            if filters[key]:
+                where.append("json_extract(data, '$."+key+"')=?")
+                args.append(filters[key])
+        for key,op in [('since','>='),('until','<')]:
+            if filters[key]:
+                try:
+                    date=datetime.strptime(filters[key],'%Y-%m-%d').replace(tzinfo=timezone.utc)
+                except ValueError:
+                    abort(400)
+                if key=='until':
+                    try: date += timedelta(days=1)
+                    except OverflowError: abort(400)
+                where.append('at'+op+'?'); args.append(int(date.timestamp()))
+        clause = ' WHERE '+' AND '.join(where) if where else ''
+        with db() as conn:
+            purge(conn)
+            counts=conn.execute("SELECT COUNT(*),COALESCE(SUM(json_extract(data,'$.outcome')='recorded'),0),COALESCE(SUM(json_extract(data,'$.automation_declared')='automated'),0) FROM events"+clause,args).fetchone()
+            total,recorded,automated=counts
+            total_pages=max(1,(total+24)//25)
+            page_number=min(page_number,total_pages) if page_number is not None else None
+            limit=' LIMIT 25 OFFSET ?' if page_number is not None else ' LIMIT 1000'
+            row_args=args+[(page_number-1)*25] if page_number is not None else args
+            rows=conn.execute('SELECT id,at,network,data FROM events'+clause+' ORDER BY at DESC,id DESC'+limit,row_args).fetchall()
+        with db() as conn:
+            blocked=conn.execute('SELECT COALESCE(SUM(count),0) FROM blocked_attempts').fetchone()[0]
+        summary=dict(total=total,recorded=recorded,rejected=total-recorded,automated=automated,rate_limited=blocked)
+        return [dict(receipt=id,timestamp_utc=at,timestamp_display=datetime.fromtimestamp(at,timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),network_hmac=net,**json.loads(data)) for id,at,net,data in rows], filters, summary, page_number, total_pages
+    @app.route('/admin/login',methods=['GET','POST'])
+    def admin_login():
+        error=None
+        status=200
+        if request.method=='POST':
+            check_csrf()
+            if limited('login:'+network(),5,900):
+                return render_template('admin.html',view='login',csrf_token=csrf(),error='Too many attempts. Try again in 15 minutes.'),429,{'Retry-After':'900'}
+            if hmac.compare_digest(request.form.get('token','').encode(),app.config['ADMIN_TOKEN'].encode()):
+                session.clear(); session['admin']=True; session.permanent=True; csrf()
+                return redirect(url_for('admin_overview'))
+            error='The operator credential was not accepted.'; status=401
+        return render_template('admin.html',view='login',csrf_token=csrf(),error=error),status
+    @app.post('/admin/logout')
+    def admin_logout():
+        check_csrf(); session.clear()
+        return redirect(url_for('admin_login'))
+    @app.get('/admin')
+    @app.get('/admin/')
+    def admin_overview():
+        if not signed_in(): return redirect(url_for('admin_login'))
+        try: page_number=max(1,int(request.args.get('page','1')))
+        except ValueError: abort(400)
+        rows,filters,summary,page_number,total_pages=event_rows(page_number)
+        return render_template('admin.html',view='overview',csrf_token=csrf(),rows=rows,
+            total=summary['total'],page_number=page_number,total_pages=total_pages,filters=filters,summary=summary)
+    @app.get('/admin/record/<receipt>')
+    def admin_detail(receipt):
+        if not signed_in(): return redirect(url_for('admin_login'))
+        with db() as conn:
+            purge(conn)
+            row=conn.execute('SELECT id,at,network,data FROM events WHERE id=?',(receipt,)).fetchone()
+        if not row: abort(404)
+        id,at,net,data=row
+        event=dict(receipt=id,timestamp_utc=at,timestamp_display=datetime.fromtimestamp(at,timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),network_hmac=net,**json.loads(data))
+        return render_template('admin.html',view='detail',csrf_token=csrf(),event=event)
+    @app.post('/admin/record/<receipt>/delete')
+    def admin_delete(receipt):
+        if not signed_in(): return redirect(url_for('admin_login'))
+        check_csrf()
+        if request.form.get('confirm') != 'yes': abort(400)
+        with db() as conn:
+            conn.execute('DELETE FROM events WHERE id=?',(receipt,))
+        return redirect(url_for('admin_overview'))
+    @app.get('/admin/export')
+    def admin_export():
+        if not signed_in(): return redirect(url_for('admin_login'))
+        rows,_,summary,*_=event_rows()
+        response=jsonify(rows)
+        response.headers['X-Export-Total']=str(summary['total'])
+        response.headers['X-Export-Truncated']='true' if summary['total']>len(rows) else 'false'
+        response.headers['Content-Disposition']='attachment; filename="observation-events.json"'
+        return response
     @app.get('/admin/events')
     def events():
         authenticate()
@@ -151,14 +292,3 @@ def create_app(config=None):
             purge(conn)
         print('Expired records removed.')
     return app
-
-SHELL = '''<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>This Is a Legit Website | Form interaction research</title><meta name="description" content="An open form-interaction research project. Explore directory, partnership and contact demonstration forms using synthetic details."><style>
-:root{color-scheme:light;--ink:#142c2a;--paper:#f4f3ec;--line:#d0d6cd;--accent:#d4ed8c}*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font:17px/1.6 system-ui,sans-serif}a{color:inherit}header,main,footer{max-width:1180px;margin:auto;padding:28px 32px}header{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);gap:20px}.brand{font-weight:800;text-decoration:none;letter-spacing:-.04em}.tag{font:12px monospace;text-transform:uppercase;letter-spacing:.14em}nav{display:flex;gap:22px}h1{font-size:clamp(42px,7vw,92px);line-height:1.03;letter-spacing:-.065em;max-width:900px;font-weight:650;margin:26px 0}h2{font-size:26px;line-height:1.2;letter-spacing:-.035em}p{max-width:690px}.intro{font-size:21px;color:#4d625c;max-width:620px}.hero{padding:42px 0 52px}.notice{border-left:4px solid #668544;padding:16px 20px;background:#e7ecd9;font-size:14px}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:36px 0}.card{padding:28px;border:1px solid var(--line);border-radius:14px;background:#fffefa;display:flex;flex-direction:column}.card p{flex:1;color:#4d625c}.button,button{display:inline-block;background:var(--ink);color:white;border:0;border-radius:8px;padding:13px 22px;text-decoration:none;font:600 15px system-ui;cursor:pointer}.button:hover,button:hover{background:#315d4e}form{max-width:680px;background:#fffefa;border:1px solid var(--line);border-radius:16px;padding:30px;margin:30px 0}label{display:block;font-weight:600;margin:18px 0 6px}input,textarea,select{width:100%;padding:13px;border:1px solid #879c91;border-radius:6px;background:white;color:var(--ink);font:inherit}input[type=checkbox]{width:auto;margin-right:8px}input:focus,textarea:focus,select:focus,a:focus,button:focus{outline:3px solid #89a64b;outline-offset:3px}.trap{position:absolute;left:-10000px;width:1px;height:1px;overflow:hidden}footer{font-size:13px;color:#52645b;border-top:1px solid var(--line);margin-top:55px}.policy{white-space:pre-wrap;max-width:850px;font:inherit}.small{font-size:13px;overflow-wrap:anywhere}.receipt{padding:28px;background:var(--accent);border-radius:14px;overflow-wrap:anywhere}@media(max-width:720px){header,main,footer{padding:22px}.cards{grid-template-columns:1fr}nav{font-size:13px}form{padding:20px}}
-</style></head><body><header><a class="brand" href="/">this is a legit website<span aria-hidden="true"> ↗</span></a><nav><a href="/apply/directory">Apply</a><a href="/terms">Terms & privacy</a></nav></header><main>
-{% if body == 'home' %}<section class="hero"><div class="tag">Independent web research / 001</div><h1>A little less friction.<br>A lot more understanding.</h1><p class="intro">Simple forms. Open pages. A closer look at how people and automated systems interact with the web.</p><a class="button" href="/apply/directory">Explore the application →</a></section>{% endif %}
-<aside class="notice"><strong>Research demonstration.</strong> These forms do not offer jobs, funding, or services. Use synthetic details only. Submission metadata is recorded for 30 days. <a href="/terms">Read the research notice and rules</a>.</aside>
-{% if body == 'home' %}<div class="cards"><article class="card"><div class="tag">01 / Directory</div><h2>Submit a listing</h2><p>A familiar business-directory application, with a short profile and an area of interest.</p><a href="/apply/directory">Open directory form →</a></article><article class="card"><div class="tag">02 / Partnerships</div><h2>Start a conversation</h2><p>Try a partnership inquiry with a fictional organization and a sample introduction.</p><a href="/apply/partner">Open partnership form →</a></article><article class="card"><div class="tag">03 / Contact</div><h2>Send a test inquiry</h2><p>A straightforward contact flow for studying form interaction and submission patterns.</p><a href="/apply/contact">Open contact form →</a></article></div><h2>Open to reading. Clear about submitting.</h2><p>Our public pages are available for browsing and indexing. Automated submissions require prior written permission from the operator. All visitors see the same content.</p>
-{% elif body == 'form' %}<h1 style="font-size:52px">{{ kind|capitalize }} application.</h1><p>Use a fictional name and test content. No application will be processed as a commercial request.</p><form method="post"><input type="hidden" name="token" value="{{ token }}"><label for="name">Test name / organization</label><input id="name" name="name" maxlength="120" required autocomplete="off" placeholder="Example Company"><label for="email">Test email (optional)</label><input type="email" id="email" name="email" maxlength="254" placeholder="example@example.com" autocomplete="off"><label for="message">Sample application</label><textarea id="message" name="message" maxlength="2000" rows="5" required placeholder="Describe a fictional request."></textarea><label for="automation">How are you completing this form?</label><select name="automation" id="automation" required><option value="">Select one</option><option value="human">Manually</option><option value="assisted">With an assistant</option><option value="automated">Automatically</option></select><div class="trap" aria-hidden="true"><label for="fax">Leave blank</label><input id="fax" name="fax" tabindex="-1" autocomplete="off"></div><label><input type="checkbox" name="consent" value="yes" required>I have read and accept the <a href="/terms">terms and privacy notice</a>, including submission metadata logging.</label><p class="small">Automation requires prior written permission. Acceptance is recorded; it does not independently verify identity or authority.</p><button type="submit">Submit test application →</button></form>
-{% elif body == 'terms' %}<h1 style="font-size:52px">Terms & privacy.</h1><p>Version {{ version }}</p><div class="policy">{{ policy }}</div><p class="small">Policy SHA-256: {{ digest }}</p>
-{% elif body == 'receipt' %}<h1 style="font-size:52px">Submission receipt.</h1><div class="receipt"><strong>{{ outcome|replace('_',' ')|capitalize }}</strong><p>Receipt: {{ receipt }}</p></div><p>This is a research record, not confirmation of a real application. Submitted names, email addresses and message contents were not retained by this application.</p><a href="/">Return home →</a>{% endif %}
-</main><footer>© Authentic Dynamics LLC · Form-interaction research · <a href="/terms">Terms & privacy</a>{% if contact %}<p>Privacy contact: {{ contact }}</p>{% else %}<p>Preview configuration — operator contact must be set before public launch.</p>{% endif %}</footer></body></html>'''

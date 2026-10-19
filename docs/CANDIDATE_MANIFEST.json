@@ -1,0 +1,16 @@
+{
+  "README.md": "d7090f60744b81b64b67c3f86c014ad2364a2cfee4dec7e030b0ba7ad9cc622b",
+  "app.py": "68c094d69bea096e96a1dea6340c80f7d94dc2660ab940d01c54175661fd33d9",
+  "orchestration/README.md": "4a7d0d18a6cf4e520f83b3ae42d8f0987f4078e58a88fd14549d38c74fdbbd14",
+  "orchestration/run_task.py": "4068bfed0aa211b7064a0d33d28b3eab4f0c9015cd14dbec0c34d99da7d3beb7",
+  "orchestration/tasks.json": "843ec676d46c1833856b20e5962dbe2d8988b51214a934dd7ca49dacbc4a00e4",
+  "orchestration/test_runner.py": "a48f4d71ed46b127b44408f21382aa031431d724a34dbf50e2bb91953e6e63c5",
+  "preflight.py": "c6bc07a1011f7ab018b916fe9c3af5241ce519e5e76f4badbc0969eeff2f672b",
+  "requirements.txt": "e9eae9074f097c101b125118dcd281694b2df5425064ab983bb2ca54cf50bea3",
+  "static/forms.js": "c413c183b1cd95e733935ab311a6ad2763eb5ffc4bc1445b6804b9f3f3b04353",
+  "static/site.css": "d0966828cc42ad3da1ce4c2bf0963ae7dc828b86bb2ef67bdef9ea6a5dc7b656",
+  "templates/admin.html": "0c71f3742dd4acfeb1c2a38a86faf8455e7f5b469896ead23d8b0a85c939a049",
+  "templates/public.html": "1ae50be5fa76f2515b8827e7f567f766af61811d27a618e6c4a61d5f2f94cf4d",
+  "test_app.py": "38a24878c0ad493221c43d9aa757de61c356042181f86849e52f4b93d9e5a18f",
+  "test_preflight.py": "d3d24309a0275a23cdff24cb26dabb601c000f233e15d8498edb437cdcc8f403"
+}

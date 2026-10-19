@@ -19,7 +19,7 @@ Start local development with `flask --app app:create_app run`. For PythonAnywher
 
 ## Evidence
 
-`GET /admin/events` returns up to 1,000 most recent events with `Authorization: Bearer <ADMIN_TOKEN>`. `DELETE /admin/events/<receipt>` removes an event using the same authentication. No browser-accessible public dashboard exists. The export includes timestamps, receipt IDs, network HMACs, limited user-agent strings, form identifiers, terms version/hash, checkbox state, field lengths, timing, declared automation, and whether the honeypot was filled. Submitted names, email addresses, message text, raw IPs, URL query parameters, and referrers are not persisted by this app. Headers are untrusted client claims; they are not identity proof.
+`GET /admin/events` returns up to 1,000 most recent events with `Authorization: Bearer <ADMIN_TOKEN>`. `DELETE /admin/events/<receipt>` removes an event using the same authentication. A private investigator interface is available at `/admin/login`. Sign in with the operator credential; session cookies are Secure, HttpOnly and SameSite=Strict with 30-minute lifetime. Use HTTPS. The dashboard supports form/outcome/UTC-date filtering, 25-record pages, event detail, filtered export and CSRF-protected deletion. The export includes timestamps, receipt IDs, network HMACs, limited user-agent strings, form identifiers, terms version/hash, checkbox state, field lengths, timing, declared automation, and whether the honeypot was filled. Submitted names, email addresses, message text, raw IPs, URL query parameters, and referrers are not persisted by this app. Headers are untrusted client claims; they are not identity proof.
 
 Missing/expired tokens, replayed tokens, and missing acceptance are recorded as rejected attempts, not accepted applications. Receipt text says what occurred. Hidden-field and fast-submission signals are not conclusive bot detection. Assisting technology and password managers may produce unusual behavior too. No finding is automatically labeled a legal violation.
 
@@ -32,11 +32,19 @@ Public pages are allowed in robots.txt. Automated form submissions require prior
 - Configure HTTPS and hosting access-log retention. Hosting logs may contain raw IP addresses independently of this app.
 - Schedule `flask --app app:create_app purge-events` daily in PythonAnywhere Tasks. Records older than 30 days are also removed during submissions and export. Include backups in the same retention/deletion policy; the application cannot erase host backups.
 - The code intentionally ignores untrusted forwarding headers. Verify `REMOTE_ADDR` on the chosen host. If it is a shared reverse proxy, network identifiers/rate limits will group visitors until a host-specific trusted-proxy configuration is implemented. Do not blindly trust X-Forwarded-For.
-- The basic limit is 30 recorded attempts per observed network per minute; concurrent requests can race. Configure an edge/body/rate limit for hostile traffic and protect admin routes there as well. This prototype is not a DDoS sink.
-- Export is limited to 1,000 recent records; use controlled database tooling for larger investigations. Store exports privately and apply the same retention policy.
+- The submission reservation limit is 30 attempts per observed network per minute, serialized with a SQLite write transaction. Login has a separate five-attempt/15-minute network bucket. Configure an edge/body/rate limit for hostile traffic and protect admin routes there as well. This prototype is not a DDoS sink.
+- Bearer export is limited to 1,000 recent records. Session-authenticated filtered export is also capped at 1,000; X-Export-Total and X-Export-Truncated headers indicate matched count and truncation. Use narrower date filters or controlled database tooling for larger investigations. Store exports privately and apply the same retention policy.
 - Change the immutable policy version whenever the policy changes and preserve prior policy text in Git history. Current records retain its digest.
 - No advertising identifiers, invasive fingerprinting, third-party tracking, outbound emails, uploaded documents, or visitor-controlled remote requests are implemented.
 
 ## Verification
 
-`python -m unittest -v` checks consent rejection, token replay protection, metadata minimization, evidence authorization, deletion, expiry cleanup, and sitemap behavior. Browser layout QA and production hosting are not yet verified. This implementation was authored directly in this session; OpenCode was not used.
+`python -m unittest -v` checks form rejection/recovery, replay protection, minimization, session/CSRF controls, login throttling, concurrency, filtering, bounded export, deletion, expiry, sitemap and configuration preflight. Run `python -m unittest discover -s orchestration -p 'test_*.py' -v` separately for offline candidate-review tests. Browser layout QA and production hosting are not yet verified. This implementation was authored directly in this session; OpenCode was not used.
+
+## Quality gate
+
+See docs/QUALITY_SCORECARD.md for ten independent fronts, each requiring 85/100; passing unit tests alone does not satisfy release approval. docs/RESEARCH_PROTOCOL.md defines the controlled study and attribution limits. docs/OPERATIONS.md documents host verification and recovery. The OpenCode execution path is disabled pending verified isolation/egress; offline candidate comparison is implemented.
+
+### Rate-limit accounting (policy 2026-10-19-v2)
+
+Requests blocked by the submission limit increment a bounded aggregate row per observed network HMAC/minute, retained for 24 hours. The dashboard shows this global count separately from its filtered event records; it is not a visitor denominator or proof of identity. Aggregates contain counts, timestamps and network HMAC only, no form bodies. Ordinary observation records retain the 30-day policy. Purge tasks handle both lifecycles.

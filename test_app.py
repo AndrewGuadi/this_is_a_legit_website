@@ -52,9 +52,122 @@ class ObservationTests(unittest.TestCase):
         for path in ('/','/terms','/apply/directory','/apply/partner','/apply/contact'):
             result = self.client.get(path)
             self.assertEqual(result.status_code,200)
-            self.assertIn(b'Research demonstration', result.data)
+            self.assertIn(b'research demonstration', result.data.lower())
         self.assertIn(b'https://example.com/apply/directory',self.client.get('/sitemap.xml').data)
         self.assertEqual(self.client.get('/apply/unknown').status_code,404)
+    def login(self):
+        self.client.get('/admin/login')
+        with self.client.session_transaction() as sess:
+            csrf = sess['csrf_token']
+        return self.client.post('/admin/login', data={'token':'a'*48,'csrf_token':csrf})
+    def test_session_security_and_filter_export(self):
+        self.assertEqual(self.client.get('/admin').status_code,302)
+        self.assertEqual(self.client.post('/admin/login',data={'token':'a'*48}).status_code,400)
+        self.assertEqual(self.login().status_code,302)
+        self.client.post('/apply/directory',data=self.data())
+        self.client.post('/apply/contact',data={})
+        export = self.client.get('/admin/export?form=directory')
+        self.assertEqual(export.status_code,200)
+        self.assertEqual(len(export.get_json()),1)
+        self.assertIn('attachment',export.headers['Content-Disposition'])
+        receipt = export.get_json()[0]['receipt']
+        self.assertEqual(self.client.post('/admin/record/'+receipt+'/delete').status_code,400)
+        with self.client.session_transaction() as sess:
+            csrf = sess['csrf_token']
+        self.assertEqual(self.client.post('/admin/record/'+receipt+'/delete',data={'csrf_token':csrf}).status_code,400)
+        self.assertEqual(len(self.events()),2)
+        self.assertEqual(self.client.post('/admin/record/'+receipt+'/delete',data={'csrf_token':csrf,'confirm':'yes'}).status_code,302)
+        self.assertEqual(len(self.events()),1)
+        self.assertEqual(self.client.post('/admin/logout',data={'csrf_token':csrf}).status_code,302)
+        self.assertEqual(self.client.get('/admin/export').status_code,302)
+    def test_server_field_limits_and_whitespace(self):
+        data=self.data(); data['name']='x'*121
+        self.assertEqual(self.client.post('/apply/directory',data=data).status_code,400)
+        data=self.data(); data['message']='   '
+        self.assertEqual(self.client.post('/apply/directory',data=data).status_code,400)
+    def test_login_throttle(self):
+        self.client.get('/admin/login')
+        with self.client.session_transaction() as sess:
+            csrf=sess['csrf_token']
+        for _ in range(5):
+            self.assertEqual(self.client.post('/admin/login',data={'token':'wrong','csrf_token':csrf}).status_code,401)
+        self.assertEqual(self.client.post('/admin/login',data={'token':'a'*48,'csrf_token':csrf}).status_code,429)
+
+    def test_date_filter_and_policy_evidence(self):
+        self.login()
+        self.client.post('/apply/directory',data=self.data())
+        rows=self.client.get('/admin/export?since=2000-01-01&until=2000-01-02').get_json()
+        self.assertEqual(rows,[])
+        self.assertEqual(self.client.get('/admin/export?since=nonsense').status_code,400)
+        self.assertEqual(self.client.get('/admin/export?until=9999-12-31').status_code,400)
+        row=self.events()[0]
+        self.assertEqual(row['schema_version'],1)
+        self.assertEqual(row['authorization_status'],'not_verified')
+        self.assertEqual(len(row['terms_sha256']),64)
+    def test_atomic_concurrent_submission_limit(self):
+        from concurrent.futures import ThreadPoolExecutor
+        def attempt(_):
+            with self.app.test_client() as client:
+                return client.post('/apply/contact',data={}).status_code
+        with ThreadPoolExecutor(max_workers=8) as pool:
+            statuses=list(pool.map(attempt,range(36)))
+        self.assertEqual(statuses.count(400),30)
+        self.assertEqual(statuses.count(429),6)
+        self.assertEqual(len(self.events()),30)
+    def test_unicode_auth_is_rejected_without_crash(self):
+        self.assertEqual(self.client.get('/admin/events',headers={'Authorization':'Bearer ☃'}).status_code,401)
+        self.client.get('/admin/login')
+        with self.client.session_transaction() as sess: csrf=sess['csrf_token']
+        self.assertEqual(self.client.post('/admin/login',data={'token':'☃','csrf_token':csrf}).status_code,401)
+
+    def test_export_cap_is_explicit(self):
+        self.login()
+        with sqlite3.connect(self.path) as conn:
+            conn.executemany('INSERT INTO events VALUES (?,?,?,?)',[(str(i),int(time.time()),'net','{}') for i in range(1005)])
+        result=self.client.get('/admin/export')
+        self.assertEqual(len(result.get_json()),1000)
+        self.assertEqual(result.headers['X-Export-Total'],'1005')
+        self.assertEqual(result.headers['X-Export-Truncated'],'true')
+    def test_invalid_form_preserves_escaped_values_and_reissues_token(self):
+        data=self.data(); data['name']='<script>alert(1)</script>'; data['message']=''
+        response=self.client.post('/apply/directory',data=data)
+        self.assertEqual(response.status_code,400)
+        html=response.get_data(as_text=True)
+        self.assertNotIn('<script>alert(1)</script>',html)
+        self.assertIn('&lt;script&gt;',html)
+        token=re.search(r'name="token" value="([^"]+)"',html).group(1)
+        self.assertNotEqual(token,data['token'])
+        data.update(token=token,message='Recovered')
+        self.assertEqual(self.client.post('/apply/directory',data=data).status_code,200)
+
+    def test_blocked_attempt_counter_and_retention(self):
+        for _ in range(33): self.client.post('/apply/contact',data={})
+        with sqlite3.connect(self.path) as conn:
+            self.assertEqual(conn.execute('SELECT SUM(count) FROM blocked_attempts').fetchone()[0],3)
+            conn.execute('INSERT INTO blocked_attempts VALUES (?,?,?)',('old',int(time.time())-90000,4))
+        self.login()
+        response=self.client.get('/admin')
+        self.assertEqual(response.status_code,200)
+        with sqlite3.connect(self.path) as conn:
+            self.assertEqual(conn.execute('SELECT SUM(count) FROM blocked_attempts').fetchone()[0],3)
+    def test_errors_have_recovery_ui_and_correct_status(self):
+        for path,method,expected in [('/unknown','get',404),('/admin/login','post',400)]:
+            response=getattr(self.client,method)(path)
+            self.assertEqual(response.status_code,expected)
+            self.assertIn(b'Return home',response.data)
+        response=self.client.post('/apply/contact',data={'message':'x'*20000})
+        self.assertEqual(response.status_code,413)
+        self.assertIn(b'Return home',response.data)
+        self.login()
+        response=self.client.get('/admin/export?since=bad')
+        self.assertEqual(response.status_code,400)
+        self.assertIn(b'Return home',response.data)
+        for _ in range(30): self.client.post('/apply/contact',data={})
+        response=self.client.post('/apply/contact',data={})
+        self.assertEqual(response.status_code,429)
+        self.assertEqual(response.headers['Retry-After'],'60')
+        self.assertIn(b'Return home',response.data)
+
     def test_rate_limit(self):
         for _ in range(30):
             self.client.post('/apply/directory',data={})
