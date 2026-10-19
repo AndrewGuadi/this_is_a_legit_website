@@ -241,6 +241,45 @@ class ObservationTests(unittest.TestCase):
         with sqlite3.connect(self.path) as conn:
             self.assertEqual(conn.execute('SELECT COUNT(*) FROM blocked_attempts').fetchone()[0],2)
 
+    def test_deletion_ledger_failure_preserves_event(self):
+        from unittest.mock import patch
+        self.client.post('/apply/directory',data=self.data())
+        receipt=self.events()[0]['receipt']
+        with patch('app.record_deletion',side_effect=OSError('private storage failure')):
+            response=self.client.delete('/admin/events/'+receipt,headers=self.auth)
+        self.assertEqual(response.status_code,503)
+        self.assertNotIn(b'private storage failure',response.data)
+        self.assertEqual(len(self.events()),1)
+    def test_deletion_ledger_precedes_delete_and_has_only_receipt_time(self):
+        from unittest.mock import patch
+        from app import record_deletion
+        self.client.post('/apply/directory',data=self.data())
+        receipt=self.events()[0]['receipt']
+        def verify_before_delete(path,item):
+            with sqlite3.connect(self.path) as conn:
+                self.assertIsNotNone(conn.execute('SELECT 1 FROM events WHERE id=?',(item,)).fetchone())
+            return record_deletion(path,item)
+        with patch('app.record_deletion',side_effect=verify_before_delete):
+            self.assertEqual(self.client.delete('/admin/events/'+receipt,headers=self.auth).status_code,204)
+        self.assertEqual(self.events(),[])
+        from app import default_ledger_path
+        with sqlite3.connect(default_ledger_path(self.path)) as conn:
+            self.assertEqual([r[1] for r in conn.execute('PRAGMA table_info(deletions)')],['receipt','at'])
+            self.assertEqual(conn.execute('SELECT receipt FROM deletions').fetchone()[0],receipt)
+    def test_concurrent_deletion_is_idempotent(self):
+        from concurrent.futures import ThreadPoolExecutor
+        from app import default_ledger_path
+        self.client.post('/apply/directory',data=self.data())
+        receipt=self.events()[0]['receipt']
+        def erase(_):
+            with self.app.test_client() as client:
+                return client.delete('/admin/events/'+receipt,headers=self.auth).status_code
+        with ThreadPoolExecutor(max_workers=4) as pool:
+            self.assertEqual(list(pool.map(erase,range(8))),[204]*8)
+        with sqlite3.connect(default_ledger_path(self.path)) as conn:
+            self.assertEqual(conn.execute('SELECT COUNT(*) FROM deletions').fetchone()[0],1)
+        self.assertEqual(self.events(),[])
+
     def test_rate_limit(self):
         for _ in range(30):
             self.client.post('/apply/directory',data={})

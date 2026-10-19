@@ -27,10 +27,10 @@ def main():
         startup=subprocess.Popen([sys.executable,'-c','from app import create_app; from deployment.maintenance import purge_once; purge_once(create_app())'])
         children.append(startup)
         try:
-            if startup.wait(timeout=30)!=0: return 1
+            if startup.wait(timeout=30)!=0: return 0 if stopping else 1
         except subprocess.TimeoutExpired:
             return 1
-        if stopping: return 1
+        if stopping: return 0
         children.clear()
         children.append(subprocess.Popen([sys.executable,'-m','deployment.maintenance']))
         children.append(subprocess.Popen([sys.executable,'-m','gunicorn','wsgi:build_application()',
@@ -39,7 +39,7 @@ def main():
         while not stopping and all(child.poll() is None for child in children):
             if not heartbeat_fresh(os.environ["DB_PATH"]): break
             time.sleep(.5)
-        return 1
+        return 0 if stopping else 1
     finally:
         stop()
         for child in children:

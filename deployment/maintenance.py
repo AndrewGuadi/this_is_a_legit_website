@@ -5,6 +5,7 @@ import time
 from pathlib import Path
 from app import create_app
 from deployment.backup import purge_expired
+from deployment.deletion_ledger import default_ledger_path, purge_ledger
 
 
 def interval_seconds():
@@ -25,6 +26,7 @@ def purge_once(app):
     if result.exit_code:
         raise RuntimeError('Retention task failed')
     purge_expired(Path(app.config['DB_PATH']).parent/'backups')
+    purge_ledger(default_ledger_path(app.config['DB_PATH']))
     heartbeat=Path(app.config['DB_PATH']).parent/'retention-heartbeat.json'
     pending=heartbeat.with_suffix('.tmp')
     pending.write_text(json.dumps({'last_success':time.time()}))

@@ -45,6 +45,6 @@ Public pages are allowed in robots.txt. Automated form submissions require prior
 
 See docs/QUALITY_SCORECARD.md for ten independent fronts, each requiring 85/100; passing unit tests alone does not satisfy release approval. docs/RESEARCH_PROTOCOL.md defines the controlled study and attribution limits. docs/OPERATIONS.md documents host verification and recovery. The OpenCode execution path is disabled pending verified isolation/egress; offline candidate comparison is implemented.
 
-### Rate-limit accounting (policy 2026-10-19-v3)
+### Rate-limit accounting (policy 2026-10-19-v4)
 
 Requests blocked by the submission limit increment a bounded aggregate row per observed network HMAC/minute, retained for 24 hours. The dashboard shows this global count separately from its filtered event records; it is not a visitor denominator or proof of identity. Aggregates contain counts, timestamps and network HMAC only, no form bodies. Ordinary observation records retain the 30-day policy. Purge tasks handle both lifecycles.

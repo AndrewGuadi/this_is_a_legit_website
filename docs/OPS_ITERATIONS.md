@@ -8,3 +8,7 @@
 6. Added regression checks for probe rollback and maintenance-driven backup expiry; updated runbook to require production wrapper and supervisor.
 
 Validation: `python -m unittest discover -s tests/operations -q`. Synthetic-only fixtures. Actual runtime/host fault tests remain distinct from these unit tests.
+
+7. Reviewer identified token/rate capacity false-ready responses. Three new regression tests first failed with HTTP 200 for exhausted token, rate-row and global-minute capacities; readiness now checks all three using request-time expiry semantics.
+
+8. Added receipt-only authoritative deletion ledger separate from observation snapshots. Restore tests first exposed missing replay and missing-ledger acceptance; restore now requires the manifest-bound current journal, replays tombstones, and rejects absent journals. 48-hour bounded receipt retention exceeds the 24-hour backup horizon. Durable concurrent writes precede application DELETE; helper closes connections explicitly.

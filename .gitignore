@@ -226,3 +226,6 @@ playwright-report/
 test-results/
 runtime-evidence/
 production-evidence/
+
+benchmark-evidence/
+production-evidence/

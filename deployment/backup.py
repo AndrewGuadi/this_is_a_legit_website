@@ -5,6 +5,7 @@ import os
 import sqlite3
 import time
 from pathlib import Path
+from deployment.deletion_ledger import initialize, default_ledger_path, apply_deletions
 
 
 def manifest_path(path):
@@ -31,11 +32,12 @@ def _copy(source, destination):
 
 def backup(source, destination, retention_seconds=86400):
     if not 1<=retention_seconds<=86400: raise ValueError('Backup retention must be 1..86400 seconds')
+    ledger_id=initialize(default_ledger_path(source))
     dest=_copy(source,destination)
     try:
         now=time.time()
         with os.fdopen(os.open(manifest_path(dest),os.O_WRONLY|os.O_CREAT|os.O_EXCL,0o600),'w') as stream:
-            json.dump({'version':1,'created_at':now,'expires_at':now+retention_seconds},stream)
+            json.dump({'version':1,'created_at':now,'expires_at':now+retention_seconds,'ledger_id':ledger_id},stream)
     except BaseException:
         dest.unlink(missing_ok=True)
         raise
@@ -49,12 +51,15 @@ def _expiry(source):
     return expires
 
 
-def restore(source,destination):
+def restore(source,destination,ledger_path=None):
+    if ledger_path is None: raise ValueError("Current authoritative ledger_path is required")
     if _expiry(source)<=time.time(): raise ValueError('Backup has expired')
     dest=_copy(source,destination)
     try:
         with sqlite3.connect(dest) as conn:
             conn.execute('DELETE FROM admin_sessions')
+            identity=json.loads(manifest_path(source).read_text())['ledger_id']
+            apply_deletions(conn,ledger_path,identity)
     except BaseException:
         dest.unlink(missing_ok=True)
         raise
@@ -76,5 +81,8 @@ def purge_expired(directory):
 if __name__=='__main__':
     parser=argparse.ArgumentParser(description='Private expiring backup or session-revoking restore into a new destination')
     parser.add_argument('action',choices=['backup','restore']); parser.add_argument('source'); parser.add_argument('destination')
-    args=parser.parse_args(); globals()[args.action](args.source,args.destination)
+    parser.add_argument('--ledger',help='Required current authoritative deletion ledger for restore')
+    args=parser.parse_args()
+    if args.action=='restore': restore(args.source,args.destination,ledger_path=args.ledger)
+    else: backup(args.source,args.destination)
     print('Operation complete; database integrity verified.')

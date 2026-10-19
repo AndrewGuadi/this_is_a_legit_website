@@ -49,3 +49,11 @@ Final observed run: `python -m unittest -q` → `Ran 26 tests in 1.579s ... OK` 
 - Purge scheduling must run independently of traffic. Purge also happens during collection and investigator reads.
 - Existing databases already larger than a new cap are not silently trimmed. New collection pauses; the operator must deliberately manage them.
 - This work does not claim legal violation, operator identity, consent validity, or definitive bot classification from collected signals.
+
+## Iteration 4 — deletion-safe restore integration
+
+Added two regression tests before integration; both failed because no durable deletion helper was wired into the application. Both session-authenticated and bearer deletion now first commit a separate receipt-only tombstone journal, then delete the application record. Journal persistence failure returns safe 503 and leaves the observation intact. No application write lock is held while acquiring the separate journal lock. Unknown receipts remain idempotent and do not grow the journal.
+
+Added assertions that the journal's deletion table contains only receipt/time and that eight concurrent deletion calls return 204 with exactly one tombstone. Operations owns journal durability, 48-hour retention, capacity, and backup/restore identity validation. Application policy v4 discloses this narrowly scoped 48-hour deletion journal.
+
+Observed application/discovery run: `Ran 29 tests ... OK`. Re-executed the controlled HTTP benchmark after the policy/app change: 9/9 task traces matched. The result manifest contains the updated application digest and policy version.

@@ -12,9 +12,10 @@ from urllib.parse import urlsplit
 from datetime import datetime, timezone, timedelta
 from flask import Flask, abort, jsonify, make_response, render_template, request, session, redirect, url_for
 from werkzeug.exceptions import SecurityError
+from deployment.deletion_ledger import record_deletion, default_ledger_path
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 
-VERSION = '2026-10-19-v3'
+VERSION = '2026-10-19-v4'
 POLICY = '''This is a form-interaction research website operated by Authentic Dynamics LLC.
 No employment, grant, purchase, or service is offered through these forms. Use synthetic test details only.
 Public pages may be read and indexed. Automated submissions require prior written operator permission;
@@ -26,6 +27,8 @@ messages are not stored by this application. The user-agent header is retained, 
 We use no advertising trackers, cross-site cookies, or device fingerprinting. Records expire after 30 days. Rate-limited attempts are counted per pseudonymous network and minute;
 these aggregate counts expire after 24 hours. They are separate from submission records.
 Collection pauses when global resource limits are reached; observations are not a complete traffic census.
+After operator deletion, a separate journal keeps only the receipt identifier and deletion time for up to
+48 hours to prevent restoring deleted records from backups; it stores no submission or network metadata.
 Hosting providers may separately process access logs and IP addresses. No records are sold or published.
 A checked box records a request's assertion, not proof of identity, human consent, operator authority, or a legal violation.
 For privacy questions or deletion requests, use the operator contact configured on this page and include your receipt ID.
@@ -148,6 +151,7 @@ def create_app(config=None):
         response.headers['Retry-After']='60'
         return response
     app.register_error_handler(sqlite3.Error,unavailable)
+    app.register_error_handler(OSError,unavailable)
     app.register_error_handler(CollectionCapacity,unavailable)
     app.register_error_handler(503,unavailable)
     def request_error(error):
@@ -316,13 +320,21 @@ def create_app(config=None):
         id,at,net,data=row
         event=dict(receipt=id,timestamp_utc=at,timestamp_display=datetime.fromtimestamp(at,timezone.utc).strftime("%Y-%m-%d %H:%M:%S UTC"),network_hmac=net,**json.loads(data))
         return render_template('admin.html',view='detail',csrf_token=csrf(),event=event)
+    def erase_event(receipt):
+        # Journal commits before event deletion. No application write lock is held
+        # while acquiring the separate ledger lock, avoiding cross-file deadlocks.
+        with db() as conn:
+            exists=conn.execute('SELECT 1 FROM events WHERE id=?',(receipt,)).fetchone()
+        if exists:
+            record_deletion(default_ledger_path(app.config['DB_PATH']),receipt)
+            with db() as conn:
+                conn.execute('DELETE FROM events WHERE id=?',(receipt,))
     @app.post('/admin/record/<receipt>/delete')
     def admin_delete(receipt):
         if not signed_in(): return redirect(url_for('admin_login'))
         check_csrf()
         if request.form.get('confirm') != 'yes': abort(400)
-        with db() as conn:
-            conn.execute('DELETE FROM events WHERE id=?',(receipt,))
+        erase_event(receipt)
         return redirect(url_for('admin_overview'))
     @app.get('/admin/export')
     def admin_export():
@@ -343,8 +355,7 @@ def create_app(config=None):
     @app.delete('/admin/events/<receipt>')
     def delete(receipt):
         authenticate()
-        with db() as conn:
-            conn.execute('DELETE FROM events WHERE id=?', (receipt,))
+        erase_event(receipt)
         return '', 204
     @app.get('/robots.txt')
     def robots():

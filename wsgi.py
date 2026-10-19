@@ -20,7 +20,17 @@ class HealthMiddleware:
                 conn.execute('BEGIN IMMEDIATE')
                 conn.execute('CREATE TABLE IF NOT EXISTS readiness_probe (value INTEGER)')
                 conn.execute('INSERT INTO readiness_probe VALUES (1)')
-                capacity=conn.execute('SELECT count(*) FROM events').fetchone()[0]<self.app.config['MAX_EVENTS']
+                now=int(time.time())
+                # Match rows remaining after request-time purge; expired rows do not
+                # block readiness while waiting for the periodic maintenance tick.
+                limits=(('events','MAX_EVENTS',30*86400),
+                        ('used_tokens','MAX_USED_TOKENS',7200),
+                        ('rate_limits','MAX_RATE_ROWS',3600))
+                capacity=all(conn.execute(f'SELECT count(*) FROM {table} WHERE at >= ?',
+                    (now-lifetime,)).fetchone()[0]<self.app.config[key]
+                    for table,key,lifetime in limits)
+                global_count=conn.execute("SELECT count(*) FROM rate_limits WHERE bucket LIKE 'submit:%' AND at>?",(now-60,)).fetchone()[0]
+                capacity=capacity and global_count<self.app.config['GLOBAL_SUBMISSIONS_PER_MINUTE']
                 conn.rollback()
             okay=capacity and heartbeat_fresh(self.app.config['DB_PATH'])
         except (OSError,ValueError,KeyError,sqlite3.Error,TypeError):
