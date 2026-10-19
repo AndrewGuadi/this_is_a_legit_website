@@ -1,0 +1,40 @@
+{
+  "candidate_commit": "89b314be1a039ce6e35a3662d67560f037ac0fc6",
+  "ci_merge_commit": "05399128ad813390118a27214d18dfc17fd7a7cc",
+  "workflow_run": "https://github.com/AndrewGuadi/this_is_a_legit_website/actions/runs/39334188923",
+  "jobs": {
+    "application": "success",
+    "browser": "success",
+    "isolation": "success",
+    "production-image": "success"
+  },
+  "checks": {
+    "root_unittest_executions": 29,
+    "operations_test_executions_including_inherited_duplicates": 33,
+    "runner_tests": 8,
+    "transport_tests": 5,
+    "chromium_scenarios_four_widths": 44,
+    "synthetic_benchmark_tasks_matched": 9
+  },
+  "production": {
+    "image": "sha256:aadf6a562a73b10bd8bca335b6a41dd182fcf3ad9cfa9be0b798ad72cea3cc44",
+    "startup": true,
+    "readiness": true,
+    "persistence_after_restart": true,
+    "expired_fixture_deleted": true,
+    "fresh_fixture_preserved": true,
+    "graceful_shutdown_exit_code": 0,
+    "hung_maintenance_watchdog": true,
+    "watchdog_exit_code": 1,
+    "watchdog_seconds": 130.99,
+    "tls_verified": false,
+    "live_host_verified": false
+  },
+  "artifact_expiry": "2026-10-26",
+  "limitations": [
+    "All runtime data synthetic.",
+    "Chromium only, not actual screen-reader testing.",
+    "Offline Docker worker only; online OpenCode execution disabled.",
+    "No production hosting, TLS, proxy/log policy, external snapshot or alert delivery verification."
+  ]
+}

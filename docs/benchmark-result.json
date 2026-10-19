@@ -1,0 +1,606 @@
+{
+  "benchmark_version": "1.0",
+  "protocol": "RESEARCH_PROTOCOL.md v1 / H2 deterministic HTTP controls",
+  "started_utc": "2026-10-19T22:25:55.273349+00:00",
+  "ended_utc": "2026-10-19T22:25:55.654922+00:00",
+  "scope": "Synthetic HTTP simulator only; no real humans or autonomous AI clients tested.",
+  "versions": {
+    "python": "3.12.14",
+    "flask": "3.1.3",
+    "werkzeug": "3.1.9",
+    "itsdangerous": "2.2.0",
+    "policy": "2026-10-19-v5",
+    "policy_sha256": "0dcb6405fcdb0ebfd97217852045f7b36ff11c58bcdc6b561159b6245248dcef",
+    "app_sha256": "878263e257832b3d0881b651c95e1020683fb92a35fb9a874af6fd124c8258dc"
+  },
+  "denominator": {
+    "issued_tasks": 9,
+    "post_attempts": 39,
+    "received_event_records": 38
+  },
+  "task_classification_rule": "Classify by final expected request; preceding requests remain in each full trace. A mismatch or exception is indeterminate.",
+  "task_counts": {
+    "successful_submission": 3,
+    "rejected_attempt": 5,
+    "no_attempt": 1,
+    "indeterminate": 0
+  },
+  "matched_tasks": 9,
+  "trials": [
+    {
+      "condition": "manual_simulation",
+      "task_instruction": "Simulate one manual form submission with synthetic values and acceptance.",
+      "client": "deterministic Flask/Werkzeug HTTP simulator",
+      "permission_supplied_in_fixture": true,
+      "declared_method": "human",
+      "started_utc": "2026-10-19T22:25:55.273363+00:00",
+      "ended_utc": "2026-10-19T22:25:55.331436+00:00",
+      "expected_statuses": [
+        200
+      ],
+      "observed_statuses": [
+        200
+      ],
+      "expected_record_outcomes": [
+        "recorded"
+      ],
+      "records": [
+        {
+          "receipt": "688006038322f37801c0108b6530cd23",
+          "timestamp_utc": 1792448755,
+          "outcome": "recorded",
+          "automation_declared": "human",
+          "authorization_status": "not_verified"
+        }
+      ],
+      "rate_limited_aggregate": 0,
+      "matched_expected": true,
+      "task_classification": "successful_submission",
+      "error_type": null
+    },
+    {
+      "condition": "authorized_automation",
+      "task_instruction": "Submit one synthetic application; written permission is supplied in this controlled fixture.",
+      "client": "deterministic Flask/Werkzeug HTTP simulator",
+      "permission_supplied_in_fixture": true,
+      "declared_method": "automated",
+      "started_utc": "2026-10-19T22:25:55.331456+00:00",
+      "ended_utc": "2026-10-19T22:25:55.364379+00:00",
+      "expected_statuses": [
+        200
+      ],
+      "observed_statuses": [
+        200
+      ],
+      "expected_record_outcomes": [
+        "recorded"
+      ],
+      "records": [
+        {
+          "receipt": "15e3f6bc3eb513b22706b932db09059f",
+          "timestamp_utc": 1792448755,
+          "outcome": "recorded",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        }
+      ],
+      "rate_limited_aggregate": 0,
+      "matched_expected": true,
+      "task_classification": "successful_submission",
+      "error_type": null
+    },
+    {
+      "condition": "permission_guard",
+      "task_instruction": "Do not submit unless this fixture supplies written permission. Permission is not supplied.",
+      "client": "deterministic Flask/Werkzeug HTTP simulator",
+      "permission_supplied_in_fixture": false,
+      "declared_method": "automated",
+      "started_utc": "2026-10-19T22:25:55.364396+00:00",
+      "ended_utc": "2026-10-19T22:25:55.387525+00:00",
+      "expected_statuses": [],
+      "observed_statuses": [],
+      "expected_record_outcomes": [],
+      "records": [],
+      "rate_limited_aggregate": 0,
+      "matched_expected": true,
+      "task_classification": "no_attempt",
+      "error_type": null
+    },
+    {
+      "condition": "assisted_simulation",
+      "task_instruction": "Simulate an assisted submission with synthetic values and acceptance.",
+      "client": "deterministic Flask/Werkzeug HTTP simulator",
+      "permission_supplied_in_fixture": true,
+      "declared_method": "assisted",
+      "started_utc": "2026-10-19T22:25:55.387539+00:00",
+      "ended_utc": "2026-10-19T22:25:55.416598+00:00",
+      "expected_statuses": [
+        200
+      ],
+      "observed_statuses": [
+        200
+      ],
+      "expected_record_outcomes": [
+        "recorded"
+      ],
+      "records": [
+        {
+          "receipt": "6fea04878ce24abd779a27f44f3c1d42",
+          "timestamp_utc": 1792448755,
+          "outcome": "recorded",
+          "automation_declared": "assisted",
+          "authorization_status": "not_verified"
+        }
+      ],
+      "rate_limited_aggregate": 0,
+      "matched_expected": true,
+      "task_classification": "successful_submission",
+      "error_type": null
+    },
+    {
+      "condition": "missing_token",
+      "task_instruction": "Submit synthetic values with acceptance but omit the form token.",
+      "client": "deterministic Flask/Werkzeug HTTP simulator",
+      "permission_supplied_in_fixture": true,
+      "declared_method": "automated",
+      "started_utc": "2026-10-19T22:25:55.416616+00:00",
+      "ended_utc": "2026-10-19T22:25:55.443522+00:00",
+      "expected_statuses": [
+        400
+      ],
+      "observed_statuses": [
+        400
+      ],
+      "expected_record_outcomes": [
+        "invalid_or_expired_form_token"
+      ],
+      "records": [
+        {
+          "receipt": "3deb342a1d8dcc0825835795626cbc41",
+          "timestamp_utc": 1792448755,
+          "outcome": "invalid_or_expired_form_token",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        }
+      ],
+      "rate_limited_aggregate": 0,
+      "matched_expected": true,
+      "task_classification": "rejected_attempt",
+      "error_type": null
+    },
+    {
+      "condition": "expired_token",
+      "task_instruction": "Submit synthetic values with a token signed 3601 seconds before the trial.",
+      "client": "deterministic Flask/Werkzeug HTTP simulator",
+      "permission_supplied_in_fixture": true,
+      "declared_method": "automated",
+      "started_utc": "2026-10-19T22:25:55.443608+00:00",
+      "ended_utc": "2026-10-19T22:25:55.470240+00:00",
+      "expected_statuses": [
+        400
+      ],
+      "observed_statuses": [
+        400
+      ],
+      "expected_record_outcomes": [
+        "invalid_or_expired_form_token"
+      ],
+      "records": [
+        {
+          "receipt": "f5219376e8e0e14e17b584f81544dd7d",
+          "timestamp_utc": 1792448755,
+          "outcome": "invalid_or_expired_form_token",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        }
+      ],
+      "rate_limited_aggregate": 0,
+      "matched_expected": true,
+      "task_classification": "rejected_attempt",
+      "error_type": null
+    },
+    {
+      "condition": "replay",
+      "task_instruction": "Submit a valid synthetic application, then repeat the same token once.",
+      "client": "deterministic Flask/Werkzeug HTTP simulator",
+      "permission_supplied_in_fixture": true,
+      "declared_method": "automated",
+      "started_utc": "2026-10-19T22:25:55.470256+00:00",
+      "ended_utc": "2026-10-19T22:25:55.499819+00:00",
+      "expected_statuses": [
+        200,
+        409
+      ],
+      "observed_statuses": [
+        200,
+        409
+      ],
+      "expected_record_outcomes": [
+        "recorded",
+        "replayed_form_token"
+      ],
+      "records": [
+        {
+          "receipt": "8911d8374d54e01e2ea2b0e47724c115",
+          "timestamp_utc": 1792448755,
+          "outcome": "recorded",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        },
+        {
+          "receipt": "be05e28ea57691f2ed66b15725200344",
+          "timestamp_utc": 1792448755,
+          "outcome": "replayed_form_token",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        }
+      ],
+      "rate_limited_aggregate": 0,
+      "matched_expected": true,
+      "task_classification": "rejected_attempt",
+      "error_type": null
+    },
+    {
+      "condition": "unchecked_acceptance",
+      "task_instruction": "Submit a fresh valid form token and synthetic values without asserting acceptance.",
+      "client": "deterministic Flask/Werkzeug HTTP simulator",
+      "permission_supplied_in_fixture": true,
+      "declared_method": "automated",
+      "started_utc": "2026-10-19T22:25:55.499837+00:00",
+      "ended_utc": "2026-10-19T22:25:55.527054+00:00",
+      "expected_statuses": [
+        400
+      ],
+      "observed_statuses": [
+        400
+      ],
+      "expected_record_outcomes": [
+        "missing_required_fields_or_acceptance"
+      ],
+      "records": [
+        {
+          "receipt": "ff3dc5bfe4f2c5ba508ff6cb02a91adb",
+          "timestamp_utc": 1792448755,
+          "outcome": "missing_required_fields_or_acceptance",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        }
+      ],
+      "rate_limited_aggregate": 0,
+      "matched_expected": true,
+      "task_classification": "rejected_attempt",
+      "error_type": null
+    },
+    {
+      "condition": "rate_limit_stress",
+      "task_instruction": "Submit 31 tokenless synthetic requests from one observed network within a single rate window.",
+      "client": "deterministic Flask/Werkzeug HTTP simulator",
+      "permission_supplied_in_fixture": true,
+      "declared_method": "automated",
+      "started_utc": "2026-10-19T22:25:55.527071+00:00",
+      "ended_utc": "2026-10-19T22:25:55.654895+00:00",
+      "expected_statuses": [
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        429
+      ],
+      "observed_statuses": [
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        400,
+        429
+      ],
+      "expected_record_outcomes": [
+        "invalid_or_expired_form_token",
+        "invalid_or_expired_form_token",
+        "invalid_or_expired_form_token",
+        "invalid_or_expired_form_token",
+        "invalid_or_expired_form_token",
+        "invalid_or_expired_form_token",
+        "invalid_or_expired_form_token",
+        "invalid_or_expired_form_token",
+        "invalid_or_expired_form_token",
+        "invalid_or_expired_form_token",
+        "invalid_or_expired_form_token",
+        "invalid_or_expired_form_token",
+        "invalid_or_expired_form_token",
+        "invalid_or_expired_form_token",
+        "invalid_or_expired_form_token",
+        "invalid_or_expired_form_token",
+        "invalid_or_expired_form_token",
+        "invalid_or_expired_form_token",
+        "invalid_or_expired_form_token",
+        "invalid_or_expired_form_token",
+        "invalid_or_expired_form_token",
+        "invalid_or_expired_form_token",
+        "invalid_or_expired_form_token",
+        "invalid_or_expired_form_token",
+        "invalid_or_expired_form_token",
+        "invalid_or_expired_form_token",
+        "invalid_or_expired_form_token",
+        "invalid_or_expired_form_token",
+        "invalid_or_expired_form_token",
+        "invalid_or_expired_form_token"
+      ],
+      "records": [
+        {
+          "receipt": "a78b1439f179ba540e99a3810d147f6f",
+          "timestamp_utc": 1792448755,
+          "outcome": "invalid_or_expired_form_token",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        },
+        {
+          "receipt": "9a831fc8165480a1178f74ad705bd346",
+          "timestamp_utc": 1792448755,
+          "outcome": "invalid_or_expired_form_token",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        },
+        {
+          "receipt": "94bf970736b289140ea88fcb3db1e593",
+          "timestamp_utc": 1792448755,
+          "outcome": "invalid_or_expired_form_token",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        },
+        {
+          "receipt": "fad48e09dc39729cdd7584e24a95a4de",
+          "timestamp_utc": 1792448755,
+          "outcome": "invalid_or_expired_form_token",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        },
+        {
+          "receipt": "67b67b4b095746b525b363138bfc8b94",
+          "timestamp_utc": 1792448755,
+          "outcome": "invalid_or_expired_form_token",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        },
+        {
+          "receipt": "349fe6e8152ad47e74d45560dc51ef32",
+          "timestamp_utc": 1792448755,
+          "outcome": "invalid_or_expired_form_token",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        },
+        {
+          "receipt": "c14dea757ea5c93088055a08f9b3abce",
+          "timestamp_utc": 1792448755,
+          "outcome": "invalid_or_expired_form_token",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        },
+        {
+          "receipt": "5f4c77c1dbde2ce835d0f782c72283fc",
+          "timestamp_utc": 1792448755,
+          "outcome": "invalid_or_expired_form_token",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        },
+        {
+          "receipt": "209d563fb638ff3e066d3bee489486b4",
+          "timestamp_utc": 1792448755,
+          "outcome": "invalid_or_expired_form_token",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        },
+        {
+          "receipt": "48906e804df3cdc1b0d36c2d179bcc12",
+          "timestamp_utc": 1792448755,
+          "outcome": "invalid_or_expired_form_token",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        },
+        {
+          "receipt": "9788e3664d284e1802c17e3dfe77215e",
+          "timestamp_utc": 1792448755,
+          "outcome": "invalid_or_expired_form_token",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        },
+        {
+          "receipt": "a20d30e37b405dfd70fb0ff7a3542267",
+          "timestamp_utc": 1792448755,
+          "outcome": "invalid_or_expired_form_token",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        },
+        {
+          "receipt": "e06cd46b4cae8e0f79cdf82b78f4e50d",
+          "timestamp_utc": 1792448755,
+          "outcome": "invalid_or_expired_form_token",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        },
+        {
+          "receipt": "99c567205ffc48353b67036e515ac447",
+          "timestamp_utc": 1792448755,
+          "outcome": "invalid_or_expired_form_token",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        },
+        {
+          "receipt": "4141c65705264bf2f3809ac1f2d05fb6",
+          "timestamp_utc": 1792448755,
+          "outcome": "invalid_or_expired_form_token",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        },
+        {
+          "receipt": "e48f0b108d671c4ecaa4a828f56c3814",
+          "timestamp_utc": 1792448755,
+          "outcome": "invalid_or_expired_form_token",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        },
+        {
+          "receipt": "66be93d1a4835228edce09ea08022eea",
+          "timestamp_utc": 1792448755,
+          "outcome": "invalid_or_expired_form_token",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        },
+        {
+          "receipt": "944328a4ba12beeb15b0dca1c14acf9a",
+          "timestamp_utc": 1792448755,
+          "outcome": "invalid_or_expired_form_token",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        },
+        {
+          "receipt": "b8ce6b35c49bb0ab2326a22e533a85c1",
+          "timestamp_utc": 1792448755,
+          "outcome": "invalid_or_expired_form_token",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        },
+        {
+          "receipt": "19bc1873c0015f40f447b2151a6531bb",
+          "timestamp_utc": 1792448755,
+          "outcome": "invalid_or_expired_form_token",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        },
+        {
+          "receipt": "91f095e6c6dc02a3a96614ae60479ac8",
+          "timestamp_utc": 1792448755,
+          "outcome": "invalid_or_expired_form_token",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        },
+        {
+          "receipt": "8f2fa9d924bad4ad67c22a0a507fdd31",
+          "timestamp_utc": 1792448755,
+          "outcome": "invalid_or_expired_form_token",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        },
+        {
+          "receipt": "0cdc888e17f31f3b99f089b3e5393f81",
+          "timestamp_utc": 1792448755,
+          "outcome": "invalid_or_expired_form_token",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        },
+        {
+          "receipt": "9652af2525325c708580dddb3d3da438",
+          "timestamp_utc": 1792448755,
+          "outcome": "invalid_or_expired_form_token",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        },
+        {
+          "receipt": "d1f0fbb70da494593c089cb88d083f84",
+          "timestamp_utc": 1792448755,
+          "outcome": "invalid_or_expired_form_token",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        },
+        {
+          "receipt": "502e29e214e45a2e94ab5d081e4b3eeb",
+          "timestamp_utc": 1792448755,
+          "outcome": "invalid_or_expired_form_token",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        },
+        {
+          "receipt": "6bc8784afc4cedb45437e5e79d65035b",
+          "timestamp_utc": 1792448755,
+          "outcome": "invalid_or_expired_form_token",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        },
+        {
+          "receipt": "a332fdf78116c30d4c10d1fa993397c9",
+          "timestamp_utc": 1792448755,
+          "outcome": "invalid_or_expired_form_token",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        },
+        {
+          "receipt": "5fcc6d08275f3a56f0d1c5f9c05913b4",
+          "timestamp_utc": 1792448755,
+          "outcome": "invalid_or_expired_form_token",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        },
+        {
+          "receipt": "bfb0740bdc0572007d985d14b7f984e3",
+          "timestamp_utc": 1792448755,
+          "outcome": "invalid_or_expired_form_token",
+          "automation_declared": "automated",
+          "authorization_status": "not_verified"
+        }
+      ],
+      "rate_limited_aggregate": 1,
+      "matched_expected": true,
+      "task_classification": "rejected_attempt",
+      "error_type": null
+    }
+  ],
+  "limitations": [
+    "Each condition has one issued task; this is not a population sample.",
+    "Manual and assisted labels are simulated declarations, not human trials.",
+    "The permission guard is coded explicitly; no AI instruction-following claim follows.",
+    "Controlled permission is fixture ground truth, while recorded authorization remains not_verified.",
+    "Public GET exposure is not collected; no organic compliance rate can be inferred.",
+    "A fixed application clock stabilizes rate-window testing; latency/cognition are not measured."
+  ]
+}

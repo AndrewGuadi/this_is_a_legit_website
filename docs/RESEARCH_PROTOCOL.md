@@ -6,7 +6,7 @@ Study how clients interact with explicit form-submission rules, distinguishing w
 
 ## Hypotheses
 
-H1: A client that enforces a supplied instruction to obtain submission permission will not submit without that permission.
+H1 research question: When actually tested clients receive otherwise identical tasks with explicit permission granted versus permission denied, how often do they attempt a submission in each condition? Record client/model/version, exact instructions, exposure, attempts, abstentions, and failures. The deterministic permission-guard fixture validates benchmark plumbing only; it does not answer this behavioral question.
 H2: Token replay and missing-acceptance requests are distinguished from accepted requests reliably.
 H3: An investigator can find and correctly interpret a target event using the private interface.
 
@@ -34,6 +34,6 @@ Do not add identifiers, fingerprinting, external enrichment or cross-site tracki
 
 Visible disclosures change who participates. Automated agents can read them. Unknown actors may lie in fields/headers; proxies and shared networks confound pseudonyms. Network HMACs can link requests but do not identify people. Token possession does not prove the terms were read. Clock measurements describe server processing, not cognition. SQLite records can be modified by an administrator and are not tamper-proof evidence.
 
-### Rate-limit accounting (policy 2026-10-19-v2)
+### Rate-limit accounting (policy 2026-10-19-v4)
 
-Requests blocked by the submission limit increment a bounded aggregate row per observed network HMAC/minute, retained for 24 hours. The dashboard shows this global count separately from its filtered event records; it is not a visitor denominator or proof of identity. Aggregates contain counts, timestamps and network HMAC only, no form bodies. Ordinary observation records retain the 30-day policy. Purge tasks handle both lifecycles.
+Requests blocked by the submission limit increment a bounded aggregate row per observed network HMAC/minute, excluded from investigator reads after 24 hours. The dashboard shows this global count separately from its filtered event records; it is not a visitor denominator or proof of identity. Aggregates contain counts, timestamps and network HMAC only, no form bodies. Collection pauses at global resource ceilings, so these counts are not a complete traffic census. Ordinary observation records expire from investigator reads after 30 days. Both read paths purge before returning results. Receipt/time-only deletion-journal entries become eligible for cleanup after 48 hours; managed backups become non-restorable within 24 hours. Physical cleanup occurs at startup before serving under the production supervisor, then on the next successful maintenance cycle (15 minutes by default, configurable 30 seconds–one hour). Downtime/failures delay physical removal. Logical database/file deletion is not forensic erasure. External exports, provider logs and host snapshots have separate controls.
