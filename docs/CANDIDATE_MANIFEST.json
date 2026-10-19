@@ -1,10 +1,10 @@
 {
-  "README.md": "8ff006c6a132dd9df125fddb6770829c4a5005e458ba3516281ed92b677a4924",
-  "app.py": "166e9f409445407a2019dbbd52b6de1fd8726590ae4797d40e26d3b7b57fb962",
+  "README.md": "d2d3cf590a83afd360e74c8d67c8c4553b4a3dca8615dd43ad9e8b5a8a85a46a",
+  "app.py": "878263e257832b3d0881b651c95e1020683fb92a35fb9a874af6fd124c8258dc",
   "requirements.txt": "f084200e2256115f0809d6d23a624f8455e7e583c66ad59162ae0b1157b6d2f9",
   "test_app.py": "a46fbd65c13dd95f09aa0948619e5049d25fd6bab96bb0be4c752bd5c499df58",
   ".dockerignore": "0ebaa59df69194dc9050136e803c245508e74be7d6217ea84f51e19100e97494",
-  ".gitignore": "6ab267f0c2577423ff9fa0c748decb426d9b38fcc651d480e7e796b79215e5e6",
+  ".gitignore": "e66f994f1c7425df368285863cebe4cf010d19c263c15595af3620b31c989087",
   "Dockerfile": "ded831bab75fcfb568da297c7615a7176d2cade6517c8e3f7d6de339ce185ecc",
   "package-lock.json": "43f23848c946ecb3bcfabaf4ef2e95c2f9bcaf36dbba33090b5aa779bb60ea4b",
   "package.json": "a6ef5cb5fa2b2bb590e0fdeff95003b91b18c3f68586ddd61ee8c769c12b261d",
@@ -12,7 +12,7 @@
   "preflight.py": "c6bc07a1011f7ab018b916fe9c3af5241ce519e5e76f4badbc0969eeff2f672b",
   "test_preflight.py": "d3d24309a0275a23cdff24cb26dabb601c000f233e15d8498edb437cdcc8f403",
   "wsgi.py": "4c703719b1294b2f65ea1d2c12fbc3237030ac270a82afb2a260a40c4e322f7e",
-  "templates/public.html": "e3b004dfe1a804bcf95460e255d76abd4217a6b443b6656e931b921493b86aa8",
+  "templates/public.html": "b530bf835c1544c8c2661ff8eeb05a037db5aa63397f1d4aa28daa994616536c",
   "templates/admin.html": "eda785e3ca722d9616718075b9e854aeec74e98833c4ff0ab6dd42cb3d6aaa56",
   "static/site.css": "a76bae31bb9ee162da45e38e321573246a88fa42bc9a95224111460beea8be3a",
   "static/forms.js": "c413c183b1cd95e733935ab311a6ad2763eb5ffc4bc1445b6804b9f3f3b04353",
@@ -30,8 +30,8 @@
   "tests/runtime/production_smoke.py": "b840b4e6d5f4ccf6a5895da0db52bc92e18e23c3562572e12ff0e64368b1c74b",
   "tests/runtime/test_transport.py": "22e0b095d52fde1b5cfb9e5c240328b4b8c8d12063442281b8f573834dd6939c",
   "tests/research/runner.py": "cc1d46973ca0ff558c5c7caa5a4b07976cb39be5fbbce59e70d310aff77909c2",
-  "tests/browser/research.spec.js": "877c455c8eeab31b89644baad6a7113ef5a5d88beb3e8685001c39f86e38745d",
-  "tests/browser/server.py": "0ee3be50e90f88d25c5f894ac9de9c1304640887c4da6828282a797a80ca6965",
+  "tests/browser/research.spec.js": "7098a0bec5733f0827dd1cd5f20dc088cf1372df70fa29632088c79648a6610c",
+  "tests/browser/server.py": "a4dfbbf0f9a09c8a7a14697cc5eca2de3e58191ee32a8c4fa8539cfd066beea7",
   "tests/browser/README.md": "ca87d826ef2a32f35f0dce7c875f128899b0eb25a207613ec5e5d86413c3b5d1",
   ".github/workflows/quality.yml": "2979fe0293bcb9c4eeb68ba787a065323203a8f21b03e7a83212bc08b827a986"
 }

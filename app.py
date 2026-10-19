@@ -15,7 +15,7 @@ from werkzeug.exceptions import SecurityError
 from deployment.deletion_ledger import record_deletion, default_ledger_path
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
 
-VERSION = '2026-10-19-v4'
+VERSION = '2026-10-19-v5'
 POLICY = '''This is a form-interaction research website operated by Authentic Dynamics LLC.
 No employment, grant, purchase, or service is offered through these forms. Use synthetic test details only.
 Public pages may be read and indexed. Automated submissions require prior written operator permission;
@@ -24,12 +24,21 @@ We record submission attempts for abuse analysis: UTC time, form type, field len
 consent checkbox state, terms version, elapsed time, HTTP outcome, and a pseudonymous network identifier.
 The identifier is an HMAC of the server-observed address; raw addresses and submitted names, emails, and
 messages are not stored by this application. The user-agent header is retained, limited to 300 characters.
-We use no advertising trackers, cross-site cookies, or device fingerprinting. Records expire after 30 days. Rate-limited attempts are counted per pseudonymous network and minute;
-these aggregate counts expire after 24 hours. They are separate from submission records.
-Collection pauses when global resource limits are reached; observations are not a complete traffic census.
-After operator deletion, a separate journal keeps only the receipt identifier and deletion time for up to
-48 hours to prevent restoring deleted records from backups; it stores no submission or network metadata.
-Hosting providers may separately process access logs and IP addresses. No records are sold or published.
+We use no advertising trackers, cross-site cookies, or device fingerprinting.
+Observation records expire from investigator reads after 30 days. Rate-limited attempts are counted
+per pseudonymous network and minute; these separate aggregate counts expire from reads after 24 hours.
+Collection pauses at resource limits; observations are not a complete traffic census.
+After operator deletion, a separate journal retains only the receipt identifier and deletion time to
+prevent restoration of deleted records. Journal entries become eligible for cleanup after 48 hours;
+the journal contains no submission or network metadata. Managed backups cannot be restored after their
+configured expiry, which is at most 24 hours. They are physically removed by scheduled cleanup.
+The production supervisor runs cleanup before serving traffic and then every 15 minutes by default
+(configurable from 30 seconds to one hour). Physical cleanup of expired rows and managed backup files
+occurs on the next successful cycle; downtime or failed maintenance can delay physical removal.
+Cleanup is logical database/file deletion, not a guarantee of forensic erasure from storage media.
+External exports, host snapshots, and provider access logs have separate operator/provider controls;
+they are not automatically removed by application cleanup. Provider logs may contain raw addresses.
+No records are sold or published.
 A checked box records a request's assertion, not proof of identity, human consent, operator authority, or a legal violation.
 For privacy questions or deletion requests, use the operator contact configured on this page and include your receipt ID.
 '''

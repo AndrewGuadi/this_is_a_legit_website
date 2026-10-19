@@ -135,3 +135,69 @@ test('investigator filters, pagination, export, detail, delete, logout', async (
   await page.goto('/admin');
   await expect(page).toHaveURL(/\/admin\/login/);
 });
+
+// Interaction helper deliberately uses only real Tab navigation, never DOM focus.
+async function tabTo(page, selector, limit = 70) {
+  for (let attempt = 0; attempt < limit; attempt += 1) {
+    if (await page.evaluate(selector => document.activeElement?.matches(selector) || false, selector)) return;
+    await page.keyboard.press('Tab');
+  }
+  throw new Error(`Keyboard navigation did not reach ${selector} after ${limit} Tab presses`);
+}
+
+test('keyboard-only public validation and successful submission', async ({ page }, testInfo) => {
+  await page.goto('/apply/contact');
+  await tabTo(page, '#name');
+  await page.keyboard.type('Keyboard Example');
+  await tabTo(page, 'form[data-research-form] button[type="submit"]');
+  await page.keyboard.press('Enter');
+  // Native required-field recovery must move focus to the first missing input.
+  await expect(page.locator('#message')).toBeFocused();
+  expect(await page.locator('#message').evaluate(el => el.validity.valueMissing)).toBe(true);
+  await page.keyboard.type('Fictional keyboard-only sample.');
+  await tabTo(page, '#automation');
+  await page.keyboard.press('Home');
+  await page.keyboard.press('ArrowDown');
+  await expect(page.locator('#automation')).toHaveValue('human');
+  await tabTo(page, 'input[name="consent"]');
+  await page.keyboard.press('Space');
+  await expect(page.locator('input[name="consent"]')).toBeChecked();
+  await tabTo(page, 'form[data-research-form] button[type="submit"]');
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('heading', { name: /Observation\s*recorded/ })).toBeVisible();
+  await expect(page.locator('#receipt-id')).toHaveText(/^[a-f0-9]{32}$/);
+  await screenshot(page, testInfo, 'keyboard-public-receipt');
+});
+
+test('keyboard-only investigator login filter deletion and logout', async ({ page, request }, testInfo) => {
+  // Synthetic fixture isolation, not a production route or a rate-limit test.
+  expect((await request.post('/__fixture/reset-rate-limits')).status()).toBe(204);
+  await page.goto('/admin/login');
+  await tabTo(page, '#admin-token');
+  await page.keyboard.type(adminToken);
+  await tabTo(page, 'button[type="submit"]');
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(/\/admin\/?$/);
+  await tabTo(page, '#filter-form');
+  await page.keyboard.press('Home');
+  await page.keyboard.press('ArrowDown');
+  await expect(page.locator('#filter-form')).toHaveValue('directory');
+  await tabTo(page, '.filters button[type="submit"]');
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(/form=directory/);
+  await tabTo(page, 'a[aria-label^="Inspect receipt"]');
+  await page.keyboard.press('Enter');
+  await expect(page.getByRole('heading', { name: 'Interaction record.' })).toBeVisible();
+  const receipt = await page.locator('.receipt-card code').innerText();
+  await tabTo(page, 'input[name="confirm"]');
+  await page.keyboard.press('Space');
+  await expect(page.locator('input[name="confirm"]')).toBeChecked();
+  await tabTo(page, '.danger-zone button[type="submit"]');
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(/\/admin\/?$/);
+  await expect(page.locator(`a[href="/admin/record/${receipt}"]`)).toHaveCount(0);
+  await tabTo(page, 'form[action="/admin/logout"] button');
+  await page.keyboard.press('Enter');
+  await expect(page).toHaveURL(/\/admin\/login/);
+  await screenshot(page, testInfo, 'keyboard-admin-signed-out');
+});

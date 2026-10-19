@@ -10,6 +10,7 @@ import time
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from app import create_app, VERSION, POLICY_HASH
+from flask import request, abort
 
 fixture = tempfile.TemporaryDirectory(prefix="legit-browser-fixture-")
 atexit.register(fixture.cleanup)
@@ -33,6 +34,15 @@ with sqlite3.connect(database) as conn:
                      field_lengths={"name": 14, "email": 0, "message": 20}, elapsed_seconds=12.0)
         conn.execute("INSERT INTO events VALUES (?,?,?,?)", (
             f"{index+1:032x}", int(time.time())-index, "a"*64, json.dumps(event)))
+
+@app.post("/__fixture/reset-rate-limits")
+def reset_fixture_rates():
+    """Test isolation only; never registered in the production application."""
+    if request.remote_addr != "127.0.0.1":
+        abort(403)
+    with sqlite3.connect(database) as conn:
+        conn.execute("DELETE FROM rate_limits")
+    return "", 204
 
 if __name__ == "__main__":
     app.run(host="127.0.0.1", port=5081, debug=False, use_reloader=False)
