@@ -1,0 +1,10 @@
+.git
+.env*
+instance
+.agent-results
+node_modules
+__pycache__
+*.sqlite3*
+test-results
+playwright-report
+runtime-evidence

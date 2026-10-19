@@ -168,6 +168,79 @@ class ObservationTests(unittest.TestCase):
         self.assertEqual(response.headers['Retry-After'],'60')
         self.assertIn(b'Return home',response.data)
 
+    def test_global_caps_fail_closed(self):
+        self.app.config.update(MAX_EVENTS=2,MAX_RATE_ROWS=20,MAX_BLOCKED_ROWS=2,GLOBAL_SUBMISSIONS_PER_MINUTE=20)
+        for i in range(5):
+            response=self.client.post('/apply/contact',data={},environ_base={'REMOTE_ADDR':f'10.0.0.{i}'})
+            self.assertEqual(response.status_code,400 if i<2 else 503)
+        with sqlite3.connect(self.path) as conn:
+            self.assertEqual(conn.execute('SELECT COUNT(*) FROM events').fetchone()[0],2)
+        self.assertIn(b'Return home',response.data)
+        self.assertEqual(response.headers['Retry-After'],'60')
+    def test_rate_and_counter_tables_are_bounded(self):
+        self.app.config.update(MAX_RATE_ROWS=3,MAX_BLOCKED_ROWS=2,GLOBAL_SUBMISSIONS_PER_MINUTE=100)
+        for i in range(8):
+            self.client.post('/apply/contact',data={},environ_base={'REMOTE_ADDR':f'10.0.0.{i}'})
+        with sqlite3.connect(self.path) as conn:
+            self.assertLessEqual(conn.execute('SELECT COUNT(*) FROM rate_limits').fetchone()[0],3)
+            self.assertLessEqual(conn.execute('SELECT COUNT(*) FROM blocked_attempts').fetchone()[0],2)
+    def test_database_failure_is_safe_and_recoverable(self):
+        from unittest.mock import patch
+        with patch('app.sqlite3.connect',side_effect=sqlite3.OperationalError('secret filesystem detail')):
+            response=self.client.post('/apply/contact',data={})
+        self.assertEqual(response.status_code,503)
+        self.assertNotIn(b'secret filesystem detail',response.data)
+        self.assertIn(b'Return home',response.data)
+    def test_production_config_fails_closed(self):
+        base=dict(TESTING=True,SECRET_KEY='s'*48,NETWORK_KEY='n'*48,ADMIN_TOKEN='a'*48,DB_PATH=self.path,APP_ENV='production')
+        with self.assertRaises(RuntimeError): create_app(base)
+        base.update(PUBLIC_URL='https://example.com',CONTACT='privacy@example.com')
+        production=create_app(base)
+        self.assertEqual(production.test_client().get('/',headers={'Host':'evil.example'}).status_code,400)
+        base['SESSION_COOKIE_SECURE']=False
+        with self.assertRaises(RuntimeError): create_app(base)
+
+    def test_logout_revokes_copied_session_cookie(self):
+        self.login()
+        copied=self.client.get_cookie('session').value
+        with self.client.session_transaction() as sess: csrf=sess['csrf_token']
+        self.client.post('/admin/logout',data={'csrf_token':csrf})
+        attacker=self.app.test_client(); attacker.set_cookie('session',copied)
+        self.assertEqual(attacker.get('/admin/export').status_code,302)
+    def test_concurrent_event_capacity(self):
+        from concurrent.futures import ThreadPoolExecutor
+        self.app.config['MAX_EVENTS']=4
+        def attempt(i):
+            with self.app.test_client() as client:
+                return client.post('/apply/contact',data={},environ_base={'REMOTE_ADDR':f'10.0.1.{i}'}).status_code
+        with ThreadPoolExecutor(max_workers=8) as pool: statuses=list(pool.map(attempt,range(12)))
+        self.assertEqual(statuses.count(400),4)
+        self.assertEqual(statuses.count(503),8)
+
+    def test_global_admission_and_nonce_caps(self):
+        self.app.config['GLOBAL_SUBMISSIONS_PER_MINUTE']=2
+        for i in range(3):
+            response=self.client.post('/apply/contact',data={},environ_base={'REMOTE_ADDR':f'10.1.1.{i}'})
+            self.assertEqual(response.status_code,400 if i<2 else 503)
+        self.app.config['GLOBAL_SUBMISSIONS_PER_MINUTE']=100
+        self.app.config['MAX_USED_TOKENS']=1
+        self.assertEqual(self.client.post('/apply/directory',data=self.data()).status_code,200)
+        self.assertEqual(self.client.post('/apply/directory',data=self.data()).status_code,503)
+        with sqlite3.connect(self.path) as conn:
+            self.assertEqual(conn.execute('SELECT COUNT(*) FROM used_tokens').fetchone()[0],1)
+    def test_blocked_counter_capacity_is_bounded(self):
+        import hmac,hashlib
+        self.app.config['MAX_BLOCKED_ROWS']=2
+        with sqlite3.connect(self.path) as conn:
+            for i in range(3):
+                net=hmac.new(('n'*48).encode(),f'10.2.2.{i}'.encode(),hashlib.sha256).hexdigest()
+                conn.executemany('INSERT INTO rate_limits VALUES (?,?)',[('submit:'+net,int(time.time()))]*30)
+        for i in range(3):
+            response=self.client.post('/apply/contact',data={},environ_base={'REMOTE_ADDR':f'10.2.2.{i}'})
+            self.assertEqual(response.status_code,429 if i<2 else 503)
+        with sqlite3.connect(self.path) as conn:
+            self.assertEqual(conn.execute('SELECT COUNT(*) FROM blocked_attempts').fetchone()[0],2)
+
     def test_rate_limit(self):
         for _ in range(30):
             self.client.post('/apply/directory',data={})

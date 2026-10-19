@@ -25,3 +25,14 @@ No automatic apply, commit, push, merge or deployment exists. The prototype supp
 ## Tests
 
 Run `python -m unittest discover -s orchestration -p 'test_*.py' -v`. Tests include a worker committing modifications such that its own git diff is empty while the manager comparison still detects them, plus malicious archive and scope/bounds checks. These are offline artifact-integrity tests, not Docker isolation tests.
+
+## Offline Docker runtime verification
+
+The model runner remains fail-closed. A separate synthetic worker exercises Docker isolation and bounded manager-owned artifact recovery without invoking OpenCode or transferring repository source:
+
+```sh
+python -m unittest discover -s tests/runtime -v
+python orchestration/runtime_smoke.py --output artifacts/runtime
+```
+
+See [runtime iterations](../docs/RUNTIME_ITERATIONS.md) for verified boundaries, CI evidence requirements, and remaining remote-model gates. A prepared smoke test is not a successful runtime result; the Docker CI job must pass first.
