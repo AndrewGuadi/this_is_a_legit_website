@@ -1,38 +1,106 @@
 {
   "foundation": {
     "depends_on": [],
-    "inputs": ["app.py", "test_app.py", "requirements.txt", "README.md"],
-    "outputs": ["app.py", "templates/", "static/base.css", "test_app.py", "docs/ui-contract.md"],
-    "directive": "Extract inline templates and CSS into Jinja templates and static/base.css while preserving behavior. Establish documented template blocks, semantic HTML, CSS tokens and JS hooks. Keep the research disclosure visible to every client. Maintain current CSP or narrowly adjust it for self-hosted assets. Add regression tests before moving code, demonstrate baseline and final results. Do not redesign backend behavior."
+    "inputs": [
+      "app.py",
+      "test_app.py",
+      "requirements.txt",
+      "README.md",
+      "templates/",
+      "static/",
+      "docs/UI_CONTRACT.md"
+    ],
+    "outputs": [
+      "templates/public.html",
+      "docs/UI_CONTRACT.md"
+    ],
+    "directive": "Maintain the public semantic HTML and template contract. Templates are already extracted; do not recreate inline HTML. Define new hooks before dependent teams start. Preserve disclosure, keyboard navigation, error recovery and no-JS completion. Do not edit backend or investigator templates."
   },
   "ui": {
-    "depends_on": ["foundation"],
-    "inputs": ["app.py", "requirements.txt", "templates/", "static/base.css", "docs/ui-contract.md"],
-    "outputs": ["static/base.css"],
+    "depends_on": [
+      "foundation"
+    ],
+    "inputs": [
+      "templates/",
+      "static/",
+      "docs/UI_CONTRACT.md"
+    ],
+    "outputs": [
+      "static/site.css"
+    ],
     "directive": "Polish only CSS: premium editorial appearance, warm paper, deep evergreen, restrained lime, excellent type hierarchy, mobile 360px through desktop. Accessible contrast, focus states, error and receipt styling. No invented business claims or metrics. Follow existing DOM contract. Document visual checks and any checks unavailable."
   },
   "javascript": {
-    "depends_on": ["foundation"],
-    "inputs": ["app.py", "requirements.txt", "templates/", "static/", "docs/ui-contract.md"],
-    "outputs": ["static/forms.js", "tests/test_forms_js.py"],
+    "depends_on": [
+      "foundation"
+    ],
+    "inputs": [
+      "templates/",
+      "static/",
+      "docs/UI_CONTRACT.md"
+    ],
+    "outputs": [
+      "static/forms.js"
+    ],
     "directive": "Progressively enhance existing forms using documented hooks. Provide accessible validation and submission feedback without breaking no-JS submissions or native keyboard behavior. Do not store entered values or tokens in localStorage or send telemetry. Do not edit templates; request integration hooks in HANDOFF.md. Do not duplicate server authorization logic as a security substitute."
   },
   "motion": {
-    "depends_on": ["foundation", "ui"],
-    "inputs": ["templates/", "static/", "docs/ui-contract.md"],
-    "outputs": ["static/motion.css"],
-    "directive": "Create a small optional motion stylesheet following the established DOM contract. Respect prefers-reduced-motion, avoid layout shifts, keep content visible without animation, and avoid distracting continuous motion. Do not edit base styles or templates; request stylesheet inclusion in HANDOFF.md."
+    "depends_on": [
+      "foundation",
+      "ui"
+    ],
+    "inputs": [
+      "templates/",
+      "static/",
+      "docs/UI_CONTRACT.md"
+    ],
+    "outputs": [
+      "static/motion.css"
+    ],
+    "directive": "Create a small optional motion stylesheet following the established DOM contract. Respect prefers-reduced-motion, avoid layout shifts, keep content visible without animation, and avoid distracting continuous motion. Do not edit base styles or templates; request stylesheet inclusion in HANDOFF.md. The current reduced-motion baseline is in static/site.css; propose integration in HANDOFF.md rather than editing it."
   },
   "backend": {
-    "depends_on": ["foundation"],
-    "inputs": ["app.py", "test_app.py", "requirements.txt", "templates/", "static/", "README.md"],
-    "outputs": ["app.py", "test_app.py", "tests/", "templates/admin/", "static/admin.css", "docs/backend-contract.md"],
-    "directive": "Implement private investigator workflows with TDD: authenticated session login/logout, expiry, CSRF, server-side pagination/filtering, event details, bounded export and deletion. Preserve bearer API compatibility. Write failing tests first for each behavior, run them and record red output, implement minimal code, then record green output. Explicitly distinguish signals from proven violations. Keep all existing minimization and retention guarantees. Never use real credentials or collected data. Define integration hooks and remaining UI work in HANDOFF.md."
+    "depends_on": [
+      "foundation"
+    ],
+    "inputs": [
+      "app.py",
+      "test_app.py",
+      "requirements.txt",
+      "templates/",
+      "static/",
+      "README.md"
+    ],
+    "outputs": [
+      "app.py",
+      "test_app.py",
+      "tests/",
+      "templates/admin.html",
+      "docs/backend-contract.md"
+    ],
+    "directive": "Implement private investigator workflows with TDD: authenticated session login/logout, expiry, CSRF, server-side pagination/filtering, event details, bounded export and deletion. Preserve bearer API compatibility. Write failing tests first for each behavior, run them and record red output, implement minimal code, then record green output. Explicitly distinguish signals from proven violations. Keep all existing minimization and retention guarantees. Never use real credentials or collected data. Define integration hooks and remaining UI work in HANDOFF.md. Existing dashboard is implemented. Extend via failing tests for actual missing behavior, not duplicate replacement. Public templates and shared site.css belong to other teams. Request new style hooks through HANDOFF.md."
   },
   "qa": {
-    "depends_on": ["foundation", "ui", "javascript", "motion", "backend"],
-    "inputs": ["app.py", "test_app.py", "requirements.txt", "templates/", "static/", "tests/", "docs/", "README.md"],
-    "outputs": ["QA_REPORT.md"],
+    "depends_on": [
+      "foundation",
+      "ui",
+      "javascript",
+      "motion",
+      "backend"
+    ],
+    "inputs": [
+      "app.py",
+      "test_app.py",
+      "requirements.txt",
+      "templates/",
+      "static/",
+      "tests/",
+      "docs/",
+      "README.md"
+    ],
+    "outputs": [
+      "QA_REPORT.md"
+    ],
     "directive": "Independently review the integrated candidate without changing code. Run available tests. Report reproducible defects by severity, expected and actual behavior. Inspect auth, CSRF, retention, hostile inputs, rendering, accessible forms and public disclosure. Never fabricate browser screenshots or tests. Identify gaps in test coverage; passing tests are not sufficient proof of correctness."
   }
 }
