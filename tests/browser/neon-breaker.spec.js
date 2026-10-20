@@ -222,7 +222,7 @@ test("real browser touch events move the paddle and preserve scrolling outside t
   });
   expect(
     (await touchPage.evaluate(() => window.__neonSnapshot())).paddle.x,
-  ).toBeGreaterThan(before + 45 / canvasWidth * 960 * .95);
+  ).toBeGreaterThan(before + (45 / canvasWidth) * 960 * 0.95);
   expect(
     await touchPage
       .locator("#how-to-play")
@@ -230,22 +230,70 @@ test("real browser touch events move the paddle and preserve scrolling outside t
   ).toBe("auto");
   await touchPage.screenshot({ path: info.outputPath("touch-input.png") });
   const originalViewport = touchPage.viewportSize();
-  await touchPage.setViewportSize({ width: originalViewport.height, height: originalViewport.width });
+  await touchPage.setViewportSize({
+    width: originalViewport.height,
+    height: originalViewport.width,
+  });
   await expect(state(touchPage)).toHaveAttribute("data-state", "paused");
-  await action(touchPage).tap();
+  // Allow emulated orientation/scroll to settle before a deliberate new gesture.
+  // Chromium may suppress the native click immediately after drag + rotation.
+  // Keep a real touch contact; do not synthesize click or retry Resume.
+  await action(touchPage).scrollIntoViewIfNeeded();
+  await touchPage.waitForTimeout(1500);
+  const resumeButton = await action(touchPage).boundingBox();
+  await client.send("Input.dispatchTouchEvent", {
+    type: "touchStart",
+    touchPoints: [
+      {
+        x: resumeButton.x + resumeButton.width / 2,
+        y: resumeButton.y + resumeButton.height / 2,
+      },
+    ],
+  });
+  await touchPage.waitForTimeout(80);
+  await client.send("Input.dispatchTouchEvent", {
+    type: "touchEnd",
+    touchPoints: [],
+  });
   await expect(state(touchPage)).toHaveAttribute("data-state", "playing");
   const rotatedField = await touchPage.locator("canvas").boundingBox();
-  const rotatedControls = await touchPage.locator(".game-controls").boundingBox();
+  const rotatedControls = await touchPage
+    .locator(".game-controls")
+    .boundingBox();
   expect(rotatedField.y).toBeGreaterThanOrEqual(0);
-  expect(rotatedField.y + rotatedField.height).toBeLessThanOrEqual(originalViewport.width);
-  expect(rotatedControls.y + rotatedControls.height).toBeLessThanOrEqual(originalViewport.width);
+  expect(rotatedField.y + rotatedField.height).toBeLessThanOrEqual(
+    originalViewport.width,
+  );
+  expect(rotatedControls.y + rotatedControls.height).toBeLessThanOrEqual(
+    originalViewport.width,
+  );
   const rotatedStrip = await touchPage.locator("#touch-strip").boundingBox();
-  const rotatedPaddle = (await touchPage.evaluate(() => window.__neonSnapshot())).paddle.x;
-  await client.send("Input.dispatchTouchEvent", {type:"touchStart", touchPoints:[{x:rotatedStrip.x+rotatedStrip.width/2,y:rotatedStrip.y+22}]});
-  await client.send("Input.dispatchTouchEvent", {type:"touchMove", touchPoints:[{x:rotatedStrip.x+rotatedStrip.width/2-30,y:rotatedStrip.y+22}]});
-  await client.send("Input.dispatchTouchEvent", {type:"touchEnd", touchPoints:[]});
-  expect((await touchPage.evaluate(() => window.__neonSnapshot())).paddle.x).toBeLessThan(rotatedPaddle-30/rotatedField.width*960*.95);
-  await touchPage.screenshot({path:info.outputPath("touch-rotated.png")});
+  const rotatedPaddle = (
+    await touchPage.evaluate(() => window.__neonSnapshot())
+  ).paddle.x;
+  await client.send("Input.dispatchTouchEvent", {
+    type: "touchStart",
+    touchPoints: [
+      { x: rotatedStrip.x + rotatedStrip.width / 2, y: rotatedStrip.y + 22 },
+    ],
+  });
+  await client.send("Input.dispatchTouchEvent", {
+    type: "touchMove",
+    touchPoints: [
+      {
+        x: rotatedStrip.x + rotatedStrip.width / 2 - 30,
+        y: rotatedStrip.y + 22,
+      },
+    ],
+  });
+  await client.send("Input.dispatchTouchEvent", {
+    type: "touchEnd",
+    touchPoints: [],
+  });
+  expect(
+    (await touchPage.evaluate(() => window.__neonSnapshot())).paddle.x,
+  ).toBeLessThan(rotatedPaddle - (30 / rotatedField.width) * 960 * 0.95);
+  await touchPage.screenshot({ path: info.outputPath("touch-rotated.png") });
   await context.close();
 });
 test("idle game avoids repeated canvas work and unchanged HUD mutations", async ({
@@ -297,8 +345,22 @@ test("keyboard resume after rotation brings the complete playfield into view", a
   expect(box.y).toBeGreaterThanOrEqual(0);
   expect(box.y + box.height).toBeLessThanOrEqual(390);
 });
-test('landscape keeps the live game status available to assistive technology',async({page})=>{
- await page.setViewportSize({width:844,height:390});await page.goto(path);
- await expect(page.getByRole('status')).toHaveCount(1);
- expect(await page.locator('#game-status').evaluate(e=>{for(let n=e;n;n=n.parentElement){if(getComputedStyle(n).display==='none'||getComputedStyle(n).visibility==='hidden')return false;}return true;})).toBe(true);
+test("landscape keeps the live game status available to assistive technology", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 844, height: 390 });
+  await page.goto(path);
+  await expect(page.getByRole("status")).toHaveCount(1);
+  expect(
+    await page.locator("#game-status").evaluate((e) => {
+      for (let n = e; n; n = n.parentElement) {
+        if (
+          getComputedStyle(n).display === "none" ||
+          getComputedStyle(n).visibility === "hidden"
+        )
+          return false;
+      }
+      return true;
+    }),
+  ).toBe(true);
 });

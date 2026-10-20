@@ -38,8 +38,8 @@ Primary risks are ball tunneling at high speed, shallow trajectories that stall 
 - [x] Original gameplay and assets implemented directly by Codex under Andrew’s updated authorization.
 - [x] Deterministic collision, life, scoring and three-stage progression checks pass.
 - [x] Automated pause, mute, restart, visibility, resize and denied-storage checks pass.
-- [ ] Complete physical-phone touch runs and independent human play observations — pending; automated desktop completion and emulated inputs are recorded separately.
+- [ ] Complete physical-phone touch runs and independent play observations — pending; automated desktop completion and emulated inputs are recorded separately.
 - [x] Reduced-motion, HTML focus/control sizing, automated accessibility and rendered layouts checked.
-- [ ] Final independent TODD acceptance — review and correction loop underway; physical-device and human play evidence remain required.
+- [ ] Final independent TODD acceptance — review and correction loop underway; physical-device and independent play evidence remain required.
 
 Completed automated checks do not imply completion of the remaining physical-device and independent-review gates. Approval permits the first game only; it does not change the other seven catalog statuses to playable or authorize their implementation.
