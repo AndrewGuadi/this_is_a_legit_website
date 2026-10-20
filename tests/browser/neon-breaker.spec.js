@@ -195,7 +195,7 @@ test("real browser touch events move the paddle and preserve scrolling outside t
   browser,
 }, info) => {
   const context = await browser.newContext({
-    viewport: { width: 390, height: 844 },
+    viewport: page.viewportSize(),
     hasTouch: true,
     isMobile: true,
   });
@@ -205,6 +205,7 @@ test("real browser touch events move the paddle and preserve scrolling outside t
   await action(touchPage).tap();
   const client = await context.newCDPSession(touchPage);
   const box = await touchPage.locator("#touch-strip").boundingBox();
+  const canvasWidth = (await touchPage.locator("canvas").boundingBox()).width;
   const before = (await touchPage.evaluate(() => window.__neonSnapshot()))
     .paddle.x;
   await client.send("Input.dispatchTouchEvent", {
@@ -221,13 +222,30 @@ test("real browser touch events move the paddle and preserve scrolling outside t
   });
   expect(
     (await touchPage.evaluate(() => window.__neonSnapshot())).paddle.x,
-  ).toBeGreaterThan(before + 80);
+  ).toBeGreaterThan(before + 45 / canvasWidth * 960 * .95);
   expect(
     await touchPage
       .locator("#how-to-play")
       .evaluate((e) => getComputedStyle(e).touchAction),
   ).toBe("auto");
   await touchPage.screenshot({ path: info.outputPath("touch-input.png") });
+  const originalViewport = touchPage.viewportSize();
+  await touchPage.setViewportSize({ width: originalViewport.height, height: originalViewport.width });
+  await expect(state(touchPage)).toHaveAttribute("data-state", "paused");
+  await action(touchPage).tap();
+  await expect(state(touchPage)).toHaveAttribute("data-state", "playing");
+  const rotatedField = await touchPage.locator("canvas").boundingBox();
+  const rotatedControls = await touchPage.locator(".game-controls").boundingBox();
+  expect(rotatedField.y).toBeGreaterThanOrEqual(0);
+  expect(rotatedField.y + rotatedField.height).toBeLessThanOrEqual(originalViewport.width);
+  expect(rotatedControls.y + rotatedControls.height).toBeLessThanOrEqual(originalViewport.width);
+  const rotatedStrip = await touchPage.locator("#touch-strip").boundingBox();
+  const rotatedPaddle = (await touchPage.evaluate(() => window.__neonSnapshot())).paddle.x;
+  await client.send("Input.dispatchTouchEvent", {type:"touchStart", touchPoints:[{x:rotatedStrip.x+rotatedStrip.width/2,y:rotatedStrip.y+22}]});
+  await client.send("Input.dispatchTouchEvent", {type:"touchMove", touchPoints:[{x:rotatedStrip.x+rotatedStrip.width/2-30,y:rotatedStrip.y+22}]});
+  await client.send("Input.dispatchTouchEvent", {type:"touchEnd", touchPoints:[]});
+  expect((await touchPage.evaluate(() => window.__neonSnapshot())).paddle.x).toBeLessThan(rotatedPaddle-30/rotatedField.width*960*.95);
+  await touchPage.screenshot({path:info.outputPath("touch-rotated.png")});
   await context.close();
 });
 test("idle game avoids repeated canvas work and unchanged HUD mutations", async ({

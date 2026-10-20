@@ -28,18 +28,18 @@ Audio starts only after intentional user interaction and is optional. A persiste
 
 ## Technical plan and risks
 
-Phaser is the proposed 2D framework candidate, not an installed dependency. Its [official documentation](https://docs.phaser.io/phaser/getting-started/what-is-phaser) describes browser-focused desktop/mobile support. After approval, pin a reviewed release, use original assets, and bundle locally. No external API, server-authoritative gameplay, paid engine service, or player identity is needed.
+Native Canvas was selected for this bounded game after comparison with Phaser. The deterministic simulation, renderer, and input controller are separate local modules; no runtime dependency was added. See [the implementation contract](neon-breaker-contract.md). No external API, server-authoritative gameplay, paid engine service, or player identity is needed.
 
 Primary risks are ball tunneling at high speed, shallow trajectories that stall play, paddle control under touch, and layout/physics changes during rotation. Bound speed, constrain rebound angles, use deterministic collision tests where practical, and separate world coordinates from display scaling. The team should validate a representative lower-powered phone before increasing effects. Engine choice can be revised if testing reveals poor suitability.
 
-## Acceptance gates for the future playable build
+## Acceptance gates for the playable candidate
 
 - [x] User approves this scope — owner: user — approved 2026-10-20.
-- [ ] Original gameplay and asset implementation — owner: implementation team — pending verified OpenCode runtime.
-- [ ] Ball/paddle/brick collision, life loss, score, and progression tests — owner: implementation/QA — blocked by implementation.
-- [ ] Pause, mute, restart, visibility changes, rotation, and storage-denied checks — owner: QA — blocked by implementation.
-- [ ] Complete runs using keyboard and touch across mobile, tablet, and desktop — owner: QA — blocked by implementation.
-- [ ] Reduced-motion, focus visibility, target sizing, and readable instructions reviewed — owner: QA — blocked by implementation.
-- [ ] Independent review of responsiveness, visual polish, usability, and remaining limitations — owner: manager/reviewer — blocked by playable evidence.
+- [x] Original gameplay and assets implemented directly by Codex under Andrew’s updated authorization.
+- [x] Deterministic collision, life, scoring and three-stage progression checks pass.
+- [x] Automated pause, mute, restart, visibility, resize and denied-storage checks pass.
+- [ ] Complete physical-phone touch runs and independent human play observations — pending; automated desktop completion and emulated inputs are recorded separately.
+- [x] Reduced-motion, HTML focus/control sizing, automated accessibility and rendered layouts checked.
+- [ ] Final independent TODD acceptance — review and correction loop underway; physical-device and human play evidence remain required.
 
-These are approval and verification gates, not completed tasks. Approval permits the first game only; it does not change the other seven catalog statuses to playable or authorize their implementation.
+Completed automated checks do not imply completion of the remaining physical-device and independent-review gates. Approval permits the first game only; it does not change the other seven catalog statuses to playable or authorize their implementation.
