@@ -1,6 +1,39 @@
 # Isolated worker runtime verification
 
-## Current iteration
+## Codespace verification — 2026-10-20
+
+The current Codespace has a working Docker 29.8.0-1 daemon. A real OpenCode
+1.19.3 smoke task ran in a disposable, non-root, resource-limited container using
+`opencode/deepseek-v4.1-flash-free`, session
+`ses_ea591483affe1Wirp3gypSL3FP`. This was a synthetic clamp-function task, not
+Neon Breaker implementation. The worker wrote tests first; two behavioral
+assertions failed before implementation, then all four tests passed. Manager and
+independent reviewer TODD reproduced RED and GREEN, verified identical test
+bytes, checked manager-owned source hashes/diff and scope rejection, and
+confirmed worker removal.
+
+TODD approved the supervised bootstrap only for a single infrastructure worker.
+The manager added a bounded-output, externally timed dispatch wrapper with
+container removal on failure following TODD's finding. The project online runner
+remains disabled; its production isolation, failure cleanup, peer/TLS/DNS tests
+and independent review remain required before game tasks.
+
+The subsequent RUN-01 infrastructure request failed with HTTP 503 from the free
+DeepSeek endpoint before returning implementation. A bounded attempt with the
+listed free GLM endpoint encountered the same unavailable-endpoint errors. No
+paid model access, game implementation, release scoring or merge is claimed.
+Raw local evidence and the resumable task ledger are under ignored
+`dev_docs/evidence/`; they are intentionally not published in this repository.
+
+Current baseline: 30 application, 8 orchestration, 5 runtime-unit, 33 operations,
+and 64 Chromium browser scenarios pass; the controlled research benchmark and
+offline Docker runtime smoke pass. This Codespace's `/tmp` default ACL produces
+unsupported candidate file modes. Use a private scratch directory without that
+ACL through a per-command `TMPDIR`; preserve the strict validator. Chromium
+required installation of its OS libraries before the browser suite could run.
+These are baseline results, not certification of future game changes.
+
+## Historical offline harness
 
 The manager has an offline synthetic Docker worker smoke test. This is executable validation of the container boundary and artifact pipeline, **not an OpenCode or model run**. Remote-model execution in `run_task.py --run` remains disabled. No claim of successful Docker isolation is warranted until the Docker smoke job finishes successfully on its target host.
 
@@ -28,7 +61,7 @@ The output directory contains `candidate.tar`, `proposal.patch`, and `result.jso
 
 ## Tests completed locally
 
-Eight candidate/baseline tests and five bounded-transport/configuration tests pass. These include hostile Git staging/commits, empty-file diff application, malicious archive members, scope violations, byte limits, export failure, and transport timeout. Docker is not available in the current development environment, so container execution remains pending CI.
+Eight candidate/baseline tests and five bounded-transport/configuration tests pass. These include hostile Git staging/commits, empty-file diff application, malicious archive members, scope violations, byte limits, export failure, and transport timeout. At the time this offline harness was authored, Docker was unavailable locally. The current Codespace execution is recorded above.
 
 ## Remaining model-runtime gate
 

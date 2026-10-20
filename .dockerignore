@@ -1,4 +1,7 @@
 .git
+dev_docs
+.venv
+.tools
 .env*
 instance
 .agent-results
