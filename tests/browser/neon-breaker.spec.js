@@ -216,6 +216,10 @@ test("real browser touch events move the paddle and preserve scrolling outside t
     type: "touchMove",
     touchPoints: [{ x: box.x + box.width / 2 + 45, y: box.y + 22 }],
   });
+  // Finish the drag at rest. Immediate CDP move/up followed by rotation
+  // can suppress the next native click, even in a plain HTML-only fixture.
+  // This is a complete touch gesture, with no click dispatch or Resume retry.
+  await touchPage.waitForTimeout(200);
   await client.send("Input.dispatchTouchEvent", {
     type: "touchEnd",
     touchPoints: [],
@@ -235,26 +239,7 @@ test("real browser touch events move the paddle and preserve scrolling outside t
     height: originalViewport.width,
   });
   await expect(state(touchPage)).toHaveAttribute("data-state", "paused");
-  // Allow emulated orientation/scroll to settle before a deliberate new gesture.
-  // Chromium may suppress the native click immediately after drag + rotation.
-  // Keep a real touch contact; do not synthesize click or retry Resume.
-  await action(touchPage).scrollIntoViewIfNeeded();
-  await touchPage.waitForTimeout(1500);
-  const resumeButton = await action(touchPage).boundingBox();
-  await client.send("Input.dispatchTouchEvent", {
-    type: "touchStart",
-    touchPoints: [
-      {
-        x: resumeButton.x + resumeButton.width / 2,
-        y: resumeButton.y + resumeButton.height / 2,
-      },
-    ],
-  });
-  await touchPage.waitForTimeout(80);
-  await client.send("Input.dispatchTouchEvent", {
-    type: "touchEnd",
-    touchPoints: [],
-  });
+  await action(touchPage).tap();
   await expect(state(touchPage)).toHaveAttribute("data-state", "playing");
   const rotatedField = await touchPage.locator("canvas").boundingBox();
   const rotatedControls = await touchPage
@@ -301,7 +286,26 @@ test("idle game avoids repeated canvas work and unchanged HUD mutations", async 
 }) => {
   await page.goto(path);
   await expect(state(page)).toHaveAttribute("data-state", "ready");
-  await page.waitForTimeout(100);
+  // A late initial ResizeObserver callback legitimately redraws once in WebKit.
+  // Measure idle work only after layout settles; repeated frame draws still fail.
+  await page.evaluate(
+    () =>
+      new Promise((resolve) => {
+        let timer;
+        const settle = () => {
+          clearTimeout(timer);
+          timer = setTimeout(() => {
+            observer.disconnect();
+            window.removeEventListener("resize", settle);
+            resolve();
+          }, 250);
+        };
+        const observer = new ResizeObserver(settle);
+        observer.observe(document.querySelector("#playfield"));
+        window.addEventListener("resize", settle);
+        settle();
+      }),
+  );
   await page.evaluate(() => {
     window.__idleDraws = 0;
     window.__hudChanges = 0;
