@@ -2,6 +2,8 @@
 
 ## Current authorization
 
+**Latest owner instruction (2026-10-20):** Implement Neon Breaker directly with Codex and an independent local TODD reviewer. The owner explicitly suspended the OpenCode-only implementation requirement while its runtime is worked out separately. Record direct Codex provenance honestly. All game scope, tests-first, privacy, independent review, scoring and merge gates below remain in force; OpenCode runtime completion is no longer a prerequisite for this game. This paragraph supersedes conflicting implementation-role instructions below.
+
 Andrew approved Neon Breaker implementation through OpenCode workers on 2026-10-20. Manager may merge the accepted first game to main once TODD averages ≥95/100 across all ten criteria and required gates pass. No other game, new visitor telemetry, purchases without an approved budget, or unrelated deployment is authorized by this scope. Older awaiting-approval documents are historical for this one game; update status when work begins.
 
 ## Responsibilities

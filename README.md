@@ -1,8 +1,8 @@
 # Legit Arcade
 
-A mobile-first arcade catalog with eight original game concepts and a secondary form-research area. The first game, **Neon Breaker**, is approved for OpenCode implementation and **not yet implemented**. The homepage is `/`, concepts live at `/games/<slug>`, and the preserved forms are at `/forms` and `/apply/<kind>`. The investigator workspace remains `/admin/login`.
+An arcade with **Neon Breaker**, a playable original three-stage brick breaker, seven future game concepts, and a secondary form-research area. Neon Breaker is a review candidate; final release requires independent TODD review and physical-device evidence. The homepage is `/`, concepts live at `/games/<slug>`, and the preserved forms are at `/forms` and `/apply/<kind>`. The investigator workspace remains `/admin/login`.
 
-Game status is tracked in `game_catalog.py`; see [game roadmap](docs/GAME_ROADMAP.md) and [first-game brief](docs/FIRST_GAME_BRIEF.md). Catalog visits do not create observation records. No game telemetry or gameplay engine is included yet.
+Game status is tracked in `game_catalog.py`; see [game roadmap](docs/GAME_ROADMAP.md) and [first-game brief](docs/FIRST_GAME_BRIEF.md). Catalog visits do not create observation records. Neon Breaker uses native Canvas and local modules, with no game telemetry or third-party requests. Optional best-score storage stays on the device.
 
 
 A Flask/SQLite form-observation prototype for Authentic Dynamics LLC. Public, crawlable pages and three conventional application flows collect bounded first-party metadata. All clients receive the same research disclosure: this is not an actual job, grant, directory-placement, or service offer.
@@ -21,6 +21,14 @@ Use Python 3.11+ and `pip install -r requirements.txt`. Configure the following 
 Generate secrets with `python -c "import secrets; print(secrets.token_urlsafe(48))"` and store them in the hosting environment. Do not paste them into GitHub.
 
 Start local development with `flask --app app:create_app run`. For production, build the Dockerfile and run its `deployment.start` supervisor with persistent `/data` storage and the required environment. This starts Gunicorn, scheduled retention, and a watchdog. See [operations](docs/OPERATIONS.md) for configuration, readiness, backup, restore and host validation. Use a single application instance with local persistent SQLite storage.
+
+## Neon Breaker
+
+Open `/games/neon-breaker` on the running app. Arrow keys or A/D move, Space launches, and P/Escape pauses while the game field is focused. Mouse movement and the touch drag strip also control the paddle. Sound starts off. A tab change or resize pauses play; use Resume to continue.
+
+Run `npm run test:game` for deterministic simulation checks and `npm run test:browser` for browser, touch-emulation and accessibility checks (install dependencies with `npm ci` and `npx playwright install chromium`). Use the project Python environment so the browser fixture can import Flask. For a local synthetic preview without production data, run `python tests/browser/server.py` and open `http://127.0.0.1:5081/games/neon-breaker`. Never deploy that fixture server.
+
+The owner authorized direct Codex implementation with a separate local TODD reviewer on 2026-10-20. See [implementation contract](docs/neon-breaker-contract.md). Browser emulation does not establish physical-phone performance.
 
 ## Evidence
 

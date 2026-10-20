@@ -1,6 +1,6 @@
 # Neon Breaker — first-game approval brief
 
-**Status: approved by Andrew on 2026-10-20 for OpenCode implementation; implementation has not begun.** The arcade catalog/site rebuild can proceed separately. This brief describes the first proposed playable release; later games remain planned.
+**Status: implemented as a playable review candidate. Andrew authorized direct Codex implementation with an independent local TODD reviewer on 2026-10-20, superseding the earlier OpenCode-only requirement. Final acceptance remains pending review and device evidence.** The arcade catalog/site rebuild can proceed separately. This brief describes the first proposed playable release; later games remain planned.
 
 ## Purpose and scope
 

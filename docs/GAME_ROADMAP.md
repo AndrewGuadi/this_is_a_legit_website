@@ -2,13 +2,13 @@
 
 `game_catalog.py` is the source of truth for the public catalog. Pages should derive their titles, order, descriptions, controls, session estimates, and status from `GAMES`; they should not maintain a second game list. Session lengths and controls are design targets until playable testing exists.
 
-The arcade website rebuild may proceed. **Game implementation is a separate gate: Neon Breaker awaits user approval.** No game is currently playable, no engine is installed by this work, and none of the execution checkboxes below is complete. Catalog pages must show “Awaiting approval” or “Planned,” never imply a functioning Play action. Approval for one game does not authorize building all eight.
+**Neon Breaker is approved and implemented as a playable review candidate.** Andrew authorized direct Codex implementation with independent local TODD review on 2026-10-20. Release to main remains gated by the ten-category review and required device evidence. The other seven games remain unapproved concepts.
 
 All eight concepts target mobile, tablet, and desktop browsers with touch and keyboard input. Use original code, names, layouts, graphics, and audio; no branded ROMs, copied game art, or commercial game music. No account, paid asset, advertising integration, external data source, or multiplayer service is needed for the initial concepts. Business assessments below are hypotheses, not measured demand or revenue claims.
 
 | Order | Game | Owner | Status | Business strategy | Technical feasibility |
 |---:|---|---|---|---|---|
-| 1 | Neon Breaker | Game implementation team; manager reviews | Awaiting approval | Familiar, short rounds can demonstrate arcade quality quickly and give visitors an immediate reason to return. Evaluate replay intent before adding monetization. | Small 2D collision surface, original formations, three lives, local score only. Paddle/ball speed and resize handling require device tests. No external API. |
+| 1 | Neon Breaker | Codex implementation; independent TODD | Playable review candidate | Familiar, short rounds can demonstrate arcade quality quickly and give visitors an immediate reason to return. Evaluate replay intent before adding monetization. | Small 2D collision surface, original formations, three lives, local score only. Paddle/ball speed and resize handling require device tests. No external API. |
 | 2 | Orbit Snake | Game implementation team; manager reviews | Planned | Quick sessions suit casual visits and low onboarding friction. Compare repeat runs with the first title before expanding scope. | Deterministic grid simulation, queued direction input, and local scoring. Prevent impossible reverse turns; verify swipes and keyboard parity. No external API. |
 | 3 | Pixel Rally | Game implementation team; manager reviews | Planned | A solo time challenge adds skill progression and a different audience within the catalog. No evidence yet supports a multiplayer investment. | Original top-down circuits and lightweight vehicle physics. Steering feel, simultaneous touch inputs, and lap validation are primary risks. Local best times; no online leaderboard. |
 | 4 | Starline Patrol | Game implementation team; manager reviews | Planned | Short action rounds broaden variety while keeping a clear score goal. Test whether visitors choose another run before adding content packs. | Scripted original enemy waves, pooled projectiles, and bounded collisions. Multi-touch movement/fire and rendering budgets need validation. No backend gameplay dependency. |
@@ -21,11 +21,11 @@ All eight concepts target mobile, tablet, and desktop browsers with touch and ke
 
 Build in the numbered order unless the user changes priorities. Each title must pass strategy review (purpose, intended audience, repeat-play hypothesis, future revenue path) and technical review (input, rendering, storage, dependency cost, rights, and device reliability). Technical review can reject or reduce scope. The initial revenue path is increased usefulness and return visits to the arcade; specific ads, purchases, or sponsorships require a separate decision and are not implemented here.
 
-- [ ] User approves the Neon Breaker brief — owner: user — status: awaiting approval.
-- [ ] Select and install the game engine for the approved first game — owner: implementation team — status: blocked by approval.
-- [ ] Implement Neon Breaker and its original assets — owner: implementation team — status: blocked by approval.
-- [ ] Verify gameplay, keyboard/touch parity, accessibility controls, and mobile/tablet/desktop layouts — owner: QA team — status: blocked by implementation.
-- [ ] Independently review the first playable build — owner: manager/reviewer — status: blocked by QA.
+- [x] User approves Neon Breaker — Andrew, 2026-10-20.
+- [x] Select native Canvas with no runtime dependency; see implementation contract.
+- [x] Implement the three-stage candidate and original procedural visuals/audio.
+- [ ] Verify gameplay, keyboard/touch parity, accessibility controls, and mobile/tablet/desktop layouts — owner: QA team — status: automated checks passing; physical-device evidence pending.
+- [ ] Independently review the first playable build — owner: manager/reviewer — status: TODD review and correction loop in progress.
 - [ ] Obtain direction for the next game — owner: user — status: planned after first-game review.
 - [ ] Repeat implementation and review gates for Orbit Snake through Skyline Sprint — owner: implementation/QA teams — status: planned; not authorized by first-game approval.
 

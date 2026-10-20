@@ -62,13 +62,17 @@ class ObservationTests(unittest.TestCase):
         self.assertIn(b'LEGIT',home.data)
         self.assertIn(b'href="/forms"',home.data)
         self.assertEqual(len(GAMES),8)
-        self.assertEqual(GAMES[0]['status'],'awaiting_approval')
+        self.assertEqual(GAMES[0]['status'],'playable')
         for game in GAMES:
             route='/games/'+game['slug']
             response=self.client.get(route)
             self.assertEqual(response.status_code,200)
-            self.assertIn(b'not a playable release',response.data)
-            self.assertNotIn(b'<canvas',response.data)
+            if game['slug'] == 'neon-breaker':
+                self.assertIn(b'<canvas',response.data)
+                self.assertIn(b'Nothing is sent to a server',response.data)
+            else:
+                self.assertIn(b'not a playable release',response.data)
+                self.assertNotIn(b'<canvas',response.data)
             self.assertIn(route.encode(),self.client.get('/sitemap.xml').data)
         self.assertEqual(self.client.get('/games/unknown').status_code,404)
         self.assertEqual(self.events(),[])
