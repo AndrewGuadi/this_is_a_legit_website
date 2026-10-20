@@ -191,6 +191,8 @@ def create_app(config=None):
     def game_concept(slug):
         game = next((item for item in GAMES if item['slug'] == slug), None)
         if game is None: abort(404)
+        if slug == 'neon-breaker':
+            return render_template('neon_breaker.html', game=game)
         return render_template('arcade.html', view='game', games=GAMES, game=game)
     @app.get('/terms')
     def terms():

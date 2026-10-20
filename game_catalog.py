@@ -1,4 +1,4 @@
-"""Arcade catalog source of truth. Planned concepts only; no game engines or code."""
+"""Arcade catalog source of truth. Neon Breaker is playable; seven future concepts remain planned."""
 GAMES = [
     {
         "slug": "neon-breaker",
@@ -7,7 +7,7 @@ GAMES = [
         "description": "Aim bright rebounds, clear original brick formations, and keep a three-life run alive.",
         "controls": "Keyboard: Left/Right or A/D; Space to launch. Touch: drag the paddle and tap Launch.",
         "session": "3–5 minutes",
-        "status": "awaiting_approval",
+        "status": "playable",
         "phase": 1,
     },
     {

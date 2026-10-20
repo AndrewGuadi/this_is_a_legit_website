@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+ <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+ <meta name="description" content="Play Neon Breaker: three original stages, one paddle, three lives. A free original browser arcade game with no accounts or tracking.">
+ <title>Play Neon Breaker — Legit Arcade</title>
+ <link rel="stylesheet" href="{{ url_for('static',filename='arcade.css') }}">
+ <link rel="stylesheet" href="{{ url_for('static',filename='neon-breaker/game.css') }}">
+ <script type="module" src="{{ url_for('static',filename='neon-breaker/game.mjs') }}"></script>
+</head>
+<body class="neon-page">
+ <a class="skip" href="#main">Skip to content</a>
+ <header class="shell header"><a class="logo" href="/"><span aria-hidden="true">↗</span> LEGIT<span class="logo-light">ARCADE</span></a><nav aria-label="Main navigation"><a href="/#games">All games</a><a href="#how-to-play">How to play</a></nav></header>
+ <main id="main" tabindex="-1" class="game-shell">
+  <div class="game-heading"><div><p class="eyebrow"><span class="live-dot" aria-hidden="true"></span> ORIGINAL 01 / BRICK BREAKER</p><h1>NEON<span>BREAKER</span><span class="heading-star" aria-hidden="true">✳</span></h1></div><p class="game-tagline">Find your angle.<br><strong>Leave nothing standing.</strong></p></div>
+  <section id="neon-game" aria-label="Neon Breaker game" data-state="loading">
+   <div class="game-cabinet">
+    <div class="game-hud"><div><span class="hud-label">Score</span><strong id="score">00000</strong></div><div class="stage-hud"><span class="hud-label">Sector <span id="stage-number">01 / 03</span></span><strong id="stage-name">First light</strong></div><div class="lives-hud"><span class="hud-label">Lives</span><strong><span id="lives">3</span> <span id="life-marks" aria-hidden="true">● ● ●</span></strong></div></div>
+    <div class="arena" id="playfield" tabindex="0" role="group" aria-label="Game field. Arrow keys or A and D move. Space launches. P or Escape pauses." aria-describedby="keyboard-help">
+     <canvas width="960" height="600" aria-label="Neon Breaker playfield. Visual ball and paddle game; controls and status are provided below.">Neon Breaker requires Canvas support and JavaScript.</canvas>
+     <div class="game-overlay" id="game-overlay"><span id="overlay-kicker">THREE SECTORS. ONE SHOT AT GLORY.</span><h2 id="overlay-title">Ready to break<br>the silence?</h2><p id="overlay-copy">Clear the signals. Keep the ball alive.</p></div>
+    </div>
+    <div id="touch-strip" class="touch-strip" aria-label="Paddle drag area"><span aria-hidden="true">↔</span> DRAG HERE TO AIM <span class="drag-track" aria-hidden="true"></span></div>
+    <div class="game-controls"><button id="game-action" class="action-button" type="button" disabled>Loading…</button><button id="sound" type="button" aria-pressed="false">Sound off</button><button id="restart" type="button">Restart run</button></div>
+    <div class="cabinet-foot"><p id="game-status" role="status" aria-live="polite">Loading game…</p><span class="cabinet-id" aria-hidden="true">LA—001 <span>●</span></span></div>
+   </div>
+   <noscript><p class="fallback">JavaScript is required to play. The other site pages remain available.</p></noscript>
+   <div class="game-meta"><span>3 original stages <span aria-hidden="true">/</span> No account. Just play.</span><span id="best-display">Best this visit: 0</span></div>
+  </section>
+  <section id="how-to-play" class="game-guide" aria-labelledby="guide-title"><div><p class="eyebrow">A LITTLE CONTROL GOES A LONG WAY</p><h2 id="guide-title">Make the rebound<br>your own.</h2><p>Catch the ball near the paddle’s edge for a sharper angle. Clear each formation to reach the next sector. Every signal is worth 100 points.</p></div><div class="guide-controls"><div><span class="guide-number">01</span><div><h3>Move & aim</h3><p id="keyboard-help"><kbd>←</kbd> <kbd>→</kbd> or <kbd>A</kbd> <kbd>D</kbd> while the field is focused. Move your mouse over the field, or drag the touch strip below it.</p></div></div><div><span class="guide-number">02</span><div><h3>Launch & take a breath</h3><p><kbd>Space</kbd> launches. <kbd>P</kbd> or <kbd>Esc</kbd> pauses. Use the visible controls anytime. Switching tabs or resizing pauses your run.</p></div></div><div><span class="guide-number">03</span><div><h3>Keep it local</h3><label class="save-best"><input id="save-best" type="checkbox"> Save best on this device</label><p id="storage-note">Optional: stores only your best score in this browser. Nothing is sent to a server. Uncheck to remove it.</p><p id="audio-note">Sound is optional and starts off.</p></div></div></div></section>
+  <p class="access-note">Accessibility: keyboard controls, reduced-motion support and readable status are included. Tracking the moving ball requires vision; this game does not offer equivalent nonvisual play.</p>
+ </main>
+ <dialog id="restart-dialog" aria-labelledby="restart-title" aria-describedby="restart-copy"><form method="dialog"><p class="eyebrow">A FRESH START?</p><h2 id="restart-title">Restart this run?</h2><p id="restart-copy">Your current score and progress will be cleared. Keep playing to return to your paused run.</p><div><button value="cancel" autofocus>Keep playing</button><button value="restart" class="action-button">Start new run</button></div></form></dialog>
+ <footer class="shell footer"><div class="footer-bottom"><span>© Authentic Dynamics LLC · Original games</span><div><a href="/">Back to the arcade</a><a href="/forms">Form research</a><a href="/terms">Terms & privacy</a></div></div><p class="research-note">Game play sends no research observations. Our separate form-research area records interaction metadata disclosed on its forms.</p></footer>
+</body></html>

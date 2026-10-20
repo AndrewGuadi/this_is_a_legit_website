@@ -1,3 +1,6 @@
+# Local Additions for codespaces
+dev_docs/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

@@ -1,0 +1,19 @@
+
+const frame=document.getElementById('game'),status=document.getElementById('status'),start=document.getElementById('start'),download=document.getElementById('download');
+function fit(){frame.style.height=`${Math.max(180,innerHeight-document.querySelector('header').getBoundingClientRect().height)}px`;}new ResizeObserver(fit).observe(document.querySelector('header'));window.addEventListener('resize',fit);fit();
+let report=null,intervals=[],previous=0,raf=0,observer=null,timer=0,lastMode='',lastViewport='',lastMemory=0;
+function percentile(a,p){return a.length?a[Math.min(a.length-1,Math.floor(a.length*p))]:null;}
+function summary(){const a=[...intervals].sort((x,y)=>x-y);return {...report,finished:new Date().toISOString(),elapsedSeconds:(performance.now()-report.startedMonotonic)/1000,activeFrameSamples:a.length,activeSeconds:intervals.reduce((x,y)=>x+y,0)/1000,medianFrameMs:percentile(a,.5),p95FrameMs:percentile(a,.95),framesOver50ms:a.filter(n=>n>50).length};}
+function finish(){frame.contentWindow.cancelAnimationFrame(raf);document.body.classList.remove('measuring');clearTimeout(timer);observer?.disconnect();report=summary();status.textContent='Check complete. Save the local report and add your observations.';document.getElementById('results').textContent=JSON.stringify(report,null,2);download.disabled=false;start.disabled=false;}
+start.onclick=()=>{
+ if(!document.getElementById('device').value.trim()){status.textContent='Enter the actual phone model and browser first.';return;}
+ const win=frame.contentWindow,doc=frame.contentDocument;intervals=[];previous=0;lastMode='';lastViewport='';lastMemory=0;download.disabled=true;start.disabled=true;
+ document.body.classList.add('measuring');
+ report={candidate:'__CANDIDATE__',device:document.getElementById('device').value.trim(),userAgent:navigator.userAgent,started:new Date().toISOString(),startedMonotonic:performance.now(),environment:'physical device only if tester confirms; this page cannot determine hardware authenticity',longTasks:[],transitions:[],viewports:[],memory:[],visibilityInterruptions:0,heapMeasurement:win.performance.memory?'browser-reported JS heap, not total process RAM':'unavailable'};
+ try{observer=new win.PerformanceObserver(list=>{for(const e of list.getEntries())if(report.longTasks.length<5000)report.longTasks.push({start:e.startTime,duration:e.duration});});observer.observe({type:'longtask',buffered:false});}catch{report.longTaskMeasurement='unavailable';}
+ function sample(now){const mode=doc.querySelector('#neon-game')?.dataset.state;if(mode==='playing'&&lastMode==='playing'&&!doc.hidden&&previous)intervals.push(now-previous);if(mode!==lastMode&&report.transitions.length<2000)report.transitions.push({seconds:(performance.now()-report.startedMonotonic)/1000,mode});lastMode=mode;previous=now;const viewport=`${win.innerWidth}x${win.innerHeight}`;if(viewport!==lastViewport){report.viewports.push({seconds:(performance.now()-report.startedMonotonic)/1000,viewport});lastViewport=viewport;}if(now-lastMemory>10000){lastMemory=now;report.memory.push({seconds:(performance.now()-report.startedMonotonic)/1000,usedJSHeap:win.performance.memory?.usedJSHeapSize??null});}const label=`Checking: ${Math.floor((performance.now()-report.startedMonotonic)/1000)} / 600 seconds. Keep playing.`;if(status.textContent!==label)status.textContent=label;raf=win.requestAnimationFrame(sample);}
+ raf=win.requestAnimationFrame(sample);timer=setTimeout(finish,600000);
+};
+document.addEventListener('visibilitychange',()=>{if(report&&start.disabled&&document.hidden)report.visibilityInterruptions++;});
+download.onclick=()=>{const blob=new Blob([JSON.stringify(report,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='neon-breaker-device-report.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+
