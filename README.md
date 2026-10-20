@@ -57,3 +57,14 @@ Requests blocked by the submission limit increment a bounded aggregate row per o
 ### Retention timing — policy 2026-10-19-v5
 
 The supported production supervisor purges before serving traffic, then runs cleanup every 15 minutes by default (`PURGE_INTERVAL_SECONDS`, 30–3600 seconds). Investigator reads purge expired 30-day events and 24-hour aggregate counts before returning results. Receipt/time-only deletion-journal entries become eligible for cleanup at 48 hours. Managed backups cannot be restored after their configured expiry (maximum 24 hours), and expired backup files are removed on the next successful cleanup cycle. Downtime or maintenance failure delays physical cleanup; the supervisor's watchdog fails closed when retention health is stale. These are logical database/file deletions, not guaranteed forensic storage erasure. External exports, host snapshots, and provider logs require separate controls and are outside automatic application cleanup.
+
+
+
+#To Run
+export SECRET_KEY="$(python -c 'import secrets; print(secrets.token_urlsafe(48))')"
+export NETWORK_KEY="$(python -c 'import secrets; print(secrets.token_urlsafe(48))')"
+export ADMIN_TOKEN="$(python -c 'import secrets; print(secrets.token_urlsafe(48))')"
+export DB_PATH="$PWD/instance/events.sqlite3"
+export APP_ENV=development
+
+flask --app app:create_app run --host=0.0.0.0 --port=8000
