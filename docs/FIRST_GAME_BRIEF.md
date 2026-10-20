@@ -1,6 +1,6 @@
 # Neon Breaker — first-game approval brief
 
-**Status: awaiting user approval. No game implementation or engine installation is authorized by this brief.** The arcade catalog/site rebuild can proceed separately. This brief describes the first proposed playable release; later games remain planned.
+**Status: approved by Andrew on 2026-10-20 for OpenCode implementation; implementation has not begun.** The arcade catalog/site rebuild can proceed separately. This brief describes the first proposed playable release; later games remain planned.
 
 ## Purpose and scope
 
@@ -34,8 +34,8 @@ Primary risks are ball tunneling at high speed, shallow trajectories that stall 
 
 ## Acceptance gates for the future playable build
 
-- [ ] User approves this scope — owner: user — awaiting approval.
-- [ ] Original gameplay and asset implementation — owner: implementation team — blocked by approval.
+- [x] User approves this scope — owner: user — approved 2026-10-20.
+- [ ] Original gameplay and asset implementation — owner: implementation team — pending verified OpenCode runtime.
 - [ ] Ball/paddle/brick collision, life loss, score, and progression tests — owner: implementation/QA — blocked by implementation.
 - [ ] Pause, mute, restart, visibility changes, rotation, and storage-denied checks — owner: QA — blocked by implementation.
 - [ ] Complete runs using keyboard and touch across mobile, tablet, and desktop — owner: QA — blocked by implementation.
