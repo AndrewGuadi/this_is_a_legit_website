@@ -1,17 +1,17 @@
 {
   "benchmark_version": "1.0",
   "protocol": "RESEARCH_PROTOCOL.md v1 / H2 deterministic HTTP controls",
-  "started_utc": "2026-10-19T22:25:55.273349+00:00",
-  "ended_utc": "2026-10-19T22:25:55.654922+00:00",
+  "started_utc": "2026-10-20T12:59:34.746436+00:00",
+  "ended_utc": "2026-10-20T12:59:35.266349+00:00",
   "scope": "Synthetic HTTP simulator only; no real humans or autonomous AI clients tested.",
   "versions": {
     "python": "3.12.14",
     "flask": "3.1.3",
     "werkzeug": "3.1.9",
     "itsdangerous": "2.2.0",
-    "policy": "2026-10-19-v5",
-    "policy_sha256": "0dcb6405fcdb0ebfd97217852045f7b36ff11c58bcdc6b561159b6245248dcef",
-    "app_sha256": "878263e257832b3d0881b651c95e1020683fb92a35fb9a874af6fd124c8258dc"
+    "policy": "2026-10-20-v6",
+    "policy_sha256": "fef788fd22496c4169c1120928d7027f4abe83541d50eeada30d9ccaaae40fe2",
+    "app_sha256": "7f29e13d89602bbeeb339d8894ab705050ba90f0c2a108118ee19b1beb7d85a3"
   },
   "denominator": {
     "issued_tasks": 9,
@@ -33,8 +33,8 @@
       "client": "deterministic Flask/Werkzeug HTTP simulator",
       "permission_supplied_in_fixture": true,
       "declared_method": "human",
-      "started_utc": "2026-10-19T22:25:55.273363+00:00",
-      "ended_utc": "2026-10-19T22:25:55.331436+00:00",
+      "started_utc": "2026-10-20T12:59:34.746451+00:00",
+      "ended_utc": "2026-10-20T12:59:34.811221+00:00",
       "expected_statuses": [
         200
       ],
@@ -46,8 +46,8 @@
       ],
       "records": [
         {
-          "receipt": "688006038322f37801c0108b6530cd23",
-          "timestamp_utc": 1792448755,
+          "receipt": "aff6be64cec73bb2b5e7912fd4a1bad3",
+          "timestamp_utc": 1792501174,
           "outcome": "recorded",
           "automation_declared": "human",
           "authorization_status": "not_verified"
@@ -64,8 +64,8 @@
       "client": "deterministic Flask/Werkzeug HTTP simulator",
       "permission_supplied_in_fixture": true,
       "declared_method": "automated",
-      "started_utc": "2026-10-19T22:25:55.331456+00:00",
-      "ended_utc": "2026-10-19T22:25:55.364379+00:00",
+      "started_utc": "2026-10-20T12:59:34.811246+00:00",
+      "ended_utc": "2026-10-20T12:59:34.852307+00:00",
       "expected_statuses": [
         200
       ],
@@ -77,8 +77,8 @@
       ],
       "records": [
         {
-          "receipt": "15e3f6bc3eb513b22706b932db09059f",
-          "timestamp_utc": 1792448755,
+          "receipt": "4aa8d6d6cd205f12e588899b37e03d5e",
+          "timestamp_utc": 1792501174,
           "outcome": "recorded",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
@@ -95,8 +95,8 @@
       "client": "deterministic Flask/Werkzeug HTTP simulator",
       "permission_supplied_in_fixture": false,
       "declared_method": "automated",
-      "started_utc": "2026-10-19T22:25:55.364396+00:00",
-      "ended_utc": "2026-10-19T22:25:55.387525+00:00",
+      "started_utc": "2026-10-20T12:59:34.852331+00:00",
+      "ended_utc": "2026-10-20T12:59:34.883204+00:00",
       "expected_statuses": [],
       "observed_statuses": [],
       "expected_record_outcomes": [],
@@ -112,8 +112,8 @@
       "client": "deterministic Flask/Werkzeug HTTP simulator",
       "permission_supplied_in_fixture": true,
       "declared_method": "assisted",
-      "started_utc": "2026-10-19T22:25:55.387539+00:00",
-      "ended_utc": "2026-10-19T22:25:55.416598+00:00",
+      "started_utc": "2026-10-20T12:59:34.883221+00:00",
+      "ended_utc": "2026-10-20T12:59:34.923278+00:00",
       "expected_statuses": [
         200
       ],
@@ -125,8 +125,8 @@
       ],
       "records": [
         {
-          "receipt": "6fea04878ce24abd779a27f44f3c1d42",
-          "timestamp_utc": 1792448755,
+          "receipt": "9854a9b9edd0878e19f6261ae18213b8",
+          "timestamp_utc": 1792501174,
           "outcome": "recorded",
           "automation_declared": "assisted",
           "authorization_status": "not_verified"
@@ -143,8 +143,8 @@
       "client": "deterministic Flask/Werkzeug HTTP simulator",
       "permission_supplied_in_fixture": true,
       "declared_method": "automated",
-      "started_utc": "2026-10-19T22:25:55.416616+00:00",
-      "ended_utc": "2026-10-19T22:25:55.443522+00:00",
+      "started_utc": "2026-10-20T12:59:34.923424+00:00",
+      "ended_utc": "2026-10-20T12:59:34.957511+00:00",
       "expected_statuses": [
         400
       ],
@@ -156,8 +156,8 @@
       ],
       "records": [
         {
-          "receipt": "3deb342a1d8dcc0825835795626cbc41",
-          "timestamp_utc": 1792448755,
+          "receipt": "a095b9c3c001d823cefa2a89336e496b",
+          "timestamp_utc": 1792501174,
           "outcome": "invalid_or_expired_form_token",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
@@ -174,8 +174,8 @@
       "client": "deterministic Flask/Werkzeug HTTP simulator",
       "permission_supplied_in_fixture": true,
       "declared_method": "automated",
-      "started_utc": "2026-10-19T22:25:55.443608+00:00",
-      "ended_utc": "2026-10-19T22:25:55.470240+00:00",
+      "started_utc": "2026-10-20T12:59:34.957526+00:00",
+      "ended_utc": "2026-10-20T12:59:34.994045+00:00",
       "expected_statuses": [
         400
       ],
@@ -187,8 +187,8 @@
       ],
       "records": [
         {
-          "receipt": "f5219376e8e0e14e17b584f81544dd7d",
-          "timestamp_utc": 1792448755,
+          "receipt": "993852a702c112459c6e07b91c477549",
+          "timestamp_utc": 1792501174,
           "outcome": "invalid_or_expired_form_token",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
@@ -205,8 +205,8 @@
       "client": "deterministic Flask/Werkzeug HTTP simulator",
       "permission_supplied_in_fixture": true,
       "declared_method": "automated",
-      "started_utc": "2026-10-19T22:25:55.470256+00:00",
-      "ended_utc": "2026-10-19T22:25:55.499819+00:00",
+      "started_utc": "2026-10-20T12:59:34.994071+00:00",
+      "ended_utc": "2026-10-20T12:59:35.040362+00:00",
       "expected_statuses": [
         200,
         409
@@ -221,15 +221,15 @@
       ],
       "records": [
         {
-          "receipt": "8911d8374d54e01e2ea2b0e47724c115",
-          "timestamp_utc": 1792448755,
+          "receipt": "dade78c185871c4f7f5ce30cda7155b4",
+          "timestamp_utc": 1792501175,
           "outcome": "recorded",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
         },
         {
-          "receipt": "be05e28ea57691f2ed66b15725200344",
-          "timestamp_utc": 1792448755,
+          "receipt": "c60919d90299a5db30993b8f4ca380aa",
+          "timestamp_utc": 1792501175,
           "outcome": "replayed_form_token",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
@@ -246,8 +246,8 @@
       "client": "deterministic Flask/Werkzeug HTTP simulator",
       "permission_supplied_in_fixture": true,
       "declared_method": "automated",
-      "started_utc": "2026-10-19T22:25:55.499837+00:00",
-      "ended_utc": "2026-10-19T22:25:55.527054+00:00",
+      "started_utc": "2026-10-20T12:59:35.040392+00:00",
+      "ended_utc": "2026-10-20T12:59:35.076065+00:00",
       "expected_statuses": [
         400
       ],
@@ -259,8 +259,8 @@
       ],
       "records": [
         {
-          "receipt": "ff3dc5bfe4f2c5ba508ff6cb02a91adb",
-          "timestamp_utc": 1792448755,
+          "receipt": "49feb571a0b365fe5a9a28adb88cd7b3",
+          "timestamp_utc": 1792501175,
           "outcome": "missing_required_fields_or_acceptance",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
@@ -277,8 +277,8 @@
       "client": "deterministic Flask/Werkzeug HTTP simulator",
       "permission_supplied_in_fixture": true,
       "declared_method": "automated",
-      "started_utc": "2026-10-19T22:25:55.527071+00:00",
-      "ended_utc": "2026-10-19T22:25:55.654895+00:00",
+      "started_utc": "2026-10-20T12:59:35.076088+00:00",
+      "ended_utc": "2026-10-20T12:59:35.266323+00:00",
       "expected_statuses": [
         400,
         400,
@@ -379,211 +379,211 @@
       ],
       "records": [
         {
-          "receipt": "a78b1439f179ba540e99a3810d147f6f",
-          "timestamp_utc": 1792448755,
+          "receipt": "771fc06cb36a8d95ce0357f499d82dcc",
+          "timestamp_utc": 1792501175,
           "outcome": "invalid_or_expired_form_token",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
         },
         {
-          "receipt": "9a831fc8165480a1178f74ad705bd346",
-          "timestamp_utc": 1792448755,
+          "receipt": "73f2a969876f370496fd68074e21cc54",
+          "timestamp_utc": 1792501175,
           "outcome": "invalid_or_expired_form_token",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
         },
         {
-          "receipt": "94bf970736b289140ea88fcb3db1e593",
-          "timestamp_utc": 1792448755,
+          "receipt": "88411be2264eb592c61c7a6552b03134",
+          "timestamp_utc": 1792501175,
           "outcome": "invalid_or_expired_form_token",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
         },
         {
-          "receipt": "fad48e09dc39729cdd7584e24a95a4de",
-          "timestamp_utc": 1792448755,
+          "receipt": "1722338f7b3ceee2fa298461a0eb1be3",
+          "timestamp_utc": 1792501175,
           "outcome": "invalid_or_expired_form_token",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
         },
         {
-          "receipt": "67b67b4b095746b525b363138bfc8b94",
-          "timestamp_utc": 1792448755,
+          "receipt": "bc42ad610d5bc2ff0a7aa915cfe593ea",
+          "timestamp_utc": 1792501175,
           "outcome": "invalid_or_expired_form_token",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
         },
         {
-          "receipt": "349fe6e8152ad47e74d45560dc51ef32",
-          "timestamp_utc": 1792448755,
+          "receipt": "0af60493046f558717518fba25b8a47f",
+          "timestamp_utc": 1792501175,
           "outcome": "invalid_or_expired_form_token",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
         },
         {
-          "receipt": "c14dea757ea5c93088055a08f9b3abce",
-          "timestamp_utc": 1792448755,
+          "receipt": "4123c0ca8fa945533c24d884cca59108",
+          "timestamp_utc": 1792501175,
           "outcome": "invalid_or_expired_form_token",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
         },
         {
-          "receipt": "5f4c77c1dbde2ce835d0f782c72283fc",
-          "timestamp_utc": 1792448755,
+          "receipt": "0a4f372e155c0b990cf94d246d7d7e89",
+          "timestamp_utc": 1792501175,
           "outcome": "invalid_or_expired_form_token",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
         },
         {
-          "receipt": "209d563fb638ff3e066d3bee489486b4",
-          "timestamp_utc": 1792448755,
+          "receipt": "4c02e5867ec037efef383dad1f819ace",
+          "timestamp_utc": 1792501175,
           "outcome": "invalid_or_expired_form_token",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
         },
         {
-          "receipt": "48906e804df3cdc1b0d36c2d179bcc12",
-          "timestamp_utc": 1792448755,
+          "receipt": "1d0e2249dfe939c02263d6dd31775e8f",
+          "timestamp_utc": 1792501175,
           "outcome": "invalid_or_expired_form_token",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
         },
         {
-          "receipt": "9788e3664d284e1802c17e3dfe77215e",
-          "timestamp_utc": 1792448755,
+          "receipt": "3b9499669e1682f84bddb1c9384855ba",
+          "timestamp_utc": 1792501175,
           "outcome": "invalid_or_expired_form_token",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
         },
         {
-          "receipt": "a20d30e37b405dfd70fb0ff7a3542267",
-          "timestamp_utc": 1792448755,
+          "receipt": "98433bc85336c5430edcf3eb71354f8c",
+          "timestamp_utc": 1792501175,
           "outcome": "invalid_or_expired_form_token",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
         },
         {
-          "receipt": "e06cd46b4cae8e0f79cdf82b78f4e50d",
-          "timestamp_utc": 1792448755,
+          "receipt": "58ca0ee1c60295e6c2df867f794d7953",
+          "timestamp_utc": 1792501175,
           "outcome": "invalid_or_expired_form_token",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
         },
         {
-          "receipt": "99c567205ffc48353b67036e515ac447",
-          "timestamp_utc": 1792448755,
+          "receipt": "02838801c3d13f7d5480bd11f6ab65eb",
+          "timestamp_utc": 1792501175,
           "outcome": "invalid_or_expired_form_token",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
         },
         {
-          "receipt": "4141c65705264bf2f3809ac1f2d05fb6",
-          "timestamp_utc": 1792448755,
+          "receipt": "b54c797be5782ad2870717ac6c2f2189",
+          "timestamp_utc": 1792501175,
           "outcome": "invalid_or_expired_form_token",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
         },
         {
-          "receipt": "e48f0b108d671c4ecaa4a828f56c3814",
-          "timestamp_utc": 1792448755,
+          "receipt": "b7fda83dcf0f29673aa9ea117e9d0282",
+          "timestamp_utc": 1792501175,
           "outcome": "invalid_or_expired_form_token",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
         },
         {
-          "receipt": "66be93d1a4835228edce09ea08022eea",
-          "timestamp_utc": 1792448755,
+          "receipt": "0e05fc9d38bbb7bb8e98408b10f3bd10",
+          "timestamp_utc": 1792501175,
           "outcome": "invalid_or_expired_form_token",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
         },
         {
-          "receipt": "944328a4ba12beeb15b0dca1c14acf9a",
-          "timestamp_utc": 1792448755,
+          "receipt": "1066ac0dff4ce360e91cb8d58f99246c",
+          "timestamp_utc": 1792501175,
           "outcome": "invalid_or_expired_form_token",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
         },
         {
-          "receipt": "b8ce6b35c49bb0ab2326a22e533a85c1",
-          "timestamp_utc": 1792448755,
+          "receipt": "64f1e3b8f3131e45533fdf4399925ebc",
+          "timestamp_utc": 1792501175,
           "outcome": "invalid_or_expired_form_token",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
         },
         {
-          "receipt": "19bc1873c0015f40f447b2151a6531bb",
-          "timestamp_utc": 1792448755,
+          "receipt": "3c55366d047cdea246abf548a2c936a3",
+          "timestamp_utc": 1792501175,
           "outcome": "invalid_or_expired_form_token",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
         },
         {
-          "receipt": "91f095e6c6dc02a3a96614ae60479ac8",
-          "timestamp_utc": 1792448755,
+          "receipt": "fb865f66bb112b6a65a8a67aa9ce426b",
+          "timestamp_utc": 1792501175,
           "outcome": "invalid_or_expired_form_token",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
         },
         {
-          "receipt": "8f2fa9d924bad4ad67c22a0a507fdd31",
-          "timestamp_utc": 1792448755,
+          "receipt": "bc61858ac093cce611ad604bf0c709c4",
+          "timestamp_utc": 1792501175,
           "outcome": "invalid_or_expired_form_token",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
         },
         {
-          "receipt": "0cdc888e17f31f3b99f089b3e5393f81",
-          "timestamp_utc": 1792448755,
+          "receipt": "21cf4ddbdc5799f71d8b5098e24b660f",
+          "timestamp_utc": 1792501175,
           "outcome": "invalid_or_expired_form_token",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
         },
         {
-          "receipt": "9652af2525325c708580dddb3d3da438",
-          "timestamp_utc": 1792448755,
+          "receipt": "09054a40de644c07ffb4611169ec74f5",
+          "timestamp_utc": 1792501175,
           "outcome": "invalid_or_expired_form_token",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
         },
         {
-          "receipt": "d1f0fbb70da494593c089cb88d083f84",
-          "timestamp_utc": 1792448755,
+          "receipt": "d7392e294bb0a7f162b155ad07b92910",
+          "timestamp_utc": 1792501175,
           "outcome": "invalid_or_expired_form_token",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
         },
         {
-          "receipt": "502e29e214e45a2e94ab5d081e4b3eeb",
-          "timestamp_utc": 1792448755,
+          "receipt": "4862c7f9f7a4d88bac110bf5d9186978",
+          "timestamp_utc": 1792501175,
           "outcome": "invalid_or_expired_form_token",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
         },
         {
-          "receipt": "6bc8784afc4cedb45437e5e79d65035b",
-          "timestamp_utc": 1792448755,
+          "receipt": "29f0c7247bac7124e64d099cd238938c",
+          "timestamp_utc": 1792501175,
           "outcome": "invalid_or_expired_form_token",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
         },
         {
-          "receipt": "a332fdf78116c30d4c10d1fa993397c9",
-          "timestamp_utc": 1792448755,
+          "receipt": "e31a538b55c000e589e2ba9668edb027",
+          "timestamp_utc": 1792501175,
           "outcome": "invalid_or_expired_form_token",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
         },
         {
-          "receipt": "5fcc6d08275f3a56f0d1c5f9c05913b4",
-          "timestamp_utc": 1792448755,
+          "receipt": "dda855fb798eaba8beb7092c388b9d23",
+          "timestamp_utc": 1792501175,
           "outcome": "invalid_or_expired_form_token",
           "automation_declared": "automated",
           "authorization_status": "not_verified"
         },
         {
-          "receipt": "bfb0740bdc0572007d985d14b7f984e3",
-          "timestamp_utc": 1792448755,
+          "receipt": "4cd495d85d33e1ec87b75cde49dad9b0",
+          "timestamp_utc": 1792501175,
           "outcome": "invalid_or_expired_form_token",
           "automation_declared": "automated",
           "authorization_status": "not_verified"

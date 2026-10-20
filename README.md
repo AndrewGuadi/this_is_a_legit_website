@@ -1,4 +1,9 @@
-# This Is a Legit Website
+# Legit Arcade
+
+A mobile-first arcade catalog with eight original game concepts and a secondary form-research area. The first game, **Neon Breaker**, is proposed and **not implemented** pending Andrew's approval. The homepage is `/`, concepts live at `/games/<slug>`, and the preserved forms are at `/forms` and `/apply/<kind>`. The investigator workspace remains `/admin/login`.
+
+Game status is tracked in `game_catalog.py`; see [game roadmap](docs/GAME_ROADMAP.md) and [first-game brief](docs/FIRST_GAME_BRIEF.md). Catalog visits do not create observation records. No game telemetry or gameplay engine is included yet.
+
 
 A Flask/SQLite form-observation prototype for Authentic Dynamics LLC. Public, crawlable pages and three conventional application flows collect bounded first-party metadata. All clients receive the same research disclosure: this is not an actual job, grant, directory-placement, or service offer.
 

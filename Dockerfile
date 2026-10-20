@@ -3,7 +3,7 @@ ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PORT=8000 APP_ENV=production
 WORKDIR /app
 COPY requirements.txt ./
 RUN pip install --no-cache-dir -r requirements.txt && useradd --uid 10001 --create-home appuser && mkdir /data && chown appuser:appuser /data
-COPY app.py preflight.py wsgi.py ./
+COPY app.py game_catalog.py preflight.py wsgi.py ./
 COPY deployment/ deployment/
 COPY templates/ templates/
 COPY static/ static/
