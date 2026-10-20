@@ -31,7 +31,7 @@ async function fillForm(page) {
   await page.getByRole('checkbox', { name: /I have read and accept/ }).check();
 }
 
-for (const path of ['/', '/terms', '/apply/directory', '/apply/partner', '/apply/contact', '/admin/login']) {
+for (const path of ['/', '/forms', '/games/neon-breaker', '/terms', '/apply/directory', '/apply/partner', '/apply/contact', '/admin/login']) {
   test(`public page ${path}: semantics, accessibility, layout`, async ({ page }, testInfo) => {
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
@@ -40,6 +40,11 @@ for (const path of ['/', '/terms', '/apply/directory', '/apply/partner', '/apply
     await expect(page.getByRole('heading', { level: 1 })).toHaveCount(1);
     await expect(page.getByRole('main')).toBeVisible();
     await noOverflow(page);
+    for (const img of await page.locator('img').all()) {
+      await img.scrollIntoViewIfNeeded();
+      await expect(img).toHaveJSProperty('complete', true);
+      expect(await img.evaluate(el => el.naturalWidth)).toBeGreaterThan(0);
+    }
     await accessible(page);
     await screenshot(page, testInfo, path.replace(/\W+/g, '-') || 'home');
     expect(errors).toEqual([]);
@@ -200,4 +205,25 @@ test('keyboard-only investigator login filter deletion and logout', async ({ pag
   await page.keyboard.press('Enter');
   await expect(page).toHaveURL(/\/admin\/login/);
   await screenshot(page, testInfo, 'keyboard-admin-signed-out');
+});
+
+// The arcade shell remains an honest catalog until the owner approves game one.
+test('arcade catalog filters and secondary forms remain usable', async ({ page }, testInfo) => {
+  await page.goto('/');
+  await expect(page.locator('[data-genre]')).toHaveCount(8);
+  const filter = page.locator('[data-filter]').nth(1);
+  const genre = await filter.getAttribute('data-filter');
+  await filter.click();
+  await expect(filter).toHaveAttribute('aria-pressed', 'true');
+  expect(await page.locator('[data-genre]:visible').count()).toBeGreaterThan(0);
+  for (const card of await page.locator('[data-genre]:visible').all()) {
+    await expect(card).toHaveAttribute('data-genre', genre);
+  }
+  await noOverflow(page);
+  await page.getByRole('button', { name: 'All concepts', exact: true }).click();
+  await expect(page.locator('[data-genre]:visible')).toHaveCount(8);
+  await page.getByRole('link', { name: 'Form research', exact: true }).click();
+  await expect(page).toHaveURL(/\/forms$/);
+  await expect(page.getByText('This is a research demonstration.', { exact: true })).toBeVisible();
+  await screenshot(page, testInfo, 'secondary-form-layer');
 });

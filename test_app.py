@@ -49,12 +49,32 @@ class ObservationTests(unittest.TestCase):
             conn.execute('INSERT INTO events VALUES (?,?,?,?)',('old',int(time.time())-31*86400,'net','{}'))
         self.assertEqual(self.events(),[])
     def test_public_pages_and_sitemap(self):
-        for path in ('/','/terms','/apply/directory','/apply/partner','/apply/contact'):
+        for path in ('/forms','/terms','/apply/directory','/apply/partner','/apply/contact'):
             result = self.client.get(path)
             self.assertEqual(result.status_code,200)
             self.assertIn(b'research demonstration', result.data.lower())
         self.assertIn(b'https://example.com/apply/directory',self.client.get('/sitemap.xml').data)
         self.assertEqual(self.client.get('/apply/unknown').status_code,404)
+    def test_arcade_catalog_preserves_secondary_forms_without_recording_views(self):
+        from game_catalog import GAMES
+        home=self.client.get('/')
+        self.assertEqual(home.status_code,200)
+        self.assertIn(b'LEGIT',home.data)
+        self.assertIn(b'href="/forms"',home.data)
+        self.assertEqual(len(GAMES),8)
+        self.assertEqual(GAMES[0]['status'],'awaiting_approval')
+        for game in GAMES:
+            route='/games/'+game['slug']
+            response=self.client.get(route)
+            self.assertEqual(response.status_code,200)
+            self.assertIn(b'not a playable release',response.data)
+            self.assertNotIn(b'<canvas',response.data)
+            self.assertIn(route.encode(),self.client.get('/sitemap.xml').data)
+        self.assertEqual(self.client.get('/games/unknown').status_code,404)
+        self.assertEqual(self.events(),[])
+        self.assertEqual(self.client.post('/apply/directory',data=self.data()).status_code,200)
+        self.assertEqual(len(self.events()),1)
+
     def login(self):
         self.client.get('/admin/login')
         with self.client.session_transaction() as sess:

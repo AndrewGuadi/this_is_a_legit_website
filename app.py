@@ -14,9 +14,11 @@ from flask import Flask, abort, jsonify, make_response, render_template, request
 from werkzeug.exceptions import SecurityError
 from deployment.deletion_ledger import record_deletion, default_ledger_path
 from itsdangerous import URLSafeTimedSerializer, BadSignature, SignatureExpired
+from game_catalog import GAMES
 
-VERSION = '2026-10-19-v5'
-POLICY = '''This is a form-interaction research website operated by Authentic Dynamics LLC.
+VERSION = '2026-10-20-v6'
+POLICY = '''Legit Arcade is a browser-game project with a secondary form-interaction research section, operated by Authentic Dynamics LLC.
+The game catalog currently contains planned concepts, not playable releases. Browsing the catalog does not create a form observation.
 No employment, grant, purchase, or service is offered through these forms. Use synthetic test details only.
 Public pages may be read and indexed. Automated submissions require prior written operator permission;
 permission to read or index does not grant permission to submit. Do not submit another person's information.
@@ -181,7 +183,15 @@ def create_app(config=None):
         app.register_error_handler(code,request_error)
     @app.get('/')
     def home():
+        return render_template('arcade.html', view='home', games=GAMES, game=GAMES[0])
+    @app.get('/forms')
+    def forms():
         return page('home')
+    @app.get('/games/<slug>')
+    def game_concept(slug):
+        game = next((item for item in GAMES if item['slug'] == slug), None)
+        if game is None: abort(404)
+        return render_template('arcade.html', view='game', games=GAMES, game=game)
     @app.get('/terms')
     def terms():
         return page('terms', policy=POLICY, version=VERSION, digest=POLICY_HASH)
@@ -377,7 +387,7 @@ def create_app(config=None):
         from xml.sax.saxutils import escape
         if not app.config['PUBLIC_URL']:
             abort(503)
-        urls=['/','/terms','/apply/directory','/apply/partner','/apply/contact']
+        urls=['/','/forms','/terms','/apply/directory','/apply/partner','/apply/contact'] + ['/games/'+game['slug'] for game in GAMES]
         content='<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
         content+=''.join('<url><loc>'+escape(app.config['PUBLIC_URL']+p)+'</loc></url>' for p in urls)+'</urlset>'
         return content,200,{'Content-Type':'application/xml'}
