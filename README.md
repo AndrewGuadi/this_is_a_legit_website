@@ -1,8 +1,8 @@
 # Legit Arcade
 
-An arcade with **Neon Breaker**, a playable original three-stage brick breaker, seven future game concepts, and a secondary form-research area. Neon Breaker is a review candidate; final release requires independent TODD review and physical-device evidence. The homepage is `/`, concepts live at `/games/<slug>`, and the preserved forms are at `/forms` and `/apply/<kind>`. The investigator workspace remains `/admin/login`.
+An arcade with **Neon Breaker**, **Infinite Tic-Tac-Toe**, seven future game concepts, and a secondary form-research area. Both games are playable review candidates; final release requires independent review and physical-device evidence. The homepage is `/`, concepts live at `/games/<slug>`, and the preserved forms are at `/forms` and `/apply/<kind>`. The investigator workspace remains `/admin/login`.
 
-Game status is tracked in `game_catalog.py`; see [game roadmap](docs/GAME_ROADMAP.md) and [first-game brief](docs/FIRST_GAME_BRIEF.md). Catalog visits do not create observation records. Neon Breaker uses native Canvas and local modules, with no game telemetry or third-party requests. Optional best-score storage stays on the device.
+Game status is tracked in `game_catalog.py`; see [game roadmap](docs/GAME_ROADMAP.md) and [first-game brief](docs/FIRST_GAME_BRIEF.md). Catalog visits do not create observation records. Both games use local modules with no game telemetry or third-party requests. Neon Breaker's optional best score and Infinite Tic-Tac-Toe's optional sound preference stay on the device.
 
 
 A Flask/SQLite form-observation prototype for Authentic Dynamics LLC. Public, crawlable pages and three conventional application flows collect bounded first-party metadata. All clients receive the same research disclosure: this is not an actual job, grant, directory-placement, or service offer.
@@ -29,6 +29,12 @@ Open `/games/neon-breaker` on the running app. Arrow keys or A/D move, Space lau
 Run `npm run test:game` for deterministic simulation checks and `npm run test:browser` for browser, touch-emulation and accessibility checks (install dependencies with `npm ci` and `npx playwright install chromium`). Use the project Python environment so the browser fixture can import Flask. For a local synthetic preview without production data, run `python tests/browser/server.py` and open `http://127.0.0.1:5081/games/neon-breaker`. Never deploy that fixture server.
 
 The owner authorized direct Codex implementation with a separate local TODD reviewer on 2026-10-20. See [implementation contract](docs/neon-breaker-contract.md). Browser emulation does not establish physical-phone performance.
+
+## Infinite Tic-Tac-Toe
+
+Open `/games/infinite-tic-tac-toe` for an endless local two-player match on one device. Choose Place or Remove, then a cell. Three in a row scores one point and ends only that round. If both players repeat their exact move on the same cell for three consecutive own turns each, the board resets while scores remain. There is no online multiplayer, account, server move traffic, or match persistence.
+
+Use native buttons with mouse/touch or Tab plus arrow keys and Enter/Space. Sound is optional and starts off; only its preference can be stored locally. See the [rules and implementation contract](docs/INFINITE_TIC_TAC_TOE.md). The same `npm run test:game` and `npm run test:browser` commands cover this game.
 
 ## Evidence
 

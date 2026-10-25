@@ -1,4 +1,4 @@
-"""Arcade catalog source of truth. Neon Breaker is playable; seven future concepts remain planned."""
+"""Arcade catalog source of truth. Two games are playable; seven future concepts remain planned."""
 GAMES = [
     {
         "slug": "neon-breaker",
@@ -79,5 +79,15 @@ GAMES = [
         "session": "2–5 minutes",
         "status": "planned",
         "phase": 8,
+    },
+    {
+        "slug": "infinite-tic-tac-toe",
+        "title": "Infinite Tic-Tac-Toe",
+        "genre": "Local strategy duel",
+        "description": "Share one screen, build three in a row, or spend a turn erasing an opponent’s mark. Endless rounds break repeating loops.",
+        "controls": "Mouse/touch: choose Place or Remove, then a cell. Keyboard: Tab to the board, arrows between cells, Enter/Space to act.",
+        "session": "Endless · 2 players",
+        "status": "playable",
+        "phase": 9,
     },
 ]
