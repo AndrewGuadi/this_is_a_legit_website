@@ -112,3 +112,5 @@ CMD-02 materially improves government, tracked progression and persistent enviro
 ## Manager verification after this independent assessment
 
 The final full browser rerun passed all 160 cases after the one-attribute bond accessibility correction. The 37-file manager inventory is at `evidence/CMD-02/source-manifest.json`, with sorted files-mapping SHA-256 `2cd0c51308dc19d1c8ca693bfeb7c9ead5ccf9684ff12d6200dd70aaa46efa64`. This later result does not change which checks the independent assessor personally executed or its zero-equivalence conclusion.
+
+Published source binding: remote candidate `0eb19f8f89ba03459f3c41172e7c53fa7316746a`, full tree `28c71bceb31e31a0bcec3332d54b1b73cdb89290`, matches the inspected source. Independent CMD-TODD-02 remains REVISE at 85.6/100; later report-only documentation does not alter those source hashes.
