@@ -1,0 +1,53 @@
+✔ creation preserves warehouse ownership without duplicating stock or inventing opening deliveries (10.058507ms)
+✔ actual staffed industrial production enters producer stock once; repeated hook is inert (11.110425ms)
+✔ closed, burning, unstaffed, unserved and unpowered producers generate no goods (9.445781ms)
+✔ warehouse cargo travels a real bounded path before a shop receives inventory (5.065644ms)
+✔ shared shop unloading is finite and goods remain aboard during partial deliveries (2.919607ms)
+✔ purchases consume only physically delivered shop stock and do not debit warehouse again (6.764528ms)
+✔ blocked roads hold real cargo and repairs restore its delivery (13.306285ms)
+✔ closing a destination returns its cargo over roads instead of teleporting or losing it (2.371524ms)
+✔ freight shares remaining road capacity with commuters and other freight (3.572322ms)
+✔ zero utilities or a closed gateway cannot dispatch warehouse freight (1.983365ms)
+✔ external warehouse transfer records only actual bounded stock and preserves money (1.197146ms)
+✔ demolition conserves producer and retail stock into explicit recovered goods (1.123977ms)
+✔ recall retains cargo and rejects malformed or missing vehicle actions without state changes (8.45777ms)
+✔ a tower shop uses explicitly supplied staffed monthly retail throughput (4.777448ms)
+✔ reporting is pure and returns defensive paths and stock/load arrays (4.231607ms)
+✔ strict validation rejects malformed keys, clocks, stocks, quantities and broken conservation (2.013629ms)
+✔ strict validation rejects malformed in-flight route/cursor/id/payload relationships (4.893704ms)
+✔ counter overflow refuses monthly production atomically (3.33678ms)
+✖ destroying the road under a loaded recalled truck preserves its position and cargo until repair (5.23893ms)
+✔ rotating shop admission eventually serves every shop under a finite shared fleet (283.003971ms)
+✔ producer stock bounds preserve actual accepted production without wrapping or losing prior goods (1.817821ms)
+✔ a demolished producer and full warehouse recover returned cargo into explicit loose goods (10.100073ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 21
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 567.351606
+
+✖ failing tests:
+
+test at tests/city/commerce.test.mjs:76:1
+✖ destroying the road under a loaded recalled truck preserves its position and cargo until repair (5.23893ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  68 !== 100
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/commerce.test.mjs:79:62)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 68,
+    expected: 100,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

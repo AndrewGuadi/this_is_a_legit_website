@@ -1,0 +1,42 @@
+✔ streetcar displaces real car commuters and restores after save/reload; route removal invalidates cached assignment (315.354076ms)
+✔ ferry displaces real car commuters and restores after save/reload; route removal invalidates cached assignment (152.668216ms)
+✔ maglev displaces real car commuters and restores after save/reload; route removal invalidates cached assignment (215.660327ms)
+✔ new infrastructure placement rejects inland ferries, unresearched maglev and ineffective track modules without charging (489.489935ms)
+✔ a complete five-topic research save is valid but forged unresearched maglev is rejected (165.862945ms)
+✔ planning creates bounded zeroed derived loads and never mutates the authoritative city (27.709398ms)
+✔ a connected rail path with two distinct accessible stations carries actual passengers (6.080658ms)
+✔ disconnected rail segments, one station and tracks without stations serve nobody (6.672365ms)
+✔ disabled, burning or road-disconnected stations are ineligible (5.087716ms)
+✔ catchments are bounded and one shared station cannot pretend to be a route (2.282491ms)
+✔ rail capacity is reserved across repeated callers sharing the same track (2.023888ms)
+✔ buses need two exchanges and a genuine connected road path, reducing car equivalents (1.326043ms)
+✔ bus capacity is shared across overlapping trips without inventing passengers (1.059922ms)
+✔ bus path cannot jump over missing tiles, diagonals or disconnected roads (5.301003ms)
+✔ invalid requests and invalid endpoint indices leave every derived load unchanged (7.937191ms)
+✔ planning snapshots network eligibility rather than retaining writable source references (2.896855ms)
+✔ rail is preferred when both a valid bus and rail route serve a journey (1.292008ms)
+✔ station modules increase aggregate throughput across different rail branches without raising edge capacity (3.790922ms)
+✔ saturated rail edges do not hide an available alternate track path (1.51637ms)
+✔ a disabled or burning bus exchange cannot provide service (1.894934ms)
+✔ streetcar assigns real demand on its connected network with finite shared segments and endpoints (5.007105ms)
+✔ streetcar rejects disconnected or demolished paths and inaccessible/closed/burning endpoints (8.323745ms)
+✔ streetcar module capacity never raises a shared segment's capacity (0.709463ms)
+✔ ferry assigns real demand on its connected network with finite shared segments and endpoints (3.66734ms)
+✔ ferry rejects disconnected or demolished paths and inaccessible/closed/burning endpoints (5.95611ms)
+✔ ferry module capacity never raises a shared segment's capacity (0.633443ms)
+✔ maglev assigns real demand on its connected network with finite shared segments and endpoints (3.559065ms)
+✔ maglev rejects disconnected or demolished paths and inaccessible/closed/burning endpoints (7.929071ms)
+✔ maglev module capacity never raises a shared segment's capacity (1.381095ms)
+✔ ferry terminals cannot teleport across land and a water bridge preserves navigation (2.129998ms)
+✔ future movement requires completed maglev research, even for imported infrastructure (2.427152ms)
+✔ streetcar a single shared track or water tile cannot be reserved repeatedly beyond capacity (1.794934ms)
+✔ ferry a single shared track or water tile cannot be reserved repeatedly beyond capacity (0.890823ms)
+✔ maglev a single shared track or water tile cannot be reserved repeatedly beyond capacity (0.771865ms)
+ℹ tests 34
+ℹ suites 0
+ℹ pass 34
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1481.204223

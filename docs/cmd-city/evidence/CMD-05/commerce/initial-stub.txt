@@ -1,0 +1,9 @@
+export function createCommerce(city){const n=city.tiles.length;return{version:1,lastMonth:city.month,nextId:1,producerStock:Array(n).fill(0),retailStock:Array(n).fill(0),looseGoods:0,vehicles:[],roadLoad:Array(n).fill(0),counters:{openingGoods:city.inventory.goods,produced:0,externalIn:0,externalOut:0,consumed:0,delivered:0,returned:0,completedTrips:0,salvaged:0}};}
+export function validateCommerce(){return true;}
+export function commerceReport(city){return{conservation:true,retailStock:city.commerce.retailStock.slice(),roadLoad:city.commerce.roadLoad.slice(),vehicles:structuredClone(city.commerce.vehicles)}}
+export function advanceCommerce(city){return{...commerceReport(city),changed:false}}
+export function commerceRetailStock(city,i){return city.commerce.retailStock[i]||0}
+export function consumeRetail(){return 0}
+export function transferWarehouse(){return 0}
+export function preserveCommerceDemolition(){return{ok:false}}
+export function commerceAction(){return{ok:false}}

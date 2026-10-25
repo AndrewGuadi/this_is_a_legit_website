@@ -259,3 +259,144 @@ test("a disabled or burning bus exchange cannot provide service", () => {
     assert.equal(n.busPassengers, 0);
   }
 });
+
+function modeFixture(mode) {
+  const f = railFixture();
+  const stops = {
+    streetcar: "streetcarStop",
+    ferry: "ferryTerminal",
+    maglev: "maglevStation",
+  };
+  f.s.research = { completed: ["maglev"] };
+  for (const x of [2, 20]) place(f.s, stops[mode], x, 15);
+  for (let x = 2; x <= 20; x++)
+    place(f.s, mode === "ferry" ? "empty" : `${mode}Track`, x, 14, {
+      terrain: mode === "ferry" ? "water" : "land",
+    });
+  return f;
+}
+for (const [mode, capacity] of [
+  ["streetcar", 160],
+  ["ferry", 200],
+  ["maglev", 600],
+]) {
+  test(`${mode} assigns real demand on its connected network with finite shared segments and endpoints`, () => {
+    const { s, origin, destination } = modeFixture(mode),
+      before = structuredClone(s),
+      n = planTransit(s, access());
+    assert.deepEqual(routeTransit(n, origin, destination, [], capacity - 20), {
+      mode,
+      moved: capacity - 20,
+      roadFactor: 0,
+    });
+    assert.equal(routeTransit(n, destination, origin, [], 50).moved, 20);
+    assert.equal(routeTransit(n, origin, destination, [], 1).moved, 0);
+    assert.equal(n[`${mode}Passengers`], capacity);
+    assert.ok(n[`${mode}Load`].some((x) => x === capacity));
+    assert.deepEqual(s, before);
+  });
+  test(`${mode} rejects disconnected or demolished paths and inaccessible/closed/burning endpoints`, () => {
+    for (const change of [
+      (s, a) => {
+        s.tiles[idx(10, 14)].type = mode === "ferry" ? "landfill" : "empty";
+      },
+      (s, a) => {
+        s.tiles[idx(2, 15)].type = "empty";
+      },
+      (s, a) => {
+        s.tiles[idx(20, 15)].enabled = false;
+      },
+      (s, a) => {
+        s.tiles[idx(20, 15)].fire = 1;
+      },
+      (s, a) => {
+        a[idx(20, 15)] = false;
+      },
+    ]) {
+      const { s, origin, destination } = modeFixture(mode),
+        a = access();
+      change(s, a);
+      const n = planTransit(s, a);
+      assert.equal(routeTransit(n, origin, destination, [], 10).moved, 0);
+      assert.equal(n[`${mode}Passengers`], 0);
+    }
+  });
+  test(`${mode} module capacity never raises a shared segment's capacity`, () => {
+    const { s, origin, destination } = modeFixture(mode);
+    s.tiles[idx(2, 15)].modules = s.tiles[idx(20, 15)].modules = 3;
+    const n = planTransit(s, access());
+    assert.equal(
+      routeTransit(n, origin, destination, [], capacity * 2).moved,
+      capacity,
+    );
+    assert.equal(routeTransit(n, origin, destination, [], 1).moved, 0);
+  });
+}
+test("ferry terminals cannot teleport across land and a water bridge preserves navigation", () => {
+  const { s, origin, destination } = modeFixture("ferry");
+  s.tiles[idx(10, 14)].terrain = "land";
+  assert.equal(
+    routeTransit(planTransit(s, access()), origin, destination, [], 30).moved,
+    0,
+  );
+  s.tiles[idx(10, 14)].terrain = "water";
+  s.tiles[idx(10, 14)].type = "bridge";
+  assert.equal(
+    routeTransit(planTransit(s, access()), origin, destination, [], 30).moved,
+    30,
+  );
+});
+test("future movement requires completed maglev research, even for imported infrastructure", () => {
+  const { s, origin, destination } = modeFixture("maglev");
+  s.research.completed = [];
+  assert.equal(
+    routeTransit(planTransit(s, access()), origin, destination, [], 30).moved,
+    0,
+  );
+  s.research.completed = ["maglev"];
+  assert.equal(
+    routeTransit(planTransit(s, access()), origin, destination, [], 30).moved,
+    30,
+  );
+});
+for (const [mode, capacity] of [
+  ["streetcar", 160],
+  ["ferry", 200],
+  ["maglev", 600],
+])
+  test(`${mode} a single shared track or water tile cannot be reserved repeatedly beyond capacity`, () => {
+    const s = fixture();
+    s.research = { completed: ["maglev"] };
+    const stop = {
+      streetcar: "streetcarStop",
+      ferry: "ferryTerminal",
+      maglev: "maglevStation",
+    }[mode];
+    place(s, mode === "ferry" ? "empty" : `${mode}Track`, 10, 10, {
+      terrain: mode === "ferry" ? "water" : "land",
+    });
+    place(s, stop, 9, 10, { modules: 3 });
+    place(s, stop, 11, 10, { modules: 3 });
+    place(s, "road", 8, 10);
+    place(s, "road", 12, 10);
+    const n = planTransit(s, access());
+    assert.equal(
+      routeTransit(n, idx(9, 10), idx(11, 10), [], capacity - 10).moved,
+      capacity - 10,
+    );
+    assert.equal(routeTransit(n, idx(11, 10), idx(9, 10), [], 30).moved, 10);
+    assert.equal(n[`${mode}Load`][idx(10, 10)], capacity);
+  });
+test("rail shares one track tile's 400 passenger capacity across repeated module-expanded station requests", () => {
+  const s = fixture();
+  place(s, "rail", 10, 10);
+  place(s, "station", 9, 10, { modules: 3 });
+  place(s, "station", 11, 10, { modules: 3 });
+  place(s, "road", 8, 10);
+  place(s, "road", 12, 10);
+  const n = planTransit(s, access());
+  assert.equal(routeTransit(n, idx(9, 10), idx(11, 10), [], 350).moved, 350);
+  assert.equal(routeTransit(n, idx(9, 10), idx(11, 10), [], 350).moved, 50);
+  assert.equal(n.railPassengers, 400);
+  assert.equal(n.railLoad[idx(10, 10)], 400);
+});

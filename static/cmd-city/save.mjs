@@ -84,7 +84,8 @@ export function parseCity(text) {
   if (
     !integer(s.research.points, 0, 1000000) ||
     !Array.isArray(s.research.completed) ||
-    s.research.completed.length > 4 ||
+    s.research.completed.length > Object.keys(RESEARCH).length ||
+    (version < 3 && s.research.completed.includes("maglev")) ||
     new Set(s.research.completed).size !== s.research.completed.length ||
     s.research.completed.some(
       (v) => typeof v !== "string" || !Object.hasOwn(RESEARCH, v),
@@ -141,6 +142,24 @@ export function parseCity(text) {
     if (t.type === "bridge" && t.terrain !== "water") bad();
     if (t.type === "mine" && !["coal", "ore"].includes(t.resource)) bad();
     if (t.type === "oilWell" && t.resource !== "oil") bad();
+    if (
+      ["maglevTrack", "maglevStation"].includes(t.type) &&
+      !s.research.completed.includes("maglev")
+    )
+      bad();
+    if (["streetcarTrack", "maglevTrack"].includes(t.type) && t.modules !== 0)
+      bad();
+    if (
+      version < 3 &&
+      [
+        "streetcarTrack",
+        "streetcarStop",
+        "ferryTerminal",
+        "maglevTrack",
+        "maglevStation",
+      ].includes(t.type)
+    )
+      bad();
     if (t.type === "tower" && !s.research.completed.includes("vertical")) bad();
     if (t.type === "tower" || t.type === "residential")
       population += t.occupancy;
@@ -239,7 +258,17 @@ export function parseCity(text) {
 /** Exact post-transaction byte bound; never guesses from entity counts. */
 export function assertCitySaveBudget(city) {
   const text = JSON.stringify(city);
-  if (typeof text !== "string" || new TextEncoder().encode(text).length > MAX)
+  // A UTF-16 code unit needs at most three UTF-8 bytes (a surrogate pair
+  // needs four total). Small strings and ASCII strings therefore have a proven
+  // byte bound without allocating a second full encoded buffer. Borderline
+  // Unicode still takes the exact encoder path.
+  if (
+    typeof text !== "string" ||
+    text.length > MAX ||
+    (text.length * 3 > MAX &&
+      /[^\u0000-\u007f]/.test(text) &&
+      new TextEncoder().encode(text).length > MAX)
+  )
     throw Error("This city would exceed the 1 MiB save/export limit.");
   return text;
 }

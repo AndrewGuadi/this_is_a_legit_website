@@ -255,13 +255,53 @@ const definitions = {
     "#c7bb9b",
     "Connect this station to rail and road, and provide a second station near workplaces. Regional train timetables remain planned.",
   ),
+  streetcarTrack: tool(
+    "Streetcar track",
+    "Transport",
+    180,
+    2,
+    "#b9a482",
+    "Dedicated connected streetcar tracks carry up to 160 assigned commuters per shared segment. Shared avenue lanes and timetables remain planned.",
+  ),
+  streetcarStop: tool(
+    "Streetcar stop",
+    "Transport",
+    1700,
+    60,
+    "#dfad72",
+    "Place beside a road and streetcar track, with a second stop near workplaces. Each base stop admits 160 commuters per month.",
+  ),
+  ferryTerminal: tool(
+    "Ferry terminal",
+    "Transport",
+    3200,
+    120,
+    "#70bdca",
+    "A road-accessible shore terminal connects local commuters over continuous navigable water to a second terminal. Shared segments and base terminals carry 200 commuters; regional arrivals and schedules remain planned.",
+  ),
+  maglevTrack: tool(
+    "Maglev guideway",
+    "Transport",
+    600,
+    8,
+    "#ad9cdd",
+    "Researched Maglev mobility connects stations on a dedicated guideway. Each shared segment carries up to 600 assigned commuters.",
+  ),
+  maglevStation: tool(
+    "Maglev station",
+    "Transport",
+    8000,
+    220,
+    "#c3b0e7",
+    "Requires Maglev mobility research, road access and a connected guideway to another station. Base terminal capacity: 600 commuters per month.",
+  ),
   port: tool(
     "Freight terminal",
     "Transport",
     4000,
     120,
     "#94b9bf",
-    "Waterfront freight terminal. Expands trade batch capacity; ferries remain planned.",
+    "Waterfront freight terminal. Expands trade batch capacity; build separate ferry terminals for local passenger service.",
   ),
   airport: tool(
     "Air terminal",
@@ -377,6 +417,13 @@ export const RESEARCH = Object.freeze({
     requires: ["cleanEnergy"],
     description:
       "Improve buses from 20 to 30 passengers per road-vehicle equivalent.",
+  },
+  maglev: {
+    label: "Maglev mobility",
+    cost: 180,
+    requires: ["transit"],
+    description:
+      "Unlock dedicated maglev guideways and stations with finite 600-passenger shared segments.",
   },
   vertical: {
     label: "Vertical construction",

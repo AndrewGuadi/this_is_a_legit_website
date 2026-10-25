@@ -1,0 +1,22 @@
+✔ save round trip restores authoritative state and deterministic future (855.40764ms)
+✔ malformed, oversize and unknown-version saves fail without changing the current city (17.857137ms)
+✔ all scalar and tile invariants are checked; unknown object keys are rejected (275.947457ms)
+✔ import strings are data and bounded, never interpreted as code (12.763497ms)
+✔ paused clock never accumulates and lifecycle reset requires explicit resume (0.409158ms)
+✔ equal simulated duration produces equal months at all speeds (0.501711ms)
+✔ stalled render is bounded; invalid elapsed does not corrupt future ticks (0.262651ms)
+✔ an accepted near-limit city rejects an ASCII or escaped rename without losing exportability (565.375838ms)
+✔ ordinary byte-safe actions preserve city identity and remain exactly exportable (24.142488ms)
+✔ a city month either remains exportable or rejects with every source field preserved (209.043387ms)
+✔ a city action cannot cross the region wrapper budget even when its individual city still fits (1125.210152ms)
+✔ near-limit regional shipment preserves stock cash shipments project and events on rejection (1033.462246ms)
+✔ near-limit regional contribute preserves stock cash shipments project and events on rejection (951.519451ms)
+✔ region switching and monthly advancement retain exportability or reject the whole region atomically (1007.999297ms)
+ℹ tests 14
+ℹ suites 0
+ℹ pass 14
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 5082.789782

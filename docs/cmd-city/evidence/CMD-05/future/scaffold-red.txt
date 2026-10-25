@@ -1,0 +1,139 @@
+✖ migration retains canonical tower population and legacy capacity with complete strict state (1.814335ms)
+✖ floor actions charge once, enforce occupied capacity, limits, research and closure (1.43862ms)
+✖ mixed floors have distinct finite capacities and internal utility dependence without report writes (0.303317ms)
+✖ corporate production consumes real finite oil and ore and books bounded product sales once (0.218605ms)
+✖ closed, disconnected or unstaffed corporate facilities cannot produce or conjure demand (0.167208ms)
+✖ research requires actual staffed institute and educated employed middle/high wealth adults (0.334337ms)
+✖ strict validation rejects altered keys, ledgers, indexes, floor counts and non-finite values (0.417631ms)
+✖ reconciliation removes demolished tower floors without losing corporate stock and initializes new towers (0.294766ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 0
+ℹ fail 8
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 127.274609
+
+✖ failing tests:
+
+test at tests/city/future.test.mjs:15:1
+✖ migration retains canonical tower population and legacy capacity with complete strict state (1.814335ms)
+  Error: Future validation not implemented
+      at validateFuture (file:///tmp/cmd-city-work/static/cmd-city/future.mjs:4:42)
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/future.test.mjs:16:20)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17)
+
+test at tests/city/future.test.mjs:19:1
+✖ floor actions charge once, enforce occupied capacity, limits, research and closure (1.43862ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/future.test.mjs:21:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/city/future.test.mjs:27:1
+✖ mixed floors have distinct finite capacities and internal utility dependence without report writes (0.303317ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/future.test.mjs:29:86)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/city/future.test.mjs:35:1
+✖ corporate production consumes real finite oil and ore and books bounded product sales once (0.218605ms)
+  Error: Future progression not implemented
+      at advanceFuture (file:///tmp/cmd-city-work/static/cmd-city/future.mjs:8:41)
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/future.test.mjs:37:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at tests/city/future.test.mjs:42:1
+✖ closed, disconnected or unstaffed corporate facilities cannot produce or conjure demand (0.167208ms)
+  Error: Future progression not implemented
+      at advanceFuture (file:///tmp/cmd-city-work/static/cmd-city/future.mjs:8:41)
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/future.test.mjs:45:11)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at tests/city/future.test.mjs:48:1
+✖ research requires actual staffed institute and educated employed middle/high wealth adults (0.334337ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/future.test.mjs:49:40)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/city/future.test.mjs:53:1
+✖ strict validation rejects altered keys, ledgers, indexes, floor counts and non-finite values (0.417631ms)
+  TypeError [Error]: Cannot set properties of undefined (setting 'tile')
+      at s.towers.<computed>.floors.push.use (file:///tmp/cmd-city-work/tests/city/future.test.mjs:54:72)
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/future.test.mjs:55:38)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)
+
+test at tests/city/future.test.mjs:57:1
+✖ reconciliation removes demolished tower floors without losing corporate stock and initializes new towers (0.294766ms)
+  Error: Future reconciliation not implemented
+      at syncFuture (file:///tmp/cmd-city-work/static/cmd-city/future.mjs:9:38)
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/future.test.mjs:58:143)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)

@@ -1,0 +1,316 @@
+✔ creation preserves warehouse ownership without duplicating stock or inventing opening deliveries (9.945818ms)
+✖ actual staffed industrial production enters producer stock once; repeated hook is inert (3.063349ms)
+✔ closed, burning, unstaffed, unserved and unpowered producers generate no goods (3.184431ms)
+✖ warehouse cargo travels a real bounded path before a shop receives inventory (9.312851ms)
+✖ shared shop unloading is finite and goods remain aboard during partial deliveries (0.71927ms)
+✖ purchases consume only physically delivered shop stock and do not debit warehouse again (3.066547ms)
+✖ blocked roads hold real cargo and repairs restore its delivery (1.278883ms)
+✖ closing a destination returns its cargo over roads instead of teleporting or losing it (1.18333ms)
+✖ freight shares remaining road capacity with commuters and other freight (0.539116ms)
+✔ zero utilities or a closed gateway cannot dispatch warehouse freight (1.045021ms)
+✖ external warehouse transfer records only actual bounded stock and preserves money (0.43843ms)
+✖ demolition conserves producer and retail stock into explicit recovered goods (0.888636ms)
+✖ recall retains cargo and rejects malformed or missing vehicle actions without state changes (1.660142ms)
+✖ a tower shop uses explicitly supplied staffed monthly retail throughput (0.596221ms)
+✔ reporting is pure and returns defensive paths and stock/load arrays (4.035277ms)
+✖ strict validation rejects malformed keys, clocks, stocks, quantities and broken conservation (0.90558ms)
+✖ strict validation rejects malformed in-flight route/cursor/id/payload relationships (0.709064ms)
+✖ counter overflow refuses monthly production atomically (2.418929ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 4
+ℹ fail 14
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 255.216885
+
+✖ failing tests:
+
+test at tests/city/commerce.test.mjs:20:1
+✖ actual staffed industrial production enters producer stock once; repeated hook is inert (3.063349ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 8
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/commerce.test.mjs:22:39)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 8,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/city/commerce.test.mjs:29:1
+✖ warehouse cargo travels a real bounded path before a shop receives inventory (9.312851ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(city.commerce.vehicles.some(v=>v.payload>0&&v.position!==ix(20,16)))
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/commerce.test.mjs:30:113)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/city/commerce.test.mjs:33:1
+✖ shared shop unloading is finite and goods remain aboard during partial deliveries (0.71927ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 80
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/commerce.test.mjs:34:106)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 80,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/city/commerce.test.mjs:36:1
+✖ purchases consume only physically delivered shop stock and do not debit warehouse again (3.066547ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(stock>0)
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/commerce.test.mjs:37:174)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/city/commerce.test.mjs:39:1
+✖ blocked roads hold real cargo and repairs restore its delivery (1.278883ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(commerceRetailStock(city,ix(20,15))>0)
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/commerce.test.mjs:40:397)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/city/commerce.test.mjs:42:1
+✖ closing a destination returns its cargo over roads instead of teleporting or losing it (1.18333ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(before<100)
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/commerce.test.mjs:43:130)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/city/commerce.test.mjs:45:1
+✖ freight shares remaining road capacity with commuters and other freight (0.539116ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(city.commerce.vehicles.some(v=>v.payload>0))
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/commerce.test.mjs:46:86)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/city/commerce.test.mjs:51:1
+✖ external warehouse transfer records only actual bounded stock and preserves money (0.43843ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 10
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/commerce.test.mjs:52:61)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 10,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/city/commerce.test.mjs:54:1
+✖ demolition conserves producer and retail stock into explicit recovered goods (0.888636ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/commerce.test.mjs:55:124)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/city/commerce.test.mjs:57:1
+✖ recall retains cargo and rejects malformed or missing vehicle actions without state changes (1.660142ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(v)
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/commerce.test.mjs:58:94)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/city/commerce.test.mjs:60:1
+✖ a tower shop uses explicitly supplied staffed monthly retail throughput (0.596221ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 10
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/commerce.test.mjs:62:49)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 10,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/city/commerce.test.mjs:67:1
+✖ strict validation rejects malformed keys, clocks, stocks, quantities and broken conservation (0.90558ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/commerce.test.mjs:68:285)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+test at tests/city/commerce.test.mjs:70:1
+✖ strict validation rejects malformed in-flight route/cursor/id/payload relationships (0.709064ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(city.commerce.vehicles.length>0)
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/commerce.test.mjs:71:60)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/city/commerce.test.mjs:73:1
+✖ counter overflow refuses monthly production atomically (2.418929ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/commerce.test.mjs:74:228)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }

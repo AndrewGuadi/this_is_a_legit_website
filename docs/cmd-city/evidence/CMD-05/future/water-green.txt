@@ -1,0 +1,27 @@
+✔ migration retains canonical tower population and legacy capacity with complete strict state (2.423431ms)
+✔ floor actions charge once, enforce occupied capacity, limits, research and closure (1.03615ms)
+✔ mixed floors have distinct finite capacities and internal utility dependence without report writes (1.765326ms)
+✔ corporate production consumes real finite oil and ore and books bounded product sales once (1.708642ms)
+✔ closed, disconnected or unstaffed corporate facilities cannot produce or conjure demand (2.265517ms)
+✔ research requires actual staffed institute and educated employed middle/high wealth adults (0.615839ms)
+✔ strict validation rejects altered keys, ledgers, indexes, floor counts and non-finite values (0.856725ms)
+✔ reconciliation removes demolished tower floors without losing corporate stock and initializes new towers (0.282815ms)
+✔ removing essential internal power disables dependent tower uses when external supply is absent (0.602068ms)
+✔ stored composite cannot sell through a closed or unstaffed corporate network (0.833095ms)
+✔ strict current state rejects ledgers beyond real stock and canonical floor bounds (0.723712ms)
+✔ invalid research, unknown actions, crowns, maximum floors and insufficient cash are atomic (1.126517ms)
+✔ progression overflow and invalid inventory reject before any mutation (0.966851ms)
+✔ research does not reuse last-month wages or disconnected households as current skilled workers (0.172631ms)
+✔ corporate report site ledger cannot mutate state or hide emitted production (0.503744ms)
+✔ free floor shutdown remains available during a treasury deficit (0.487461ms)
+✔ the single crown remains the top floor when a use is added below it (1.024752ms)
+✔ 240 varied months preserve resource and product identities and exact restored continuation (32.793032ms)
+✔ internal water cannot bypass an exhausted or explicitly unavailable shared water reserve (0.539642ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 19
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 174.52075

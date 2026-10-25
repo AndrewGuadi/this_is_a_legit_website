@@ -1,0 +1,10 @@
+✔ schema 1 rejects a research topic introduced with new transport (35.630611ms)
+✔ schema 2 rejects a research topic introduced with new transport (26.385871ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 2
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 314.37861

@@ -1,9 +1,11 @@
+import { roadTopology } from "./road-network.mjs";
 import { assertCitySaveBudget, serializeCity } from "./save.mjs";
 import {
   createHouseholds,
   validateHouseholds,
   reconcileHouseholds,
   householdReport,
+  householdSimulationReport,
   advanceHouseholds,
   householdWorkers,
   householdAction,
@@ -11,6 +13,7 @@ import {
 } from "./households.mjs";
 import {
   createServices,
+  createServiceReportSnapshot,
   serviceReport,
   advanceServices,
   serviceAction,
@@ -19,6 +22,7 @@ import {
 } from "./services.mjs";
 import {
   createEnvironment,
+  createEnvironmentReportSnapshot,
   advanceEnvironment,
   environmentReport,
   environmentAction,
@@ -48,7 +52,7 @@ const roads = new Set(["road", "avenue", "bridge"]);
 const buildings = (t) =>
   t.type !== "empty" &&
   !roads.has(t.type) &&
-  t.type !== "rail" &&
+  !["rail", "streetcarTrack", "maglevTrack"].includes(t.type) &&
   t.type !== "ruins";
 const housing = (t) => t.type === "residential" || t.type === "tower";
 const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
@@ -187,6 +191,7 @@ function utilities(s, access, reservedFuel = null) {
       { supply: 0, demand: 0, ratio: 1 },
     ]),
   );
+  const utilityValues = Object.values(u);
   u.power.supply = access[GATE] ? s.regionalPower : 0;
   let coalNeeded = 0,
     baseCoalSupply = 0,
@@ -198,7 +203,7 @@ function utilities(s, access, reservedFuel = null) {
       d = TOOLS[t.type];
     if (!access[i]) continue;
     const occupied = consumption(t);
-    for (const v of Object.values(u)) v.demand += occupied;
+    for (const v of utilityValues) v.demand += occupied;
     if (active(t)) {
       const demand = facilityDemand(t);
       u.power.demand += demand.power;
@@ -259,21 +264,36 @@ function utilities(s, access, reservedFuel = null) {
   return { ...u, fuelUsed, nuclearFuelUsed };
 }
 function routeEmployment(s, graph, u, coverage) {
-  const roadLoad = Array(N).fill(0),
+  const topology = roadTopology(s);
+  const roadCapacity = s.tiles.map((t) => TOOLS[t.type]?.capacity || 80),
+    roadLoad = Array(N).fill(0),
     homeEmployment = Array(N).fill(0),
     jobFill = Array(N).fill(0),
-    jobs = [];
+    jobs = [],
+    potentialJobs = [];
   const ready = Math.min(u.power.ratio, u.water.ratio) >= 0.9;
   const transit = planTransit(
     s,
     graph.access.map((v) => v && ready),
   );
+  const hasIndependentTransit =
+    transit.stations.length >= 2 ||
+    transit.streetcarStops.length >= 2 ||
+    transit.ferryTerminals.length >= 2 ||
+    transit.maglevStations.length >= 2;
   let population = 0,
     workers = 0,
     employed = 0;
   for (let i = 0; i < N; i++) {
     const t = s.tiles[i];
     if (housing(t)) population += t.occupancy;
+    if (
+      graph.frontage[i] >= 0 &&
+      (t.type === "commercial" ||
+        t.type === "industrial" ||
+        Object.hasOwn(FACILITY_JOBS, t.type))
+    )
+      potentialJobs.push({ i, road: graph.frontage[i] });
     if (
       (t.type === "commercial" ||
         t.type === "industrial" ||
@@ -289,8 +309,9 @@ function routeEmployment(s, graph, u, coverage) {
     }
   }
   const totalJobs = jobs.reduce((a, j) => a + j.left, 0);
-  const jobByTile = new Map(jobs.map((j) => [j.i, j])),
-    jobSignature = jobs.map((j) => j.i).join(",");
+  const jobByTile = new Array(N),
+    jobSignature = potentialJobs.map((j) => j.i).join(",");
+  for (const job of jobs) jobByTile[job.i] = job;
   if (graph.jobSignature !== jobSignature) {
     graph.orders.clear();
     graph.jobSignature = jobSignature;
@@ -307,57 +328,65 @@ function routeEmployment(s, graph, u, coverage) {
   // Rotate the eligible home list once per month; within each home the existing
   // nearest-job and road/transit capacity rules remain unchanged.
   const first = homes.length ? s.month % homes.length : 0;
-  for (let n = 0; n < homes.length; n++) {
+  let remainingJobs = totalJobs;
+  for (let n = 0; n < homes.length && remainingJobs > 0; n++) {
     const i = homes[(first + n) % homes.length];
     let need = householdWorkers(s, i);
     const start = graph.frontage[i];
     if (
-      transit.stations.length < 2 &&
-      (TOOLS[s.tiles[start].type]?.capacity || 80) - roadLoad[start] <
+      !hasIndependentTransit &&
+      roadCapacity[start] - roadLoad[start] <
         (transit.exchanges.length >= 2 ? busFactor : 1) - 1e-8
     )
       continue;
-    let tree = graph.paths.get(start);
-    if (!tree) {
-      const prev = new Int16Array(N).fill(-1),
-        distance = new Float32Array(N).fill(Infinity),
-        queue = [start];
-      distance[start] = 0;
-      for (let k = 0; k < queue.length; k++)
-        for (const next of neighbors(queue[k]))
-          if (graph.connected[next] && distance[next] === Infinity) {
-            distance[next] = distance[queue[k]] + 1;
-            prev[next] = queue[k];
-            queue.push(next);
-          }
-      tree = { prev, distance };
-      graph.paths.set(start, tree);
-    }
+    const tree = topology.complete([start], String(start));
     const { prev, distance } = tree;
     let order = graph.orders.get(start);
     if (!order) {
-      order = jobs
-        .filter((j) => Number.isFinite(distance[j.road]))
-        .sort((a, b) => distance[a.road] - distance[b.road] || a.i - b.i)
-        .map((j) => j.i);
+      const keys = new Uint32Array(potentialJobs.length);
+      let count = 0;
+      for (const job of potentialJobs)
+        if (distance[job.road] >= 0)
+          keys[count++] = distance[job.road] * N + job.i;
+      order = Array.from(keys.subarray(0, count).sort(), (key) => key % N);
       graph.orders.set(start, order);
     }
     for (const id of order) {
       if (!need) break;
-      const job = jobByTile.get(id);
+      const job = jobByTile[id];
       if (!job || job.left <= 0) continue;
-      if (transit.stations.length < 2) {
+      if (!hasIndependentTransit) {
         const minimum = transit.exchanges.length >= 2 ? busFactor : 1;
-        if (
-          TOOLS[s.tiles[start].type].capacity - roadLoad[start] <
-          minimum - 1e-8
-        )
-          break;
-        if (
-          TOOLS[s.tiles[job.road].type].capacity - roadLoad[job.road] <
-          minimum - 1e-8
-        )
+        if (roadCapacity[start] - roadLoad[start] < minimum - 1e-8) break;
+        if (roadCapacity[job.road] - roadLoad[job.road] < minimum - 1e-8)
           continue;
+      }
+      // Without transit, route assignment only needs the predecessor chain.
+      // Walk it directly: materializing/caching thousands of temporary path
+      // arrays adds no simulation information and causes cache thrash.
+      if (!hasIndependentTransit && transit.exchanges.length < 2) {
+        let room = Infinity;
+        for (let p = job.road; p !== -1; p = prev[p]) {
+          room = Math.min(room, Math.max(0, roadCapacity[p] - roadLoad[p]));
+          if (room === 0 || p === start) break;
+        }
+        const take = Math.min(
+          need,
+          job.left,
+          Math.max(0, Math.floor(room + 1e-8)),
+        );
+        if (!take) continue;
+        for (let p = job.road; p !== -1; p = prev[p]) {
+          roadLoad[p] += take;
+          if (p === start) break;
+        }
+        need -= take;
+        job.left -= take;
+        remainingJobs -= take;
+        jobFill[job.i] += take;
+        homeEmployment[i] += take;
+        employed += take;
+        continue;
       }
       const pathKey = start * N + job.road;
       let path = graph.routePaths.get(pathKey);
@@ -377,13 +406,13 @@ function routeEmployment(s, graph, u, coverage) {
       for (const p of path) {
         roadRoom = Math.min(
           roadRoom,
-          Math.max(0, (TOOLS[s.tiles[p].type]?.capacity || 80) - roadLoad[p]),
+          Math.max(0, roadCapacity[p] - roadLoad[p]),
         );
         // A saturated edge is already the exact lower bound for this path.
         if (roadRoom === 0) break;
       }
       let moved;
-      if (transit.stations.length < 2 && transit.exchanges.length < 2)
+      if (!hasIndependentTransit && transit.exchanges.length < 2)
         moved = { mode: "none", moved: 0, roadFactor: 1 };
       else if (roadRoom < requested * busFactor) {
         const exchanges = transit.exchanges;
@@ -413,14 +442,13 @@ function routeEmployment(s, graph, u, coverage) {
         roadLoad[p] += carTake + moved.moved * moved.roadFactor;
       need -= take;
       job.left -= take;
+      remainingJobs -= take;
       jobFill[job.i] += take;
       homeEmployment[i] += take;
       employed += take;
     }
   }
-  const busy = roadLoad.map((n, i) =>
-    n ? (100 * n) / (TOOLS[s.tiles[i].type]?.capacity || 80) : 0,
-  );
+  const busy = roadLoad.map((n, i) => (n ? (100 * n) / roadCapacity[i] : 0));
   return {
     population,
     workers,
@@ -433,6 +461,12 @@ function routeEmployment(s, graph, u, coverage) {
     traffic: Math.max(0, ...busy),
     busPassengers: transit.busPassengers,
     railPassengers: transit.railPassengers,
+    streetcarPassengers: transit.streetcarPassengers,
+    ferryPassengers: transit.ferryPassengers,
+    maglevPassengers: transit.maglevPassengers,
+    streetcarLoad: transit.streetcarLoad,
+    ferryLoad: transit.ferryLoad,
+    maglevLoad: transit.maglevLoad,
     railLoad: transit.railLoad,
     busLoad: transit.busLoad,
   };
@@ -442,7 +476,8 @@ function routeEmployment(s, graph, u, coverage) {
 // are caller-owned copies so a consumer cannot corrupt this derived cache.
 function cachedEmployment(s, graph, u, coverage) {
   let cached = employmentCache.get(s);
-  const transit = s.research.completed.includes("transit");
+  const transit = s.research.completed.includes("transit"),
+    maglev = s.research.completed.includes("maglev");
   const funding = Object.values(s.funding);
   let changed =
     !cached ||
@@ -450,6 +485,7 @@ function cachedEmployment(s, graph, u, coverage) {
     cached.power !== u.power.ratio ||
     cached.water !== u.water.ratio ||
     cached.transit !== transit ||
+    cached.maglev !== maglev ||
     funding.length !== cached.funding.length ||
     funding.some((v, i) => v !== cached.funding[i]);
   // Compare primitive routing inputs without allocating a large string on every
@@ -457,7 +493,7 @@ function cachedEmployment(s, graph, u, coverage) {
   if (!changed)
     for (let i = 0; i < N; i++) {
       const t = s.tiles[i],
-        at = i * 6,
+        at = i * 7,
         values = cached.values;
       if (
         cached.types[i] !== t.type ||
@@ -466,7 +502,8 @@ function cachedEmployment(s, graph, u, coverage) {
         values[at + 2] !== t.enabled ||
         values[at + 3] !== t.fire ||
         values[at + 4] !== graph.access[i] ||
-        values[at + 5] !== (housing(t) ? householdWorkers(s, i) : 0)
+        values[at + 5] !== (housing(t) ? householdWorkers(s, i) : 0) ||
+        values[at + 6] !== t.terrain
       ) {
         changed = true;
         break;
@@ -474,10 +511,10 @@ function cachedEmployment(s, graph, u, coverage) {
     }
   if (changed) {
     const types = new Array(N),
-      values = new Array(N * 6);
+      values = new Array(N * 7);
     for (let i = 0; i < N; i++) {
       const t = s.tiles[i],
-        at = i * 6;
+        at = i * 7;
       types[i] = t.type;
       values[at] = t.occupancy;
       values[at + 1] = t.modules;
@@ -485,12 +522,14 @@ function cachedEmployment(s, graph, u, coverage) {
       values[at + 3] = t.fire;
       values[at + 4] = graph.access[i];
       values[at + 5] = housing(t) ? householdWorkers(s, i) : 0;
+      values[at + 6] = t.terrain;
     }
     cached = {
       types,
       values,
       funding,
       transit,
+      maglev,
       month: s.month,
       power: u.power.ratio,
       water: u.water.ratio,
@@ -505,6 +544,9 @@ function cachedEmployment(s, graph, u, coverage) {
     homeEmployment: m.homeEmployment.slice(),
     roadLoad: m.roadLoad.slice(),
     railLoad: m.railLoad.slice(),
+    streetcarLoad: m.streetcarLoad.slice(),
+    ferryLoad: m.ferryLoad.slice(),
+    maglevLoad: m.maglevLoad.slice(),
     busLoad: m.busLoad.slice(),
   };
 }
@@ -568,6 +610,9 @@ function cachedCoverage(s, access, u, extra) {
   );
 }
 export function measure(s, options = {}) {
+  return measureDerived(s, options);
+}
+function measureDerived(s, options = {}, context = null) {
   const road = roadGraph(s),
     access = road.access.map(
       (v, i) => v && (!restricted(s, i) || RECOVERY.has(s.tiles[i].type)),
@@ -584,7 +629,11 @@ export function measure(s, options = {}) {
   // The operational graph shares cached Maps with the physical graph, but its
   // primitive signature must also be retained or each measure re-sorts all jobs.
   road.jobSignature = graph.jobSignature;
-  const services = serviceReport(s, { population: employment.population });
+  const services = context
+    ? (context.services ||= createServiceReportSnapshot(s))({
+        population: employment.population,
+      })
+    : serviceReport(s, { population: employment.population });
   const monthlyWaste = s.tiles.reduce((n, t) => n + t.occupancy, 0);
   u.waste.processingRatio = u.waste.ratio;
   u.waste.collectionRatio = services.pendingWaste
@@ -592,7 +641,7 @@ export function measure(s, options = {}) {
     : 1;
   u.waste.ratio = u.waste.collectionRatio;
   u.waste.pending = services.pendingWaste;
-  const environment = environmentReport(s, {
+  const environmentMetrics = {
     ...employment,
     access,
     utilities: u,
@@ -600,7 +649,14 @@ export function measure(s, options = {}) {
     // During the monthly transaction the ore is already reserved and deducted.
     // The pure source forecast must not reserve that same physical stock twice.
     nuclearFuelUsed: options.reservedFuel ? 0 : nuclearFuelUsed,
-  });
+  };
+  const environment = context
+    ? (context.environment ||= createEnvironmentReportSnapshot(s))(
+        environmentMetrics,
+        { presentation: context.presentation !== false },
+      )
+    : environmentReport(s, environmentMetrics);
+
   const pollution = environment.air;
   const landValue = pollution.map((p, i) =>
     clamp(
@@ -620,7 +676,11 @@ export function measure(s, options = {}) {
     .filter((i) => i >= 0);
   const avg = (a) =>
     homes.length ? homes.reduce((n, i) => n + a[i], 0) / homes.length : 0;
-  const households = householdReport(s, {
+  const households = (
+    context?.presentation === false
+      ? householdSimulationReport
+      : householdReport
+  )(s, {
     ...employment,
     access: road.access,
     operationAccess: access,
@@ -818,7 +878,8 @@ export function measure(s, options = {}) {
       n ? (100 * n) / (TOOLS[s.tiles[i].type]?.capacity || 80) : 0,
     ),
   );
-  result.civic = civicReport(s, civicMetrics(result));
+  if (context?.presentation !== false)
+    result.civic = civicReport(s, civicMetrics(result));
   return result;
 }
 export function createCity({
@@ -1023,10 +1084,15 @@ function performAction(s, a) {
     if (a.tool === "oilWell" && t.resource !== "oil")
       return fail("An oil well requires an oil deposit.");
     if (
-      a.tool === "port" &&
+      ["port", "ferryTerminal"].includes(a.tool) &&
       !neighbors(i).some((j) => s.tiles[j].terrain === "water")
     )
-      return fail("A freight terminal needs waterfront land.");
+      return fail("A waterfront terminal needs shore land beside water.");
+    if (
+      ["maglevTrack", "maglevStation"].includes(a.tool) &&
+      !s.research.completed.includes("maglev")
+    )
+      return fail("Complete Maglev mobility research first.");
     if (a.tool === "tower" && !s.research.completed.includes("vertical"))
       return fail("Complete Vertical construction research first.");
     if (restricted(s, i) && !RECOVERY.has(a.tool))
@@ -1102,7 +1168,7 @@ function performAction(s, a) {
         "Density capacity increased. Existing occupancy is unchanged.",
       );
     }
-    if (t.type === "rail")
+    if (["rail", "streetcarTrack", "maglevTrack"].includes(t.type))
       return fail("No module upgrade is implemented for this infrastructure.");
     if (t.modules >= 3) return fail("Maximum module expansion reached.");
     const cost = TOOLS[t.type].cost;
@@ -1287,8 +1353,16 @@ function preserveFacility(s, index) {
 }
 function simulateMonth(s) {
   reconcileHouseholds(s);
-  const initial = measure(s);
-  advanceEnvironment(s, { ...initial, access: initial.operationAccess });
+  const initial = measureDerived(
+    s,
+    {},
+    { services: null, environment: null, presentation: false },
+  );
+  advanceEnvironment(
+    s,
+    { ...initial, access: initial.operationAccess },
+    { report: false },
+  );
   // Reserve actual fuel before any mine, factory, trade or recycling transaction.
   const reservedFuel = {
     fuelUsed: initial.fuelUsed,
@@ -1296,8 +1370,13 @@ function simulateMonth(s) {
   };
   s.inventory.coal -= reservedFuel.fuelUsed;
   s.inventory.ore -= reservedFuel.nuclearFuelUsed;
-  const monthMeasure = () => measure(s, { reservedFuel });
-  advanceServices(s, { ...initial, roadLoad: initial.roadLoad });
+  const context = { services: null, environment: null, presentation: false };
+  const monthMeasure = () => measureDerived(s, { reservedFuel }, context);
+  advanceServices(
+    s,
+    { ...initial, roadLoad: initial.roadLoad },
+    { report: false },
+  );
   let m = monthMeasure();
   let power = Math.max(0, m.utilities.power.supply - m.utilities.power.demand),
     water = Math.max(0, m.utilities.water.supply - m.utilities.water.demand);
@@ -1321,7 +1400,10 @@ function simulateMonth(s) {
     }
   }
   if (incidentChanged) reconcileHouseholds(s);
-  if (incidentChanged) m = monthMeasure();
+  if (incidentChanged) {
+    context.services = null;
+    m = monthMeasure();
+  }
   let shrunk = false;
   // Shrink first, then reserve the genuinely freed capacity before allocating growth.
   for (let i = 0; i < N; i++) {
@@ -1516,10 +1598,14 @@ function simulateMonth(s) {
     Math.max(0, m.utilities.sewage.demand - m.utilities.sewage.supply),
   );
   // Financials describe end-of-month occupancy. Fuel was reserved for this month's service.
-  const householdResult = advanceHouseholds(s, {
-    ...m,
-    roadLoad: m.commuterRoadLoad,
-  });
+  const householdResult = advanceHouseholds(
+    s,
+    {
+      ...m,
+      roadLoad: m.commuterRoadLoad,
+    },
+    { report: false },
+  );
   const finance = {
     ...m.monthly,
     income: m.visitorIncome + householdResult.bookedTaxes.total,
@@ -1546,11 +1632,22 @@ function simulateMonth(s) {
     ...finance,
   });
   if (s.history.length > 24) s.history.shift();
-  if (s.policies.disasters && random(s) < 0.02)
+  if (s.policies.disasters && random(s) < 0.02) {
     performAction(s, { type: "disaster", kind: "fire" });
+    // Actual disaster mutation invalidates captured service/environment fields.
+    context.services = null;
+    context.environment = null;
+  }
+  context.presentation = true;
   const finalMetrics = monthMeasure();
-  advanceCivic(s, civicMetrics(finalMetrics));
-  return measure(s);
+  const civic = advanceCivic(s, civicMetrics(finalMetrics));
+  // Without combustion/fuel plants, reserved fuel cannot change the forecast.
+  // Civic advancement changes only civic state; retain the exact measured result.
+  if (!s.tiles.some((t) => t.type === "coalPlant" || t.type === "nuclear")) {
+    finalMetrics.civic = civic;
+    return finalMetrics;
+  }
+  return measureDerived(s, {}, context);
 }
 export function inspectTile(s, x, y, m = measure(s)) {
   const i = at(x, y);

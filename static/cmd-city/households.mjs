@@ -1,3 +1,4 @@
+import { roadTopology } from "./road-network.mjs";
 import { TOOLS } from "./content.mjs";
 
 /** Original aggregate household economy. No DOM, clock, network, RNG or individual aging. */
@@ -81,13 +82,17 @@ const fail = (message) => ({ ok: false, message }),
 const bad = () => {
   throw Error("Invalid CMD City household version 1 state.");
 };
+const keySets = new WeakMap();
 function keys(o, names) {
-  if (
-    !plain(o) ||
-    Object.keys(o).length !== names.length ||
-    Object.keys(o).some((k) => !names.includes(k))
-  )
-    bad();
+  if (!plain(o)) bad();
+  const actual = Object.keys(o);
+  if (actual.length !== names.length) bad();
+  let allowed = keySets.get(names);
+  if (!allowed) {
+    allowed = new Set(names);
+    keySets.set(names, allowed);
+  }
+  for (const key of actual) if (!allowed.has(key)) bad();
 }
 function context(city) {
   if (
@@ -205,7 +210,9 @@ export function householdWorkers(city, index) {
     integer(h.adults, 0, 1000000) &&
     integer(h.seniors, 0, 1000000) &&
     pop(h) > 0
-    ? demographics(count, h).adults
+    ? count === pop(h)
+      ? h.adults
+      : demographics(count, h).adults
     : demographics(count).adults;
 }
 export function validateHouseholds(value, city, { stable = true } = {}) {
@@ -387,8 +394,19 @@ function cloneState(source) {
     ledger: { ...source.ledger },
   };
 }
-function virtualState(city) {
+function virtualState(city, writable = false) {
   validateHouseholds(city.households, city, { stable: false });
+  // Reports only need a draft when occupancy reconciliation would alter records.
+  // Mutating transactions always request their own validated copy.
+  if (
+    !writable &&
+    city.households.homes.every((h, i) =>
+      isHome(city.tiles[i])
+        ? h !== null && pop(h) === city.tiles[i].occupancy
+        : h === null,
+    )
+  )
+    return city.households;
   const state = cloneState(city.households);
   reconcileInto(state, city);
   return state;
@@ -536,14 +554,16 @@ export function effectiveTaxRate(city, sector, metrics) {
   observation(city, metrics, state);
   return effective(state, city, sector, metrics);
 }
-function reportWith(state, city, metrics) {
-  const classes = [0, 1, 2].map((wealth) => ({
-    wealth,
-    label: ["Low wealth", "Middle wealth", "High wealth"][wealth],
-    people: 0,
-    homes: 0,
-    cash: 0,
-  }));
+function reportWith(state, city, metrics, presentation = true) {
+  const classes = presentation
+    ? [0, 1, 2].map((wealth) => ({
+        wealth,
+        label: ["Low wealth", "Middle wealth", "High wealth"][wealth],
+        people: 0,
+        homes: 0,
+        cash: 0,
+      }))
+    : null;
   const demographics = {
     children: 0,
     adults: 0,
@@ -557,13 +577,23 @@ function reportWith(state, city, metrics) {
     const count = pop(h);
     population += count;
     satisfaction += h.satisfaction * count;
-    classes[h.wealth].people += count;
-    classes[h.wealth].homes++;
-    classes[h.wealth].cash += h.cash;
+    if (presentation) {
+      classes[h.wealth].people += count;
+      classes[h.wealth].homes++;
+      classes[h.wealth].cash += h.cash;
+    }
     demographics.children += h.children;
     demographics.adults += h.adults;
     demographics.seniors += h.seniors;
     demographics.educatedAdults += h.educated;
+    if (!presentation)
+      return {
+        satisfaction: h.satisfaction,
+        badMonths: h.badMonths,
+        unmet: h.unmet,
+        shoppingWanted: h.shoppingWanted,
+        taxRate: state.wealthTaxes.residential[h.wealth],
+      };
     return {
       ...h,
       population: count,
@@ -571,7 +601,7 @@ function reportWith(state, city, metrics) {
       employmentRate: h.adults ? h.employed / h.adults : 0,
     };
   });
-  const sum = totals(state.homes),
+  const sum = presentation ? totals(state.homes) : null,
     l = state.ledger,
     booked = {
       residential: l.residentialTaxes,
@@ -583,7 +613,9 @@ function reportWith(state, city, metrics) {
     population,
     classes,
     demographics,
-    budgets: { ...l, currentCash: sum.cash, arrears: sum.arrears },
+    ...(presentation
+      ? { budgets: { ...l, currentCash: sum.cash, arrears: sum.arrears } }
+      : {}),
     shopping: {
       wanted: l.shoppingWanted,
       bought: l.shoppingBought,
@@ -618,6 +650,12 @@ export function householdReport(city, metrics) {
   const state = virtualState(city);
   observation(city, metrics, state);
   return reportWith(state, city, metrics);
+}
+/** Read-only projection for internal growth/finance calculations; public reports stay complete. */
+export function householdSimulationReport(city, metrics) {
+  const state = virtualState(city);
+  observation(city, metrics, state);
+  return reportWith(state, city, metrics, false);
 }
 export function setSectorTaxes(city, sector, value) {
   if (
@@ -683,12 +721,15 @@ function neighbors(i, city) {
     i < n - w ? i + w : -1,
   ].filter((j) => j >= 0);
 }
-// Retain topology only: no household balances, staff, supplies, prices or capacity decisions.
-// Per city: at most 256 BFS pairs of Int16Array(N), bounded to 1.25 MiB at N=1280.
+// Retain derived topology and exact-keyed nearest-shop orders, never balances or capacity decisions.
+// At most 512 endpoint/distance pairs: <=2.5 MiB at N=1280; shared BFS frontiers
+// live only in road-network.mjs bounded cache, never pinned by these closures.
+// Each route retains only the latest shop-ID order (<=N entries), not historical months.
 // Actual path arrays are materialized only for the at-most-128 returned trip samples.
 const networkCache = new WeakMap();
-const MAX_ROUTES = 256;
+const MAX_ROUTES = 512;
 function roadNetwork(city) {
+  const topology = roadTopology(city);
   const n = city.tiles.length,
     signature =
       `${city.width}:${city.height}:` +
@@ -719,6 +760,9 @@ function roadNetwork(city) {
         queue.push(j);
       }
   const network = {
+    topology,
+    shopKey: null,
+    shopVersion: 0,
     connected,
     frontages: adjacency.map((js) => js.filter((j) => connected[j])),
     roadNeighbors: adjacency.map((js) => js.filter((j) => connected[j])),
@@ -738,25 +782,12 @@ function routesFrom(city, network, from) {
     return cached;
   }
   const n = city.tiles.length,
-    dist = new Int16Array(n).fill(-1),
-    prev = new Int16Array(n).fill(-1),
-    queue = network.queue;
-  let head = 0,
-    tail = 0;
-  for (const j of roots) {
-    dist[j] = 0;
-    queue[tail++] = j;
-  }
-  while (head < tail) {
-    const current = queue[head++];
-    for (const j of network.roadNeighbors[current])
-      if (dist[j] < 0) {
-        dist[j] = dist[current] + 1;
-        prev[j] = current;
-        queue[tail++] = j;
-      }
-  }
-  const endpoint = (to) => {
+    endpoints = new Int16Array(n).fill(-2),
+    distances = new Int16Array(n).fill(-1),
+    tree = () => network.topology.complete(roots, key);
+  const endpoint = (to, frontier) => {
+    if (endpoints[to] !== -2) return endpoints[to];
+    const dist = (frontier || tree()).distance;
     let best = -1,
       bestDistance = Infinity;
     for (const j of network.frontages[to])
@@ -767,12 +798,40 @@ function routesFrom(city, network, from) {
         best = j;
         bestDistance = dist[j];
       }
+    endpoints[to] = best;
+    distances[to] = best < 0 ? -1 : dist[best] + 1;
     return best;
   };
+  let shopKey = null,
+    shopOrder = [];
   const route = {
+    orderedShops(shops, key) {
+      if (shopKey !== key) {
+        // Pack the exact distance/price/tile tie order into bounded integer keys.
+        // Native numeric sort avoids one temporary object per home-shop pair.
+        const keys = new Uint32Array(shops.length),
+          frontier = tree();
+        let count = 0;
+        for (const shop of shops) {
+          const distance =
+            endpoint(shop.i, frontier) < 0 ? Infinity : distances[shop.i];
+          if (Number.isFinite(distance))
+            keys[count++] =
+              (distance * 3 + HOUSEHOLD_RULES.shopPrices.indexOf(shop.price)) *
+                NMAX +
+              shop.i;
+        }
+        shopOrder = Array.from(
+          keys.subarray(0, count).sort(),
+          (key) => key % NMAX,
+        );
+        shopKey = key;
+      }
+      return shopOrder;
+    },
     distance(to) {
       const end = endpoint(to);
-      return end < 0 ? Infinity : dist[end] + 1;
+      return end < 0 ? Infinity : distances[to];
     },
     reachable(to) {
       return endpoint(to) >= 0;
@@ -780,15 +839,18 @@ function routesFrom(city, network, from) {
     fits(to, remaining) {
       const end = endpoint(to);
       if (end < 0) return false;
+      const prev = tree().prev;
       for (let j = end; j !== -1; j = prev[j])
         if (remaining[j] < 1 - 1e-9) return false;
       return true;
     },
     walk(to, visit) {
+      const prev = tree().prev;
       for (let j = endpoint(to); j !== -1; j = prev[j]) visit(j);
     },
     path(to) {
-      const path = [];
+      const prev = tree().prev,
+        path = [];
       for (let j = endpoint(to); j !== -1; j = prev[j]) path.push(j);
       return path.reverse();
     },
@@ -923,8 +985,12 @@ function updateWealth(h, metrics, i) {
     h.goodMonths = 0;
   }
 }
-export function advanceHouseholds(city, metrics) {
-  const state = virtualState(city);
+export function advanceHouseholds(
+  city,
+  metrics,
+  { report: includeReport = true } = {},
+) {
+  const state = virtualState(city, true);
   observation(city, metrics, state);
   if (city.households.lastMonth === city.month + 1) {
     const report = reportWith(state, city, metrics);
@@ -1012,32 +1078,31 @@ export function advanceHouseholds(city, metrics) {
         price: HOUSEHOLD_RULES.shopPrices[businessWealth(metrics.landValue[i])],
       });
   const choices = new Map(),
+    shopById = new Map(shops.map((shop) => [shop.i, shop])),
+    shopKey = shops.map((shop) => `${shop.i}:${shop.price}`).join("|"),
     minimumShopPrice = shops.reduce(
       (minimum, shop) => Math.min(minimum, shop.price),
       Infinity,
     );
+  if (network.shopKey !== shopKey) {
+    network.shopKey = shopKey;
+    network.shopVersion++;
+  }
   function choicesFor(i) {
     let result = choices.get(i);
     if (!result) {
       result = shops.length
-        ? shops
-            .map((shop) => ({
-              shop,
-              distance: homeRoutes.get(i).distance(shop.i),
-            }))
-            .filter((x) => Number.isFinite(x.distance))
-            .sort(
-              (a, b) =>
-                a.distance - b.distance ||
-                a.shop.price - b.shop.price ||
-                a.shop.i - b.shop.i,
-            )
+        ? homeRoutes
+            .get(i)
+            .orderedShops(shops, network.shopVersion)
+            .map((id) => ({ shop: shopById.get(id) }))
         : [];
       choices.set(i, result);
     }
     return result;
   }
   let goods = city.inventory.goods,
+    remainingShopCapacity = shops.reduce((n, shop) => n + shop.left, 0),
     served = true,
     tripsTruncated = false;
   const shoppingLoad = Array(city.tiles.length).fill(0),
@@ -1045,15 +1110,23 @@ export function advanceHouseholds(city, metrics) {
       (t, i) => (TOOLS[t.type]?.capacity ?? 0) - (metrics.roadLoad?.[i] ?? 0),
     ),
     trips = [],
-    tripIndex = new Map();
-  while (goods > 0 && served) {
+    tripIndex = new Map(),
+    blockedHomes = new Uint8Array(city.tiles.length);
+  while (goods > 0 && served && remainingShopCapacity > 0) {
     served = false;
     for (const i of order) {
       const h = state.homes[i];
-      if (h.shoppingBought >= h.shoppingWanted || h.cash < minimumShopPrice)
+      if (
+        blockedHomes[i] ||
+        h.shoppingBought >= h.shoppingWanted ||
+        h.cash < minimumShopPrice
+      )
         continue;
       const availableChoices = choicesFor(i);
-      if (!availableChoices.length) continue;
+      if (!availableChoices.length) {
+        blockedHomes[i] = 1;
+        continue;
+      }
       const route = homeRoutes.get(i),
         choice = availableChoices.find(
           (x) =>
@@ -1061,9 +1134,15 @@ export function advanceHouseholds(city, metrics) {
             h.cash >= x.shop.price &&
             route.fits(x.shop.i, remainingRoad),
         );
-      if (!choice) continue;
+      // Wallets, shop stock and road room only decrease inside this shopping
+      // round. An unavailable home cannot acquire a route later in the loop.
+      if (!choice) {
+        blockedHomes[i] = 1;
+        continue;
+      }
       const { shop } = choice;
       shop.left--;
+      remainingShopCapacity--;
       goods--;
       h.cash -= shop.price;
       h.spending += shop.price;
@@ -1076,6 +1155,10 @@ export function advanceHouseholds(city, metrics) {
           (metrics.roadLoad?.[p] ?? 0) -
           shoppingLoad[p];
       });
+      if (!includeReport) {
+        if (goods <= 0) break;
+        continue;
+      }
       const key = `${i}:${shop.i}`;
       if (tripIndex.has(key)) {
         const trip = trips[tripIndex.get(key)];
@@ -1119,10 +1202,20 @@ export function advanceHouseholds(city, metrics) {
   // Commit only after all bounded financial/cohort calculations validate.
   city.households = state;
   city.inventory.goods = goods;
-  const report = reportWith(state, city, metrics);
+  const report = includeReport ? reportWith(state, city, metrics) : null;
   return {
     report,
-    bookedTaxes: report.taxes.booked,
+    bookedTaxes: report
+      ? report.taxes.booked
+      : {
+          residential: ledger.residentialTaxes,
+          commercial: ledger.commercialTaxes,
+          industrial: ledger.industrialTaxes,
+          total:
+            ledger.residentialTaxes +
+            ledger.commercialTaxes +
+            ledger.industrialTaxes,
+        },
     shoppingLoad,
     trips,
     tripsTruncated,

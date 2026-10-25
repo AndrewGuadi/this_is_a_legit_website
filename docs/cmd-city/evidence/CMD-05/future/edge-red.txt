@@ -1,0 +1,62 @@
+✔ migration retains canonical tower population and legacy capacity with complete strict state (2.263628ms)
+✔ floor actions charge once, enforce occupied capacity, limits, research and closure (0.7562ms)
+✔ mixed floors have distinct finite capacities and internal utility dependence without report writes (1.561322ms)
+✔ corporate production consumes real finite oil and ore and books bounded product sales once (1.453311ms)
+✔ closed, disconnected or unstaffed corporate facilities cannot produce or conjure demand (0.632146ms)
+✔ research requires actual staffed institute and educated employed middle/high wealth adults (4.440173ms)
+✔ strict validation rejects altered keys, ledgers, indexes, floor counts and non-finite values (0.783996ms)
+✔ reconciliation removes demolished tower floors without losing corporate stock and initializes new towers (0.393205ms)
+✔ removing essential internal power disables dependent tower uses when external supply is absent (0.910253ms)
+✖ stored composite cannot sell through a closed or unstaffed corporate network (1.79113ms)
+✖ strict current state rejects ledgers beyond real stock and canonical floor bounds (0.391294ms)
+✔ invalid research, unknown actions, crowns, maximum floors and insufficient cash are atomic (0.972033ms)
+✔ progression overflow and invalid inventory reject before any mutation (0.923773ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 11
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 143.460357
+
+✖ failing tests:
+
+test at tests/city/future.test.mjs:68:1
+✖ stored composite cannot sell through a closed or unstaffed corporate network (1.79113ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  3 !== 0
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/future.test.mjs:72:68)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 3,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/city/future.test.mjs:75:1
+✖ strict current state rejects ledgers beyond real stock and canonical floor bounds (0.391294ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/future.test.mjs:77:61)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }

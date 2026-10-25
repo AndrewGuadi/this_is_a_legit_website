@@ -1,0 +1,123 @@
+
+Running 3 tests using 1 worker
+
+  ✘  1 [chromium-1440] › tests/browser/cmd-city-transit.spec.js:18:37 › streetcar construction connects assigned commuters, exports and recovers after terminal closure (9.2s)
+  ✘  2 [chromium-1440] › tests/browser/cmd-city-transit.spec.js:18:37 › ferry construction connects assigned commuters, exports and recovers after terminal closure (8.9s)
+  ✘  3 [chromium-1440] › tests/browser/cmd-city-transit.spec.js:18:37 › maglev construction connects assigned commuters, exports and recovers after terminal closure (9.1s)
+
+
+  1) [chromium-1440] › tests/browser/cmd-city-transit.spec.js:18:37 › streetcar construction connects assigned commuters, exports and recovers after terminal closure 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: locator('#city-indicators dt').filter({ hasText: 'Streetcar assigned commuters' }).locator('xpath=following-sibling::dd[1]')
+    Expected: "0"
+    Timeout: 7000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveText" locator('#city-indicators dt').filter({ hasText: 'Streetcar assigned commuters' }).locator('xpath=following-sibling::dd[1]') with timeout 7000ms
+      - waiting for locator('#city-indicators dt').filter({ hasText: 'Streetcar assigned commuters' }).locator('xpath=following-sibling::dd[1]')
+
+
+      24 |  await panel(page,'City report');
+      25 |  const assigned=()=>page.locator('#city-indicators dt').filter({hasText:`${label} assigned commuters`}).locator('xpath=following-sibling::dd[1]');
+    > 26 |  await expect(assigned()).toHaveText('0');
+         |                           ^
+      27 |  await selected(page,7,17);await page.getByLabel('Construction category').selectOption('Transport');
+      28 |  for(const tool of ['streetcarTrack','streetcarStop','ferryTerminal','maglevTrack','maglevStation'])await expect(page.locator(`[data-tool="${tool}"]`)).toBeVisible();
+      29 |  await page.locator(`[data-tool="${stop}"]`).click();await page.locator('#city-map').focus();await page.keyboard.press('Enter');
+        at /tmp/cmd-city-work/tests/browser/cmd-city-transit.spec.js:26:27
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cmd-city-transit-streetcar-4660c-vers-after-terminal-closure-chromium-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/cmd-city-transit-streetcar-4660c-vers-after-terminal-closure-chromium-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/cmd-city-transit-streetcar-4660c-vers-after-terminal-closure-chromium-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/cmd-city-transit-streetcar-4660c-vers-after-terminal-closure-chromium-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium-1440] › tests/browser/cmd-city-transit.spec.js:18:37 › ferry construction connects assigned commuters, exports and recovers after terminal closure 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: locator('#city-indicators dt').filter({ hasText: 'Ferry assigned commuters' }).locator('xpath=following-sibling::dd[1]')
+    Expected: "0"
+    Timeout: 7000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveText" locator('#city-indicators dt').filter({ hasText: 'Ferry assigned commuters' }).locator('xpath=following-sibling::dd[1]') with timeout 7000ms
+      - waiting for locator('#city-indicators dt').filter({ hasText: 'Ferry assigned commuters' }).locator('xpath=following-sibling::dd[1]')
+
+
+      24 |  await panel(page,'City report');
+      25 |  const assigned=()=>page.locator('#city-indicators dt').filter({hasText:`${label} assigned commuters`}).locator('xpath=following-sibling::dd[1]');
+    > 26 |  await expect(assigned()).toHaveText('0');
+         |                           ^
+      27 |  await selected(page,7,17);await page.getByLabel('Construction category').selectOption('Transport');
+      28 |  for(const tool of ['streetcarTrack','streetcarStop','ferryTerminal','maglevTrack','maglevStation'])await expect(page.locator(`[data-tool="${tool}"]`)).toBeVisible();
+      29 |  await page.locator(`[data-tool="${stop}"]`).click();await page.locator('#city-map').focus();await page.keyboard.press('Enter');
+        at /tmp/cmd-city-work/tests/browser/cmd-city-transit.spec.js:26:27
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cmd-city-transit-ferry-con-8bd9b-vers-after-terminal-closure-chromium-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/cmd-city-transit-ferry-con-8bd9b-vers-after-terminal-closure-chromium-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/cmd-city-transit-ferry-con-8bd9b-vers-after-terminal-closure-chromium-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/cmd-city-transit-ferry-con-8bd9b-vers-after-terminal-closure-chromium-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium-1440] › tests/browser/cmd-city-transit.spec.js:18:37 › maglev construction connects assigned commuters, exports and recovers after terminal closure 
+
+    Error: expect(locator).toHaveText(expected) failed
+
+    Locator: locator('#city-indicators dt').filter({ hasText: 'Maglev assigned commuters' }).locator('xpath=following-sibling::dd[1]')
+    Expected: "0"
+    Timeout: 7000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toHaveText" locator('#city-indicators dt').filter({ hasText: 'Maglev assigned commuters' }).locator('xpath=following-sibling::dd[1]') with timeout 7000ms
+      - waiting for locator('#city-indicators dt').filter({ hasText: 'Maglev assigned commuters' }).locator('xpath=following-sibling::dd[1]')
+
+
+      24 |  await panel(page,'City report');
+      25 |  const assigned=()=>page.locator('#city-indicators dt').filter({hasText:`${label} assigned commuters`}).locator('xpath=following-sibling::dd[1]');
+    > 26 |  await expect(assigned()).toHaveText('0');
+         |                           ^
+      27 |  await selected(page,7,17);await page.getByLabel('Construction category').selectOption('Transport');
+      28 |  for(const tool of ['streetcarTrack','streetcarStop','ferryTerminal','maglevTrack','maglevStation'])await expect(page.locator(`[data-tool="${tool}"]`)).toBeVisible();
+      29 |  await page.locator(`[data-tool="${stop}"]`).click();await page.locator('#city-map').focus();await page.keyboard.press('Enter');
+        at /tmp/cmd-city-work/tests/browser/cmd-city-transit.spec.js:26:27
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cmd-city-transit-maglev-co-eba4f-vers-after-terminal-closure-chromium-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/cmd-city-transit-maglev-co-eba4f-vers-after-terminal-closure-chromium-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/cmd-city-transit-maglev-co-eba4f-vers-after-terminal-closure-chromium-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/cmd-city-transit-maglev-co-eba4f-vers-after-terminal-closure-chromium-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3 failed
+    [chromium-1440] › tests/browser/cmd-city-transit.spec.js:18:37 › streetcar construction connects assigned commuters, exports and recovers after terminal closure 
+    [chromium-1440] › tests/browser/cmd-city-transit.spec.js:18:37 › ferry construction connects assigned commuters, exports and recovers after terminal closure 
+    [chromium-1440] › tests/browser/cmd-city-transit.spec.js:18:37 › maglev construction connects assigned commuters, exports and recovers after terminal closure 

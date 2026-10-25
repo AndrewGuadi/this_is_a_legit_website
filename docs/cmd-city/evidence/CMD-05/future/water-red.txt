@@ -1,0 +1,50 @@
+✔ migration retains canonical tower population and legacy capacity with complete strict state (3.23593ms)
+✔ floor actions charge once, enforce occupied capacity, limits, research and closure (0.98803ms)
+✔ mixed floors have distinct finite capacities and internal utility dependence without report writes (1.572649ms)
+✔ corporate production consumes real finite oil and ore and books bounded product sales once (1.772961ms)
+✔ closed, disconnected or unstaffed corporate facilities cannot produce or conjure demand (1.990318ms)
+✔ research requires actual staffed institute and educated employed middle/high wealth adults (0.431127ms)
+✔ strict validation rejects altered keys, ledgers, indexes, floor counts and non-finite values (1.378743ms)
+✔ reconciliation removes demolished tower floors without losing corporate stock and initializes new towers (0.415655ms)
+✔ removing essential internal power disables dependent tower uses when external supply is absent (0.845905ms)
+✔ stored composite cannot sell through a closed or unstaffed corporate network (1.327303ms)
+✔ strict current state rejects ledgers beyond real stock and canonical floor bounds (0.576589ms)
+✔ invalid research, unknown actions, crowns, maximum floors and insufficient cash are atomic (1.141724ms)
+✔ progression overflow and invalid inventory reject before any mutation (0.751251ms)
+✔ research does not reuse last-month wages or disconnected households as current skilled workers (0.155975ms)
+✔ corporate report site ledger cannot mutate state or hide emitted production (0.509357ms)
+✔ free floor shutdown remains available during a treasury deficit (0.336594ms)
+✔ the single crown remains the top floor when a use is added below it (0.295062ms)
+✔ 240 varied months preserve resource and product identities and exact restored continuation (32.974762ms)
+✖ internal water cannot bypass an exhausted or explicitly unavailable shared water reserve (1.550814ms)
+ℹ tests 19
+ℹ suites 0
+ℹ pass 18
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 204.277688
+
+✖ failing tests:
+
+test at tests/city/future.test.mjs:458:1
+✖ internal water cannot bypass an exhausted or explicitly unavailable shared water reserve (1.550814ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  300 !== 0
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/future.test.mjs:461:86)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 300,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

@@ -1,0 +1,111 @@
+✖ streetcar displaces real car commuters and restores after save/reload; route removal invalidates cached assignment (281.988489ms)
+✖ ferry displaces real car commuters and restores after save/reload; route removal invalidates cached assignment (152.836977ms)
+✖ maglev displaces real car commuters and restores after save/reload; route removal invalidates cached assignment (200.907132ms)
+✖ new infrastructure placement rejects inland ferries, unresearched maglev and ineffective track modules without charging (187.185103ms)
+✖ a complete five-topic research save is valid but forged unresearched maglev is rejected (174.804194ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 0
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1158.544272
+
+✖ failing tests:
+
+test at tests/city/transit-integration.test.mjs:26:50
+✖ streetcar displaces real car commuters and restores after save/reload; route removal invalidates cached assignment (281.988489ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(m[`${mode}Passengers`]>0)
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/transit-integration.test.mjs:28:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/city/transit-integration.test.mjs:26:50
+✖ ferry displaces real car commuters and restores after save/reload; route removal invalidates cached assignment (152.836977ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(m[`${mode}Passengers`]>0)
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/transit-integration.test.mjs:28:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/city/transit-integration.test.mjs:26:50
+✖ maglev displaces real car commuters and restores after save/reload; route removal invalidates cached assignment (200.907132ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(m[`${mode}Passengers`]>0)
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/transit-integration.test.mjs:28:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/city/transit-integration.test.mjs:41:1
+✖ new infrastructure placement rejects inland ferries, unresearched maglev and ineffective track modules without charging (187.185103ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/transit-integration.test.mjs:44:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/city/transit-integration.test.mjs:55:1
+✖ a complete five-topic research save is valid but forged unresearched maglev is rejected (174.804194ms)
+  Error: This file is not a valid CMD City version 1, 2 or 3 save.
+      at bad (file:///tmp/cmd-city-work/static/cmd-city/save.mjs:9:9)
+      at parseCity (file:///tmp/cmd-city-work/static/cmd-city/save.mjs:93:5)
+      at serializeCity (file:///tmp/cmd-city-work/static/cmd-city/save.mjs:248:3)
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/transit-integration.test.mjs:58:30)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7)

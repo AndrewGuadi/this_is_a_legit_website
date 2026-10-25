@@ -1,0 +1,31 @@
+✔ creation preserves warehouse ownership without duplicating stock or inventing opening deliveries (17.216973ms)
+✔ actual staffed industrial production enters producer stock once; repeated hook is inert (17.220917ms)
+✔ closed, burning, unstaffed, unserved and unpowered producers generate no goods (14.082822ms)
+✔ warehouse cargo travels a real bounded path before a shop receives inventory (16.177157ms)
+✔ shared shop unloading is finite and goods remain aboard during partial deliveries (12.121697ms)
+✔ purchases consume only physically delivered shop stock and do not debit warehouse again (10.852046ms)
+✔ blocked roads hold real cargo and repairs restore its delivery (16.899406ms)
+✔ closing a destination returns its cargo over roads instead of teleporting or losing it (4.04517ms)
+✔ freight shares remaining road capacity with commuters and other freight (3.711829ms)
+✔ zero utilities or a closed gateway cannot dispatch warehouse freight (2.636217ms)
+✔ external warehouse transfer records only actual bounded stock and preserves money (4.491638ms)
+✔ demolition conserves producer and retail stock into explicit recovered goods (2.114182ms)
+✔ recall retains cargo and rejects malformed or missing vehicle actions without state changes (12.406088ms)
+✔ a tower shop uses explicitly supplied staffed monthly retail throughput (6.436737ms)
+✔ reporting is pure and returns defensive paths and stock/load arrays (6.120863ms)
+✔ strict validation rejects malformed keys, clocks, stocks, quantities and broken conservation (2.270709ms)
+✔ strict validation rejects malformed in-flight route/cursor/id/payload relationships (7.802477ms)
+✔ counter overflow refuses monthly production atomically (4.155219ms)
+✔ destroying the road under a loaded recalled truck preserves its position and cargo until repair (7.213464ms)
+✔ rotating shop admission eventually serves every shop under a finite shared fleet (167.391912ms)
+✔ producer stock bounds preserve actual accepted production without wrapping or losing prior goods (1.494853ms)
+✔ a demolished producer and full warehouse recover returned cargo into explicit loose goods (11.184961ms)
+✔ a mixed road and avenue crossing uses each endpoint remaining capacity rather than mixing unrelated maxima (3.305263ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 23
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 573.268292

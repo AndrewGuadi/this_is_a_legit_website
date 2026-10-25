@@ -1,0 +1,55 @@
+✔ straight plans a bounded connected grid road and commits exact cost without mutating source (680.407758ms)
+✔ curve plans a bounded connected grid road and commits exact cost without mutating source (644.255721ms)
+✔ circle plans a bounded connected grid road and commits exact cost without mutating source (1473.817093ms)
+✔ block plans a bounded connected grid road and commits exact cost without mutating source (957.145088ms)
+✔ occupied buildings or insufficient funds reject complete plans without partial mutations (68.726076ms)
+✔ water crossings price and construct bridges while existing roads are preserved and free (163.928251ms)
+✔ invalid geometry, out-of-map circles and unsupported road types reject without mutation (2.116871ms)
+✔ a stale preview is revalidated against current funds and occupied tiles at commit (36.213543ms)
+✔ invalid regional identity rejects the complete plan without mutating any source fields (56.780517ms)
+✖ responsive road commits yield to the UI, preserve source state and match synchronous construction (324.397748ms)
+✖ canceling a responsive plan after candidate construction discards every candidate change (308.589509ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 9
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 4874.787396
+
+✖ failing tests:
+
+test at tests/city/roads.test.mjs:164:1
+✖ responsive road commits yield to the UI, preserve source state and match synchronous construction (324.397748ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(yields>=10)
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/roads.test.mjs:168:38)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+test at tests/city/roads.test.mjs:170:1
+✖ canceling a responsive plan after candidate construction discards every candidate change (308.589509ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/roads.test.mjs:174:9)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

@@ -1,0 +1,24 @@
+✔ migration retains canonical tower population and legacy capacity with complete strict state (2.095017ms)
+✔ floor actions charge once, enforce occupied capacity, limits, research and closure (1.185301ms)
+✔ mixed floors have distinct finite capacities and internal utility dependence without report writes (1.584109ms)
+✔ corporate production consumes real finite oil and ore and books bounded product sales once (1.439942ms)
+✔ closed, disconnected or unstaffed corporate facilities cannot produce or conjure demand (5.088623ms)
+✔ research requires actual staffed institute and educated employed middle/high wealth adults (0.404059ms)
+✔ strict validation rejects altered keys, ledgers, indexes, floor counts and non-finite values (0.997247ms)
+✔ reconciliation removes demolished tower floors without losing corporate stock and initializes new towers (0.381828ms)
+✔ removing essential internal power disables dependent tower uses when external supply is absent (0.535769ms)
+✔ stored composite cannot sell through a closed or unstaffed corporate network (0.726138ms)
+✔ strict current state rejects ledgers beyond real stock and canonical floor bounds (0.498728ms)
+✔ invalid research, unknown actions, crowns, maximum floors and insufficient cash are atomic (0.830813ms)
+✔ progression overflow and invalid inventory reject before any mutation (0.848416ms)
+✔ research does not reuse last-month wages or disconnected households as current skilled workers (0.167461ms)
+✔ corporate report site ledger cannot mutate state or hide emitted production (0.310651ms)
+✔ free floor shutdown remains available during a treasury deficit (0.237975ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 133.269284

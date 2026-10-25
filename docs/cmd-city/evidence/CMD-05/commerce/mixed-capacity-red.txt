@@ -1,0 +1,54 @@
+✔ creation preserves warehouse ownership without duplicating stock or inventing opening deliveries (12.655897ms)
+✔ actual staffed industrial production enters producer stock once; repeated hook is inert (13.591637ms)
+✔ closed, burning, unstaffed, unserved and unpowered producers generate no goods (15.576844ms)
+✔ warehouse cargo travels a real bounded path before a shop receives inventory (5.759187ms)
+✔ shared shop unloading is finite and goods remain aboard during partial deliveries (4.216726ms)
+✔ purchases consume only physically delivered shop stock and do not debit warehouse again (7.608533ms)
+✔ blocked roads hold real cargo and repairs restore its delivery (10.240894ms)
+✔ closing a destination returns its cargo over roads instead of teleporting or losing it (3.399981ms)
+✔ freight shares remaining road capacity with commuters and other freight (3.570931ms)
+✔ zero utilities or a closed gateway cannot dispatch warehouse freight (3.229738ms)
+✔ external warehouse transfer records only actual bounded stock and preserves money (1.480189ms)
+✔ demolition conserves producer and retail stock into explicit recovered goods (1.354107ms)
+✔ recall retains cargo and rejects malformed or missing vehicle actions without state changes (13.302597ms)
+✔ a tower shop uses explicitly supplied staffed monthly retail throughput (6.891008ms)
+✔ reporting is pure and returns defensive paths and stock/load arrays (7.743198ms)
+✔ strict validation rejects malformed keys, clocks, stocks, quantities and broken conservation (2.893571ms)
+✔ strict validation rejects malformed in-flight route/cursor/id/payload relationships (8.560948ms)
+✔ counter overflow refuses monthly production atomically (3.239911ms)
+✔ destroying the road under a loaded recalled truck preserves its position and cargo until repair (7.962114ms)
+✔ rotating shop admission eventually serves every shop under a finite shared fleet (175.135632ms)
+✔ producer stock bounds preserve actual accepted production without wrapping or losing prior goods (1.848199ms)
+✔ a demolished producer and full warehouse recover returned cargo into explicit loose goods (9.380249ms)
+✖ a mixed road and avenue crossing uses each endpoint remaining capacity rather than mixing unrelated maxima (7.569338ms)
+ℹ tests 23
+ℹ suites 0
+ℹ pass 22
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 511.56512
+
+✖ failing tests:
+
+test at tests/city/commerce.test.mjs:95:1
+✖ a mixed road and avenue crossing uses each endpoint remaining capacity rather than mixing unrelated maxima (7.569338ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+  
+    assert.ok(city.commerce.vehicles.some(v=>v.position>ix(0,16)))
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/commerce.test.mjs:97:29)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

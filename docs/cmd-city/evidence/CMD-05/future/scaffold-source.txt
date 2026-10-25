@@ -1,0 +1,10 @@
+/** CMD-05 future systems scaffold; behavioral implementation pending. */
+export const FUTURE_FLOORS = Object.freeze({ homes:{capacity:90}, shops:{}, offices:{}, power:{}, water:{}, school:{}, park:{}, crown:{} });
+export function createFuture() { return {version:1,lastMonth:0,towers:[],composite:0,ledger:{}}; }
+export function validateFuture() { throw Error('Future validation not implemented'); }
+export function futureTowerCapacity() { return 0; }
+export function futureReport() { return {}; }
+export function futureAction() { return {ok:false,message:'Future action not implemented'}; }
+export function advanceFuture() { throw Error('Future progression not implemented'); }
+export function syncFuture() { throw Error('Future reconciliation not implemented'); }
+export function canResearchFuture() { return {ok:false,message:'Future research not implemented'}; }

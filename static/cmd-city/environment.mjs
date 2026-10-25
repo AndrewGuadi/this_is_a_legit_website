@@ -131,7 +131,8 @@ function moduleScale(tile) {
   return 1 + 0.5 * (integer(tile.modules, 0, 3) ? tile.modules : 0);
 }
 function sourceReport(city, metrics) {
-  const size = city.width * city.height;
+  const size = city.width * city.height,
+    r = ratios(metrics);
   const air = Array(size).fill(0),
     ground = Array(size).fill(0),
     sources = [];
@@ -175,8 +176,7 @@ function sourceReport(city, metrics) {
   };
   for (let i = 0; i < size; i++) {
     const tile = city.tiles[i],
-      filled = workers(metrics, i),
-      r = ratios(metrics);
+      filled = workers(metrics, i);
     if (active(tile) && connected(metrics, i)) {
       if (tile.type === "coalPlant")
         add(
@@ -308,9 +308,43 @@ function localWaterContamination(city, environment, index) {
   return weight ? total / weight : 0;
 }
 export function environmentReport(city, metrics = {}) {
-  const environment = environmentOf(city),
-    size = city.width * city.height,
-    emissions = sourceReport(city, metrics);
+  return environmentReportWith(city, metrics, environmentOf(city));
+}
+/** Validated, independent environmental fields for one read-only simulation phase.
+ * Live staffing, stocks, occupancy, buildings and utilities are still recomputed.
+ */
+export function createEnvironmentReportSnapshot(
+  city,
+  { presentation = true } = {},
+) {
+  const source = environmentOf(city),
+    width = city.width,
+    height = city.height;
+  const environment = {
+    ...source,
+    air: source.air.slice(),
+    ground: source.ground.slice(),
+    radiation: source.radiation.slice(),
+  };
+  return (metrics = {}, options = {}) => {
+    if (city.width !== width || city.height !== height)
+      throw Error("Environmental snapshot dimensions changed.");
+    return environmentReportWith(
+      city,
+      metrics,
+      environment,
+      options.presentation ?? presentation,
+    );
+  };
+}
+function environmentReportWith(
+  city,
+  metrics,
+  environment,
+  presentation = true,
+) {
+  const size = city.width * city.height,
+    emissions = presentation ? sourceReport(city, metrics) : null;
   let pumpCapacity = 0,
     weightedContamination = 0,
     filterCapacity = 0;
@@ -365,7 +399,7 @@ export function environmentReport(city, metrics = {}) {
     airExposure = 0,
     radiationExposure = 0;
   const restricted = environment.radiation.map((v) => v >= 200),
-    blockers = Array.from({ length: size }, () => []);
+    blockers = presentation ? Array.from({ length: size }, () => []) : null;
   for (let i = 0; i < size; i++) {
     const tile = city.tiles[i];
     if (
@@ -377,19 +411,19 @@ export function environmentReport(city, metrics = {}) {
       airExposure += (environment.air[i] / 10) * population;
       radiationExposure += (environment.radiation[i] / 10) * population;
     }
-    if (restricted[i])
+    if (presentation && restricted[i])
       blockers[i].push(
         "Radiation restricts new occupation and normal development on this land. Recovery access and cleanup may remain available.",
       );
-    if (environment.ground[i] >= 500)
+    if (presentation && environment.ground[i] >= 500)
       blockers[i].push(
         "Persistent ground contamination is high; removing the emitter does not clean existing soil.",
       );
-    if (tile.type === "water" && pumpContamination[i] > 20)
+    if (presentation && tile.type === "water" && pumpContamination[i] > 20)
       blockers[i].push(
         "This pump draws contaminated water. Connected, supplied and staffed filtration treats only its available throughput.",
       );
-    if (tile.type === "landfill" && amount(tile.stored))
+    if (presentation && tile.type === "landfill" && amount(tile.stored))
       blockers[i].push(
         "Stored landfill waste remains a local contamination source, including after closure.",
       );
@@ -403,11 +437,15 @@ export function environmentReport(city, metrics = {}) {
     ground: environment.ground.map((v) => v / 10),
     radiation: environment.radiation.map((v) => v / 10),
     restricted,
-    blockers,
-    sources: emissions.sources,
-    emissions: emissions.totals,
-    emissionBasis: "opening-month activity forecast",
-    pumpContamination: pumpContamination.map(display),
+    ...(presentation
+      ? {
+          blockers,
+          sources: emissions.sources,
+          emissions: emissions.totals,
+          emissionBasis: "opening-month activity forecast",
+          pumpContamination: pumpContamination.map(display),
+        }
+      : {}),
     pumpWeightedRawContamination: display(rawContamination),
     deliveredWaterContamination: display(deliveredWaterContamination),
     waterFilterCapacity: filterCapacity,
@@ -459,11 +497,11 @@ function cleanupWork(city, metrics, environment) {
   }
   return { groundRemoved, radiationRemoved };
 }
-export function advanceEnvironment(city, metrics = {}) {
+export function advanceEnvironment(city, metrics = {}, { report = true } = {}) {
   const before = environmentOf(city);
   if (before.lastMonth >= city.month)
     return {
-      ...environmentReport(city, metrics),
+      ...(report ? environmentReport(city, metrics) : {}),
       changed: false,
       massBalance: null,
     };
@@ -523,7 +561,7 @@ export function advanceEnvironment(city, metrics = {}) {
   validateEnvironment(next, city.width, city.height, city.month);
   city.environment = next;
   return {
-    ...environmentReport(city, metrics),
+    ...(report ? environmentReport(city, metrics) : {}),
     changed: true,
     massBalance: balance,
   };

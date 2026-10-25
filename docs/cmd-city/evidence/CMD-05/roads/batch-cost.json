@@ -1,0 +1,12 @@
+{
+  "node": "v24.22.1",
+  "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+  "tiles": 140,
+  "builds": 139,
+  "planMs": 1.3155419999999935,
+  "commitMs": 4196.904503000001,
+  "ok": true,
+  "cost": 3475000,
+  "sourceCashUnchanged": true,
+  "limitation": "One synthetic full-map block. Synchronous guarded construction, not frame rendering or physical-device proof."
+}

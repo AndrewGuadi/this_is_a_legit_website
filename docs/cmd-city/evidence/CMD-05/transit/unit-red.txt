@@ -1,0 +1,291 @@
+✔ planning creates bounded zeroed derived loads and never mutates the authoritative city (7.424343ms)
+✔ a connected rail path with two distinct accessible stations carries actual passengers (4.47412ms)
+✔ disconnected rail segments, one station and tracks without stations serve nobody (2.884154ms)
+✔ disabled, burning or road-disconnected stations are ineligible (2.191611ms)
+✔ catchments are bounded and one shared station cannot pretend to be a route (1.944882ms)
+✔ rail capacity is reserved across repeated callers sharing the same track (1.223281ms)
+✔ buses need two exchanges and a genuine connected road path, reducing car equivalents (1.657098ms)
+✔ bus capacity is shared across overlapping trips without inventing passengers (0.788195ms)
+✔ bus path cannot jump over missing tiles, diagonals or disconnected roads (2.456583ms)
+✔ invalid requests and invalid endpoint indices leave every derived load unchanged (3.285934ms)
+✔ planning snapshots network eligibility rather than retaining writable source references (1.238778ms)
+✔ rail is preferred when both a valid bus and rail route serve a journey (0.441068ms)
+✔ station modules increase aggregate throughput across different rail branches without raising edge capacity (1.244603ms)
+✔ saturated rail edges do not hide an available alternate track path (0.676904ms)
+✔ a disabled or burning bus exchange cannot provide service (1.276765ms)
+✖ streetcar assigns real demand on its connected network with finite shared segments and endpoints (3.298065ms)
+✖ streetcar rejects disconnected or demolished paths and inaccessible/closed/burning endpoints (0.713394ms)
+✖ streetcar module capacity never raises a shared segment's capacity (0.461702ms)
+✖ ferry assigns real demand on its connected network with finite shared segments and endpoints (1.447749ms)
+✖ ferry rejects disconnected or demolished paths and inaccessible/closed/burning endpoints (0.378427ms)
+✖ ferry module capacity never raises a shared segment's capacity (0.452345ms)
+✖ maglev assigns real demand on its connected network with finite shared segments and endpoints (1.690034ms)
+✖ maglev rejects disconnected or demolished paths and inaccessible/closed/burning endpoints (0.426837ms)
+✖ maglev module capacity never raises a shared segment's capacity (0.417258ms)
+✖ ferry terminals cannot teleport across land and a water bridge preserves navigation (0.894652ms)
+✖ future movement requires completed maglev research, even for imported infrastructure (1.038609ms)
+ℹ tests 26
+ℹ suites 0
+ℹ pass 15
+ℹ fail 11
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 220.688397
+
+✖ failing tests:
+
+test at tests/city/transit.test.mjs:272:3
+✖ streetcar assigns real demand on its connected network with finite shared segments and endpoints (3.298065ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    {
+  +   mode: 'none',
+  +   moved: 0,
+  +   roadFactor: 1
+  -   mode: 'streetcar',
+  -   moved: 140,
+  -   roadFactor: 0
+    }
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/transit.test.mjs:274:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { mode: 'none', moved: 0, roadFactor: 1 },
+    expected: { mode: 'streetcar', moved: 140, roadFactor: 0 },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/city/transit.test.mjs:281:3
+✖ streetcar rejects disconnected or demolished paths and inaccessible/closed/burning endpoints (0.713394ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  undefined !== 0
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/transit.test.mjs:293:14)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/city/transit.test.mjs:296:3
+✖ streetcar module capacity never raises a shared segment's capacity (0.461702ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 160
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/transit.test.mjs:300:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 160,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/city/transit.test.mjs:272:3
+✖ ferry assigns real demand on its connected network with finite shared segments and endpoints (1.447749ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    {
+  +   mode: 'none',
+  +   moved: 0,
+  +   roadFactor: 1
+  -   mode: 'ferry',
+  -   moved: 180,
+  -   roadFactor: 0
+    }
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/transit.test.mjs:274:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { mode: 'none', moved: 0, roadFactor: 1 },
+    expected: { mode: 'ferry', moved: 180, roadFactor: 0 },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/city/transit.test.mjs:281:3
+✖ ferry rejects disconnected or demolished paths and inaccessible/closed/burning endpoints (0.378427ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  undefined !== 0
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/transit.test.mjs:293:14)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/city/transit.test.mjs:296:3
+✖ ferry module capacity never raises a shared segment's capacity (0.452345ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 200
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/transit.test.mjs:300:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 200,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/city/transit.test.mjs:272:3
+✖ maglev assigns real demand on its connected network with finite shared segments and endpoints (1.690034ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+  
+    {
+  +   mode: 'none',
+  +   moved: 0,
+  +   roadFactor: 1
+  -   mode: 'maglev',
+  -   moved: 580,
+  -   roadFactor: 0
+    }
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/transit.test.mjs:274:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: { mode: 'none', moved: 0, roadFactor: 1 },
+    expected: { mode: 'maglev', moved: 580, roadFactor: 0 },
+    operator: 'deepStrictEqual',
+    diff: 'simple'
+  }
+
+test at tests/city/transit.test.mjs:281:3
+✖ maglev rejects disconnected or demolished paths and inaccessible/closed/burning endpoints (0.426837ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  undefined !== 0
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/transit.test.mjs:293:14)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/city/transit.test.mjs:296:3
+✖ maglev module capacity never raises a shared segment's capacity (0.417258ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 600
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/transit.test.mjs:300:12)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 600,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/city/transit.test.mjs:304:1
+✖ ferry terminals cannot teleport across land and a water bridge preserves navigation (0.894652ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 30
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/transit.test.mjs:310:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 30,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/city/transit.test.mjs:312:1
+✖ future movement requires completed maglev research, even for imported infrastructure (1.038609ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  0 !== 30
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/transit.test.mjs:317:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0,
+    expected: 30,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

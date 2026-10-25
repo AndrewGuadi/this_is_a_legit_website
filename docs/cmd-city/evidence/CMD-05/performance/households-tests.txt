@@ -1,0 +1,40 @@
+✔ new per-home cohorts exactly partition actual population and begin low wealth (8.734642ms)
+✔ migration starts at current month with no invented past learning (2.535745ms)
+✔ growth reconciliation adds declared external capital without inventing residents or municipal money (2.084509ms)
+✔ departures proportionally remove private cash, educated adults and uncollected debt (1.182295ms)
+✔ demolition clears the departed home without transferring its private wallet to treasury (0.703323ms)
+✔ reports virtually reconcile changed occupants but never mutate any source state or RNG (4.902951ms)
+✔ private wages come only from actual routed employment and ledger cash reconciles (6.741623ms)
+✔ unemployed households receive no ghost wage income (3.328223ms)
+✔ private-wallet saturation records capped external wages without overflow or hidden loss (2.833332ms)
+✔ shopping consumes actual shared goods and household money along a real road path (3.723736ms)
+✔ a broken physical road prevents shopping even if aggregate access and coverage say yes (1.637073ms)
+✔ closed, burning, unstaffed or unsupplied shops do not sell (8.615351ms)
+✔ all homes share finite shop capacity and finite goods without overselling (1.722986ms)
+✔ poor wallets never overspend and unpaid residential taxes remain explicit arrears (1.370603ms)
+✔ actual sales are private merchant receipts, never municipal sales revenue (2.416505ms)
+✔ schools and universities share finite enrollment slots instead of granting coverage-based education (2.241361ms)
+✔ adult graduation requires twelve attended months, with no retrospective migration credit (6.886944ms)
+✔ coverage alone or an interruption cannot graduate untrained adults (12.851443ms)
+✔ land value alone cannot promote a poor uneducated unemployed household (4.18126ms)
+✔ wealth changes require sustained real conditions and move only one class at a time (10.489405ms)
+✔ class tax requires Finance and an open operating Town Hall; malformed actions are inert (20.715556ms)
+✔ uniform rates preserve legacy tax arithmetic and legacy sector changes set all classes (3.389125ms)
+✔ booked residential taxes retain the old class when wealth changes after collection (1.565636ms)
+✔ strict validation catches malformed counts, money, study, tax arrays, unknown keys and phase markers (4.758031ms)
+✔ monthly hook is idempotent in prefinance phase and preserves authoritative population and RNG (3.663038ms)
+✔ shopping reserves remaining shared road capacity after actual commuting (6.494328ms)
+✔ full booked shopping traffic survives repeated hooks, JSON round-trip and pure reports (7.335213ms)
+✔ caller edits to returned shopping-load arrays cannot poison persisted history (4.303866ms)
+✔ reconciliation retains historical loads across deletion while validator rejects malformed load arrays (3.76358ms)
+✔ route topology caches observe road closure, fire, demolition and restoration across months (10.559588ms)
+✔ route reuse never caches shop staffing, wallet, price, utility or goods eligibility (2.566172ms)
+✔ optimized reports retain deep defensive copies of home balances, tax arrays, ledger and traffic (8.071751ms)
+ℹ tests 32
+ℹ suites 0
+ℹ pass 32
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 304.409484

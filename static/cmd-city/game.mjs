@@ -11,6 +11,7 @@ import {
 } from "./region.mjs";
 import { createClock, setRunning, setSpeed, advanceClock } from "./clock.mjs";
 import { createView } from "./view.mjs";
+import { planRoad, commitRoadPlanAsync } from "./roads.mjs";
 import { createCivic, REQUESTS } from "./civic.mjs";
 import { createHouseholds } from "./households.mjs";
 import { createServices } from "./services.mjs";
@@ -68,6 +69,11 @@ const glyphs = {
   bus: "▰",
   rail: "╫",
   station: "▱",
+  streetcarTrack: "╪",
+  streetcarStop: "T",
+  ferryTerminal: "F",
+  maglevTrack: "≋",
+  maglevStation: "M",
   port: "⚓",
   airport: "↗",
   mine: "◒",
@@ -118,6 +124,10 @@ let running = false,
 const clock = createClock();
 const canvas = $("city-map");
 let view;
+let roadCommitToken = 0;
+let roadPreview = null,
+  roadDrawing = false,
+  roadAnchor = null;
 
 function message(text, error = false) {
   $("city-message").textContent = text;
@@ -158,6 +168,7 @@ function updateRunState() {
   $("simulation-action").disabled = false;
 }
 function toggleRun() {
+  cancelRoadPlan(false);
   if ($("city-dialog").open) return;
   running = !running;
   setRunning(clock, running);
@@ -198,6 +209,7 @@ function setInput(id, value) {
   if (document.activeElement !== el) el.value = value;
 }
 function chooseTool(id) {
+  cancelRoadPlan(false);
   tool = id;
   dirty = true;
   $("inspect-tool").setAttribute("aria-pressed", String(id === "inspect"));
@@ -282,7 +294,9 @@ function updateInspector() {
   // The optional facility closure action is exposed only if the core recognizes it.
   const toggle = $("toggle-facility");
   if (toggle) {
-    toggle.disabled = !TOOLS[tile.type] || tile.type === "rail";
+    toggle.disabled =
+      !TOOLS[tile.type] ||
+      ["rail", "streetcarTrack", "maglevTrack"].includes(tile.type);
     toggle.textContent = road
       ? tile.enabled === false
         ? "Reopen selected road"
@@ -1000,8 +1014,11 @@ function renderManagement() {
   ]);
   ledger($("city-indicators"), [
     ["Working residents", whole(metrics.workers)],
-    ["Bus passengers", whole(metrics.busPassengers)],
-    ["Rail passengers", whole(metrics.railPassengers)],
+    ["Bus assigned commuters", whole(metrics.busPassengers)],
+    ["Rail assigned commuters", whole(metrics.railPassengers)],
+    ["Streetcar assigned commuters", whole(metrics.streetcarPassengers)],
+    ["Ferry assigned commuters", whole(metrics.ferryPassengers)],
+    ["Maglev assigned commuters", whole(metrics.maglevPassengers)],
     ["Regional renewable support", `${whole(city.regionalPower)} power units`],
     ["Reachable job capacity", whole(metrics.jobs)],
     ["Filled jobs", whole(metrics.employed)],
@@ -1107,6 +1124,7 @@ function update() {
   dirty = true;
 }
 function act(action) {
+  cancelRoadPlan(false);
   const result = regionCityAction(region, action);
   city = region.cities[region.active].state;
   message(result.message, !result.ok);
@@ -1150,6 +1168,7 @@ function ask(title, copy, confirmLabel, confirm, setup = false) {
   $("city-dialog").showModal();
 }
 function replaceCity(candidate, note) {
+  cancelRoadPlan(false);
   region = candidate.cities ? candidate : wrapCity(candidate);
   city = region.cities[region.active].state;
   selected = { x: 5, y: 16 };
@@ -1197,6 +1216,7 @@ function parsePlayable(text) {
   }
 }
 function regionAct(action) {
+  cancelRoadPlan(false);
   const result = regionAction(region, action);
   message(result.message, !result.ok);
   if (result.ok) {
@@ -1302,7 +1322,132 @@ function initializeRegion() {
     );
   });
 }
+function roadConfig() {
+  const at = (name) => ({
+    x: Number($(`road-${name}-x`).value),
+    y: Number($(`road-${name}-y`).value),
+  });
+  return {
+    shape: $("road-shape").value,
+    roadType: $("road-class").value,
+    start: at("start"),
+    end: at("end"),
+    control: at("control"),
+  };
+}
+function roadPoint(name, p) {
+  $(`road-${name}-x`).value = p.x;
+  $(`road-${name}-y`).value = p.y;
+}
+function cancelRoadPlan(notice = true) {
+  roadCommitToken++;
+  const hadPlan = roadPreview !== null || roadDrawing;
+  roadDrawing = false;
+  roadAnchor = null;
+  roadPreview = null;
+  $("commit-road").disabled = true;
+  $("draw-road").setAttribute("aria-pressed", "false");
+  if (notice || hadPlan)
+    $("road-plan-status").textContent =
+      "Road plan canceled. No construction was charged.";
+  dirty = true;
+}
+function previewRoad() {
+  roadCommitToken++;
+  pause();
+  const config = roadConfig(),
+    plan = planRoad(city, config);
+  roadPreview = { ...plan, config };
+  $("commit-road").disabled = !plan.ok;
+  $("road-plan-status").textContent = plan.ok
+    ? `${plan.message} ${money(plan.cost)} total, including water bridges.`
+    : plan.message;
+  dirty = true;
+}
+function roadMapPoint(tile, start = null) {
+  if (!tile) return;
+  roadCommitToken++;
+  if (start) {
+    roadPoint("start", start);
+    roadPoint("end", tile);
+    roadAnchor = null;
+    previewRoad();
+    return;
+  }
+  if (!roadAnchor) {
+    roadAnchor = tile;
+    roadPoint("start", tile);
+    roadPreview = null;
+    $("commit-road").disabled = true;
+    $("road-plan-status").textContent =
+      "Start selected. Choose the end point (circle radius point).";
+    dirty = true;
+  } else {
+    roadPoint("end", tile);
+    roadAnchor = null;
+    previewRoad();
+  }
+}
+function initializeRoadPlanner() {
+  $("preview-road").addEventListener("click", previewRoad);
+  $("cancel-road").addEventListener("click", () => cancelRoadPlan());
+  $("draw-road").addEventListener("click", () => {
+    chooseTool("inspect");
+    pause();
+    roadDrawing = true;
+    $("draw-road").setAttribute("aria-pressed", "true");
+    $("road-plan-status").textContent =
+      "Drag across the map or tap two end points. Preview only; use Build road plan to commit.";
+    canvas.focus({ preventScroll: true });
+  });
+  for (const input of $("road-planner").querySelectorAll("input,select"))
+    input.addEventListener("input", () => {
+      roadCommitToken++;
+      roadPreview = null;
+      $("commit-road").disabled = true;
+      dirty = true;
+      $("road-plan-status").textContent =
+        "Coordinates changed. Preview the road before building.";
+    });
+  $("road-planner").addEventListener("keydown", (event) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      cancelRoadPlan();
+    }
+  });
+  $("commit-road").addEventListener("click", async () => {
+    if (!roadPreview?.ok) return;
+    const token = ++roadCommitToken,
+      source = region;
+    $("commit-road").disabled = true;
+    const result = await commitRoadPlanAsync(source, roadPreview.config, {
+      isCanceled: () => token !== roadCommitToken || source !== region,
+      onProgress: ({ completed, total }) => {
+        $("road-plan-status").textContent =
+          `Preparing ${completed} of ${total} road tiles. Cancel to keep your city unchanged.`;
+      },
+    });
+    if (token !== roadCommitToken || source !== region) return;
+    if (!result.ok) {
+      cancelRoadPlan(false);
+      $("road-plan-status").textContent = result.message;
+      message(result.message, true);
+      return;
+    }
+    region = result.region;
+    city = region.cities[region.active].state;
+    cancelRoadPlan(false);
+    metrics = measure(city);
+    update();
+    storeCity();
+    const note = `Built ${result.count} road tiles for ${money(result.cost)}.`;
+    $("road-plan-status").textContent = note;
+    message(note);
+  });
+}
+
 function initializeControls() {
+  initializeRoadPlanner();
   $("simulation-action").addEventListener("click", toggleRun);
   $("inspect-tool").addEventListener("click", () => chooseTool("inspect"));
   $("bulldoze-tool").addEventListener("click", () => chooseTool("bulldoze"));
@@ -1610,12 +1755,16 @@ function initializeMapInput() {
       );
     } else if (event.key === "Enter") {
       event.preventDefault();
-      if (!event.repeat) performTool({ ...selected });
+      if (!event.repeat) {
+        if (roadDrawing) roadMapPoint({ ...selected });
+        else performTool({ ...selected });
+      }
     } else if (event.key === " ") {
       event.preventDefault();
       if (!event.repeat) toggleRun();
     } else if (event.key.toLowerCase() === "i" || event.key === "Escape") {
       event.preventDefault();
+      cancelRoadPlan();
       chooseTool("inspect");
     }
   });
@@ -1631,7 +1780,7 @@ function initializeMapInput() {
       y: event.clientY,
       tile,
       moved: false,
-      inspect: tool === "inspect",
+      inspect: tool === "inspect" && !roadDrawing,
     };
     try {
       canvas.setPointerCapture(event.pointerId);
@@ -1650,6 +1799,11 @@ function initializeMapInput() {
       ) > 6
     )
       pointer.moved = true;
+    if (roadDrawing && pointer.moved && pointer.tile && hover) {
+      roadPoint("start", pointer.tile);
+      roadPoint("end", hover);
+      previewRoad();
+    }
     if (pointer.inspect && pointer.moved) {
       view.pan(event.clientX - pointer.x, event.clientY - pointer.y);
       canvas.classList.add("panning");
@@ -1663,6 +1817,10 @@ function initializeMapInput() {
     pointer = null;
     canvas.classList.remove("panning");
     const tile = view.pointToTile(event.clientX, event.clientY);
+    if (roadDrawing) {
+      if (tile) roadMapPoint(tile, prior.moved ? prior.tile : null);
+      return;
+    }
     if (
       !prior.moved &&
       tile &&
@@ -1672,6 +1830,7 @@ function initializeMapInput() {
       performTool(tile);
   });
   const cancelPointer = () => {
+    if (pointer && roadDrawing) cancelRoadPlan();
     pointer = null;
     hover = null;
     canvas.classList.remove("panning");
@@ -1722,7 +1881,7 @@ function frame(time) {
     }
   }
   if (dirty) {
-    view.draw(city, metrics, selected, tool, overlay, hover);
+    view.draw(city, metrics, selected, tool, overlay, hover, roadPreview);
     dirty = false;
   }
   requestAnimationFrame(frame);

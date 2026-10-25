@@ -1,0 +1,13 @@
+# CMD-05 future module handoff
+
+Worker: direct Codex session `/root/cmd05_future`, with parent-authorized exception in AGENTS.md. Baseline: `3c33c764a7548d81aa84988688caabeabe47d545`. No commits, pushes or deployments. Owned paths only: new future module, its unit tests, FUTURE_CONTRACT.md and this evidence directory.
+
+Standalone phase is frozen pending isolated core/UI/save integration. `source-hashes.json` binds the exact files. **22 tests pass**, including a 240-month varied finite-resource/deterministic-restoration check. Inputs are synthetic; no browser UI or production execution is implied.
+
+Delivered: canonical tower population/capacity migration; distinct mixed-use floors; atomic floor controls and actual cash costs; crown order; critical-role staffing; no invented workforce from reporting; shared-water reservation input and exhausted-water safety; pure reports; current educated/wealth workforce research prerequisite; finite corporate oil/ore conversion, product stock, operational sales capacity, revenue and per-site emissions ledger; strict state/bounds/marker validation; idempotent monthly hook and structural reconciliation.
+
+Actual initial scaffold RED and first GREEN are retained. Corrective RED/GREEN pairs show real defects before their fixes: closed-network product sales; impossible ledger bounds; stale household employment qualifying research; zero-cost floor shutdown while insolvent; crown ordering; local water bypassing an exhausted reserve; aggregate staffing diluting power-floor workers and closed-building upkeep; reporting overriding explicit reserved job roles. Scaffold source and the pre-edge-fix source snapshot are retained. Later changes have actual command/log evidence and tested final source; no claim is made that every intermediate source snapshot was archived independently. Supporting regression cases added after implementation are not falsely labeled initial TDD RED.
+
+Final test command: `node --test tests/city/future.test.mjs`, exit 0, 22/22, no skipped tests. Formatting used temporary `npx --yes prettier@3.6.2`, without changing package dependencies. Final source diff whitespace check passed.
+
+The module is not yet imported by core or save.mjs. No current feature ledger promotion is warranted until real player controls, once-only finance/material effects, household capacities and schema migration are integrated and tested. FUTURE_CONTRACT.md specifies the critical-first worker/route reservation schedule, shared finite groundwater accounting and required hooks. Fusion/tidal, richer franchises, actual drones and robot disaster remain next phases, not delivered claims.

@@ -1,3 +1,4 @@
+import { roadTopology } from "./road-network.mjs";
 /** Original deterministic road services. Saved counts represent service cases, not identities. */
 import { TOOLS } from "./content.mjs";
 const MAX = 1e12,
@@ -47,13 +48,25 @@ const invalid = () => {
   throw Error("Invalid CMD City road services state.");
 };
 const active = (t) => t && t.enabled !== false && !t.fire && t.type !== "ruins";
-const exact = (v, keys) =>
-  v &&
-  typeof v === "object" &&
-  !Array.isArray(v) &&
-  [Object.prototype, null].includes(Object.getPrototypeOf(v)) &&
-  Object.keys(v).length === keys.length &&
-  Object.keys(v).every((k) => keys.includes(k));
+const keySets = new WeakMap();
+function exact(v, keys) {
+  if (
+    !v ||
+    typeof v !== "object" ||
+    Array.isArray(v) ||
+    ![Object.prototype, null].includes(Object.getPrototypeOf(v))
+  )
+    return false;
+  const actual = Object.keys(v);
+  if (actual.length !== keys.length) return false;
+  let allowed = keySets.get(keys);
+  if (!allowed) {
+    allowed = new Set(keys);
+    keySets.set(keys, allowed);
+  }
+  for (const key of actual) if (!allowed.has(key)) return false;
+  return true;
+}
 function dimensions(city) {
   const n = city.width * city.height;
   if (
@@ -96,28 +109,28 @@ function totalStored(city) {
 function cargo(s, kind) {
   return s.vehicles.reduce((n, v) => n + (v.kind === kind ? v.payload : 0), 0);
 }
-function conservation(s, city) {
+function conservation(s, totals) {
   return {
     waste:
       s.counters.generatedWaste +
         s.counters.legacyWaste +
         s.counters.initialStoredWaste ===
-      sum(s.waste) +
+      totals.waste +
         s.looseWaste +
-        cargo(s, "garbage") +
-        totalStored(city) +
+        totals.garbage +
+        totals.stored +
         s.counters.processedWaste,
     patients:
       s.counters.createdPatients ===
-      sum(s.patients) +
-        sum(s.beds) +
-        cargo(s, "medical") +
+      totals.patients +
+        totals.beds +
+        totals.medical +
         s.counters.treatedPatients,
     crimes:
       s.counters.createdCrimes ===
-      sum(s.crimes) +
-        sum(s.custody) +
-        cargo(s, "police") +
+      totals.crimes +
+        totals.custody +
+        totals.police +
         s.counters.resolvedCrimes,
   };
 }
@@ -160,7 +173,7 @@ export function createServices(city, { month = city.month } = {}) {
   s.counters.initialStoredWaste = totalStored(city);
   return s;
 }
-export function validateServices(s, city, { stable = true } = {}) {
+function inspectServices(s, city, { stable = true } = {}) {
   const n = dimensions(city);
   if (
     !exact(s, [
@@ -183,11 +196,23 @@ export function validateServices(s, city, { stable = true } = {}) {
     !exact(s.counters, COUNTERS)
   )
     invalid();
+  const totals = {
+    garbage: 0,
+    medical: 0,
+    police: 0,
+    fire: 0,
+    stored: totalStored(city),
+  };
   for (const key of FIELD_KEYS) {
     const a = s[key];
     if (!Array.isArray(a) || a.length !== n || Object.keys(a).length !== n)
       invalid();
-    for (const v of a) if (!integer(v)) invalid();
+    let total = 0;
+    for (const v of a) {
+      if (!integer(v)) invalid();
+      total += v;
+    }
+    totals[key] = total;
   }
   for (const v of Object.values(s.counters))
     if (!integer(v, 0, COUNTER_MAX)) invalid();
@@ -223,6 +248,7 @@ export function validateServices(s, city, { stable = true } = {}) {
       (v.kind === "fire" && (v.payload !== 0 || v.capacity !== 0))
     )
       invalid();
+    totals[v.kind] += v.payload;
     ids.add(v.id);
     vehicles.set(v.id, v);
     if (v.path.length) {
@@ -303,7 +329,12 @@ export function validateServices(s, city, { stable = true } = {}) {
     s.counters.recoveredOre > Math.floor(s.counters.processedWaste / 10)
   )
     invalid();
-  if (!Object.values(conservation(s, city)).every(Boolean)) invalid();
+  totals.conservation = conservation(s, totals);
+  if (!Object.values(totals.conservation).every(Boolean)) invalid();
+  return totals;
+}
+export function validateServices(s, city, options) {
+  inspectServices(s, city, options);
   return true;
 }
 function servicesOf(city) {
@@ -392,68 +423,28 @@ function providers(city, m) {
   );
 }
 /**
- * One ephemeral road snapshot and lazy FIFO BFS frontier per start for this tick.
- * Packed Int32 values retain predecessor(+1,low11bits) and discovery rank; a
- * Uint16 queue resumes only as far as each query needs. At most128 start entries
- * (also capped by map size) retain <=~1MiB at1280tiles; eviction changes no route.
+ * Bounded road-topology cache and lazy FIFO BFS frontier per start across ticks.
+ * Every tick and same-tick extinguishment compares the full active-road mask;
+ * topology changes discard all frontiers. No vehicle/case/material state is cached.
+ * Shared Int16 distance/predecessor/discovery-rank fields and a Uint16 queue
+ * resume only as far as each query needs. The global per-city cache holds at
+ * most 512 root sets (5 MiB buffers at 1280 tiles); eviction changes no route.
  * Reconstructed route arrays never alias a frontier or another vehicle path.
  */
-function createRouteContext(city) {
-  const size = city.tiles.length,
-    adjacent = Array.from({ length: size }, (_, i) => neighbors(i, city));
-  const mask = new Uint8Array(size),
-    trees = new Map(),
-    limit = Math.min(128, size);
-  function invalidate() {
-    for (let i = 0; i < size; i++) mask[i] = road(city, i) ? 1 : 0;
-    trees.clear();
-  }
-  invalidate();
+function createRouteContext(city, identity = city) {
+  const topology = roadTopology(city, identity);
   return {
-    invalidate,
-    isRoad: (i) => mask[i] === 1,
+    invalidate: () => topology.refresh(city),
+    isRoad: (i) => topology.mask[i] === 1,
     path(start, target) {
-      if (!mask[start]) return null;
-      const goals = mask[target]
+      const goals = topology.mask[target]
         ? [target]
-        : adjacent[target].filter((i) => mask[i]);
-      if (!goals.length) return null;
-      let entry = trees.get(start);
-      if (!entry) {
-        const tree = new Int32Array(size);
-        tree.fill(-1);
-        tree[start] = 0;
-        const queue = new Uint16Array(size);
-        queue[0] = start;
-        entry = { tree, queue, head: 0, tail: 1 };
-        if (trees.size >= limit) trees.delete(trees.keys().next().value);
-        trees.set(start, entry);
-      }
-      const { tree, queue } = entry;
-      let goal = -1,
-        rank = Infinity;
-      for (const candidate of goals)
-        if (tree[candidate] >= 0 && tree[candidate] >>> 11 < rank) {
-          goal = candidate;
-          rank = tree[candidate] >>> 11;
-        }
-      while (goal < 0 && entry.head < entry.tail) {
-        const here = queue[entry.head++];
-        for (const next of adjacent[here])
-          if (mask[next] && tree[next] === -1) {
-            tree[next] = (entry.tail << 11) | (here + 1);
-            queue[entry.tail++] = next;
-            if (goal < 0 && goals.includes(next)) goal = next;
-          }
-      }
-      if (goal < 0) return null;
+        : topology.adjacent[target].filter((i) => topology.mask[i]);
+      const found = topology.nearest(start, goals);
+      if (!found) return null;
       const result = [];
-      for (
-        let current = goal;
-        current !== -1;
-        current = (tree[current] & 2047) - 1
-      )
-        result.push(current);
+      for (let p = found.goal; p !== -1; p = found.entry.prev[p])
+        result.push(p);
       return result.reverse();
     },
   };
@@ -494,7 +485,8 @@ function syncFleet(city, m, list) {
       kept.push(v);
       continue;
     }
-    const p = byIndex.get(v.home), count = counts.get(v.home) || 0;
+    const p = byIndex.get(v.home),
+      count = counts.get(v.home) || 0;
     if (!p || p.kind !== v.kind || count >= (quotas.get(v.home) || 0)) continue;
     v.capacity = p.payload;
     counts.set(v.home, count + 1);
@@ -673,20 +665,21 @@ function returnRoute(city, v, list, routes) {
   v.destination = candidates[0].p.index;
   return true;
 }
-function collectAdjacent(city, v) {
+function reservedGarbageTargets(s, taskId) {
+  const reserved = new Set();
+  for (const t of s.tasks)
+    if (
+      t.kind === "garbage" &&
+      t.status !== "queued" &&
+      t.status !== "completed" &&
+      t.id !== taskId
+    )
+      reserved.add(t.target);
+  return reserved;
+}
+function collectAdjacent(city, v, reserved) {
   if (v.kind !== "garbage" || v.payload >= v.capacity) return;
-  const s = city.services,
-    reserved = new Set(
-      s.tasks
-        .filter(
-          (t) =>
-            t.kind === "garbage" &&
-            t.status !== "queued" &&
-            t.status !== "completed" &&
-            t.id !== v.taskId,
-        )
-        .map((t) => t.target),
-    );
+  const s = city.services;
   for (const i of [v.position, ...neighbors(v.position, city)]) {
     if (reserved.has(i)) continue;
     let take = Math.min(v.capacity - v.payload, s.waste[i]);
@@ -702,7 +695,7 @@ function collectAdjacent(city, v) {
     if (v.payload >= v.capacity) break;
   }
 }
-function arriveOutbound(city, v, list, routes) {
+function arriveOutbound(city, v, list, routes, reserved) {
   const s = city.services,
     t = s.tasks.find((t) => t.id === v.taskId);
   if (!t) return;
@@ -721,7 +714,7 @@ function arriveOutbound(city, v, list, routes) {
     const take = Math.min(v.capacity, s.crimes[target]);
     s.crimes[target] -= take;
     v.payload += take;
-  } else collectAdjacent(city, v);
+  } else collectAdjacent(city, v, reserved);
   v.status = "returning";
   t.status = "returning";
   returnRoute(city, v, list, routes);
@@ -767,6 +760,8 @@ function moveVehicles(city, m, list, routes) {
     budgets = new Map(list.map((p) => [p.index, p.processing]));
   for (const v of s.vehicles) {
     if (v.status === "idle") continue;
+    const reserved =
+      v.kind === "garbage" ? reservedGarbageTargets(s, v.taskId) : null;
     let budget = v.kind === "garbage" ? 32 : 8,
       guard = 0;
     if (v.status === "returning") returnRoute(city, v, list, routes);
@@ -784,7 +779,7 @@ function moveVehicles(city, m, list, routes) {
     }
     while (v.status !== "idle" && guard++ < city.tiles.length * 2 + 4) {
       if (!v.path.length) break;
-      collectAdjacent(city, v);
+      collectAdjacent(city, v, reserved);
       if (
         v.status === "outbound" &&
         v.kind === "garbage" &&
@@ -797,7 +792,7 @@ function moveVehicles(city, m, list, routes) {
       }
       if (v.cursor === v.path.length - 1) {
         if (v.status === "outbound") {
-          arriveOutbound(city, v, list, routes);
+          arriveOutbound(city, v, list, routes, reserved);
           continue;
         }
         const p = byIndex.get(v.destination);
@@ -870,11 +865,12 @@ function generate(city, m) {
   }
 }
 export function serviceReport(city, m = {}) {
-  const s = servicesOf(city),
-    uncollectedWaste = sum(s.waste) + s.looseWaste,
-    carriedWaste = cargo(s, "garbage"),
-    untreatedPatients = sum(s.patients) + sum(s.beds) + cargo(s, "medical"),
-    unresolvedCrimes = sum(s.crimes) + sum(s.custody) + cargo(s, "police"),
+  const s = city.services || createServices(city),
+    totals = inspectServices(s, city, { stable: false }),
+    uncollectedWaste = totals.waste + s.looseWaste,
+    carriedWaste = totals.garbage,
+    untreatedPatients = totals.patients + totals.beds + totals.medical,
+    unresolvedCrimes = totals.crimes + totals.custody + totals.police,
     population = Math.max(
       1,
       Number.isFinite(m.population)
@@ -906,37 +902,77 @@ export function serviceReport(city, m = {}) {
     uncollectedWaste,
     carriedWaste,
     pendingWaste: uncollectedWaste + carriedWaste,
-    storedWaste: totalStored(city),
+    storedWaste: totals.stored,
     processedWaste: s.counters.processedWaste,
     collectedWaste: s.counters.collectedWaste,
     untreatedPatients,
-    waitingPatients: sum(s.patients),
-    admittedPatients: sum(s.beds),
-    carriedPatients: cargo(s, "medical"),
+    waitingPatients: totals.patients,
+    admittedPatients: totals.beds,
+    carriedPatients: totals.medical,
     treatedPatients: s.counters.treatedPatients,
     unresolvedCrimes,
-    waitingCrimes: sum(s.crimes),
-    custody: sum(s.custody),
-    carriedCrimes: cargo(s, "police"),
+    waitingCrimes: totals.crimes,
+    custody: totals.custody,
+    carriedCrimes: totals.police,
     resolvedCrimes: s.counters.resolvedCrimes,
     healthPenalty: Math.min(60, (untreatedPatients / population) * 100),
     crimePenalty: Math.min(60, (unresolvedCrimes / population) * 100),
-    conservation: conservation(s, city),
+    conservation: totals.conservation,
     counters: { ...s.counters },
   };
 }
-export function advanceServices(city, m = {}) {
+/** Capture an independently owned, validated service report for a read-only phase.
+ * Later city mutations cannot alter this snapshot. Population-dependent penalties
+ * are recomputed from each call's current metrics; no live state is trusted by identity.
+ */
+export function createServiceReportSnapshot(city) {
+  const base = serviceReport(city);
+  const defaultPopulation = city.tiles.reduce(
+    (n, t) => n + (["residential", "tower"].includes(t.type) ? t.occupancy : 0),
+    0,
+  );
+  return (m = {}) => {
+    const population = Math.max(
+      1,
+      Number.isFinite(m.population) ? m.population : defaultPopulation,
+    );
+    return {
+      ...base,
+      vehicles: base.vehicles.map((v) => ({ ...v })),
+      conservation: { ...base.conservation },
+      counters: { ...base.counters },
+      healthPenalty: Math.min(60, (base.untreatedPatients / population) * 100),
+      crimePenalty: Math.min(60, (base.unresolvedCrimes / population) * 100),
+    };
+  };
+}
+// The validated schema has scalar records and five numeric arrays. Copy those
+// explicit fields without invoking the general structured-clone traversal.
+function cloneServices(source) {
+  return {
+    ...source,
+    waste: source.waste.slice(),
+    patients: source.patients.slice(),
+    crimes: source.crimes.slice(),
+    beds: source.beds.slice(),
+    custody: source.custody.slice(),
+    counters: { ...source.counters },
+    tasks: source.tasks.map((t) => ({ ...t })),
+    vehicles: source.vehicles.map((v) => ({ ...v, path: v.path.slice() })),
+  };
+}
+export function advanceServices(city, m = {}, { report = true } = {}) {
   const source = servicesOf(city);
   if (source.lastMonth === city.month)
-    return { ...serviceReport(city, m), changed: false };
+    return { ...(report ? serviceReport(city, m) : {}), changed: false };
   const work = {
     ...city,
-    services: structuredClone(source),
+    services: cloneServices(source),
     tiles: city.tiles.map((t) => ({ ...t })),
     inventory: { ...city.inventory },
     backlogs: { ...city.backlogs },
   };
-  const routes = createRouteContext(work),
+  const routes = createRouteContext(work, city),
     list = providers(work, m);
   generate(work, m);
   treatCases(work, list);
@@ -959,7 +995,7 @@ export function advanceServices(city, m = {}) {
         work.services.looseWaste +
         cargo(work.services, "garbage"),
     );
-  return { ...serviceReport(city, m), changed: true };
+  return { ...(report ? serviceReport(city, m) : {}), changed: true };
 }
 export function serviceAction(city, a) {
   if (
@@ -972,7 +1008,7 @@ export function serviceAction(city, a) {
   )
     return fail("Choose a valid medical or crime incident of1–100 cases.");
   const source = servicesOf(city),
-    s = structuredClone(source),
+    s = cloneServices(source),
     i = a.y * city.width + a.x,
     key = a.kind === "medical" ? "patients" : "crimes",
     c = a.kind === "medical" ? "createdPatients" : "createdCrimes";
@@ -991,7 +1027,7 @@ export function preserveDemolition(city, index) {
   if (!integer(index, 0, city.tiles.length - 1))
     return fail("Choose a valid demolition tile.");
   const source = servicesOf(city),
-    s = structuredClone(source),
+    s = cloneServices(source),
     tile = city.tiles[index];
   try {
     addField(s.waste, index, integer(tile.stored) ? tile.stored : 0);

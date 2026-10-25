@@ -210,7 +210,7 @@ export function createView(canvas) {
       ctx.stroke();
     }
   }
-  function building(t, x, y, index) {
+  function building(t, x, y, index, state) {
     const px = x * UNIT,
       py = y * UNIT,
       d = TOOLS[t.type];
@@ -221,6 +221,42 @@ export function createView(canvas) {
       ctx.fillStyle = "#565b4d";
       ctx.fillRect(px + 7, py + 8, 4, 4);
       ctx.fillRect(px + 15, py + 14, 5, 5);
+      return;
+    }
+    if (["streetcarTrack", "maglevTrack"].includes(t.type)) {
+      const connected = (dx, dy) =>
+        tileAt(state, x + dx, y + dy)?.type === t.type;
+      const horizontal = connected(-1, 0) || connected(1, 0);
+      const vertical = connected(0, -1) || connected(0, 1) || !horizontal;
+      ctx.strokeStyle = "#34483f";
+      ctx.lineWidth = t.type === "maglevTrack" ? 9 : 7;
+      ctx.beginPath();
+      if (horizontal) {
+        ctx.moveTo(px, py + 12);
+        ctx.lineTo(px + UNIT, py + 12);
+      }
+      if (vertical) {
+        ctx.moveTo(px + 12, py);
+        ctx.lineTo(px + 12, py + UNIT);
+      }
+      ctx.stroke();
+      ctx.strokeStyle = d.color;
+      ctx.lineWidth = 2;
+      ctx.stroke();
+      ctx.fillStyle = "#f4eedc";
+      ctx.font = "bold 8px system-ui";
+      ctx.textAlign = "center";
+      ctx.fillText(t.type === "maglevTrack" ? "M" : "T", px + 12, py + 8);
+      if (t.enabled === false || t.fire) {
+        ctx.strokeStyle = "#f3b28b";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(px + 6, py + 6);
+        ctx.lineTo(px + 18, py + 18);
+        ctx.moveTo(px + 18, py + 6);
+        ctx.lineTo(px + 6, py + 18);
+        ctx.stroke();
+      }
       return;
     }
     if (t.type === "rail") {
@@ -370,6 +406,18 @@ export function createView(canvas) {
       ctx.fillRect(px + 9, py + 10 - h, 5, 1.7);
       ctx.fillRect(px + 10.7, py + 8.3 - h, 1.7, 5);
     }
+    if (["streetcarStop", "ferryTerminal", "maglevStation"].includes(t.type)) {
+      ctx.fillStyle = "#203a34";
+      ctx.fillRect(px + 7, py + 9 - h, 10, 9);
+      ctx.fillStyle = "#fbf5df";
+      ctx.font = "bold 8px system-ui";
+      ctx.textAlign = "center";
+      ctx.fillText(
+        { streetcarStop: "T", ferryTerminal: "F", maglevStation: "M" }[t.type],
+        px + 12,
+        py + 16 - h,
+      );
+    }
     if (t.type === "school" || t.type === "university") {
       ctx.fillStyle = "#f5e3b7";
       ctx.fillRect(px + 8, py + 6 - h, 7, 2);
@@ -436,6 +484,14 @@ export function createView(canvas) {
       if (overlay === "traffic" && ROAD.has(t.type)) {
         const n = (m.roadLoad[i] || 0) / (TOOLS[t.type].capacity || 80);
         color = n > 0.8 ? "#ef9861b0" : n > 0.3 ? "#e2ca7d90" : "#8acc9b90";
+      }
+      if (overlay === "traffic") {
+        const assigned = Math.max(
+          m.streetcarLoad?.[i] || 0,
+          m.ferryLoad?.[i] || 0,
+          m.maglevLoad?.[i] || 0,
+        );
+        if (assigned > 0) color = "#a3baf6a0";
       }
       if (overlay === "services") {
         const n = Math.max(
@@ -524,6 +580,7 @@ export function createView(canvas) {
     tool = "inspect",
     overlay = "none",
     hover = null,
+    roadPreview = null,
   ) {
     mapWidth = s.width;
     mapHeight = s.height;
@@ -550,10 +607,30 @@ export function createView(canvas) {
     for (let y = 0; y < s.height; y++)
       for (let x = 0; x < s.width; x++) {
         const t = tileAt(s, x, y);
-        if (!ROAD.has(t.type)) building(t, x, y, y * s.width + x);
+        if (!ROAD.has(t.type)) building(t, x, y, y * s.width + x, s);
       }
     dataOverlay(s, m, overlay);
     serviceVehicles(s, m);
+    if (roadPreview?.tiles) {
+      ctx.fillStyle = roadPreview.ok ? "#c5e9a58c" : "#ee9b828c";
+      ctx.strokeStyle = roadPreview.ok ? "#f0ffd0" : "#ffdbca";
+      ctx.lineWidth = 1.4;
+      for (const tile of roadPreview.tiles) {
+        ctx.fillRect(tile.x * UNIT + 2, tile.y * UNIT + 2, UNIT - 4, UNIT - 4);
+        ctx.strokeRect(
+          tile.x * UNIT + 2,
+          tile.y * UNIT + 2,
+          UNIT - 4,
+          UNIT - 4,
+        );
+        if (!roadPreview.ok) {
+          ctx.beginPath();
+          ctx.moveTo(tile.x * UNIT + 5, tile.y * UNIT + 5);
+          ctx.lineTo(tile.x * UNIT + 19, tile.y * UNIT + 19);
+          ctx.stroke();
+        }
+      }
+    }
     ctx.strokeStyle = "#dbe8bb90";
     ctx.lineWidth = 1;
     ctx.strokeRect(0, 0, s.width * UNIT, s.height * UNIT);

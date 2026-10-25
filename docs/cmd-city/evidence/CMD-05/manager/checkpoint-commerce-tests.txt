@@ -1,0 +1,34 @@
+✔ creation preserves warehouse ownership without duplicating stock or inventing opening deliveries (13.025702ms)
+✔ actual staffed industrial production enters producer stock once; repeated hook is inert (16.899811ms)
+✔ closed, burning, unstaffed, unserved and unpowered producers generate no goods (12.961082ms)
+✔ warehouse cargo travels a real bounded path before a shop receives inventory (7.39873ms)
+✔ shared shop unloading is finite and goods remain aboard during partial deliveries (4.153477ms)
+✔ purchases consume only physically delivered shop stock and do not debit warehouse again (6.355633ms)
+✔ blocked roads hold real cargo and repairs restore its delivery (11.957284ms)
+✔ closing a destination returns its cargo over roads instead of teleporting or losing it (4.128354ms)
+✔ freight shares remaining road capacity with commuters and other freight (2.914544ms)
+✔ zero utilities or a closed gateway cannot dispatch warehouse freight (2.747676ms)
+✔ external warehouse transfer records only actual bounded stock and preserves money (2.259294ms)
+✔ demolition conserves producer and retail stock into explicit recovered goods (1.205196ms)
+✔ recall retains cargo and rejects malformed or missing vehicle actions without state changes (12.414838ms)
+✔ a tower shop uses explicitly supplied staffed monthly retail throughput (6.352329ms)
+✔ reporting is pure and returns defensive paths and stock/load arrays (5.64331ms)
+✔ strict validation rejects malformed keys, clocks, stocks, quantities and broken conservation (1.967922ms)
+✔ strict validation rejects malformed in-flight route/cursor/id/payload relationships (16.730446ms)
+✔ counter overflow refuses monthly production atomically (3.145736ms)
+✔ destroying the road under a loaded recalled truck preserves its position and cargo until repair (8.532046ms)
+✔ rotating shop admission eventually serves every shop under a finite shared fleet (198.66421ms)
+✔ producer stock bounds preserve actual accepted production without wrapping or losing prior goods (1.548938ms)
+✔ a demolished producer and full warehouse recover returned cargo into explicit loose goods (28.017511ms)
+✔ a mixed road and avenue crossing uses each endpoint remaining capacity rather than mixing unrelated maxima (3.418487ms)
+✔ independent producer and warehouse fleets cannot exceed the shared 32 vehicle bound (11.291462ms)
+✔ scalar consumption and external transfer overflows preserve both affected stock and counter (7.649709ms)
+✔ malformed observation rejects monthly work before any warehouse or commerce mutation (9.105435ms)
+ℹ tests 26
+ℹ suites 0
+ℹ pass 26
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 569.165885

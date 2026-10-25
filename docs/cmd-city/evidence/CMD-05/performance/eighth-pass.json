@@ -1,0 +1,14 @@
+{
+  "node": "v24.22.1",
+  "cpu": "INTEL(R) XEON(R) PLATINUM 8573C",
+  "platform": "linux x64",
+  "tiles": 1280,
+  "initialPopulation": 43200,
+  "months": 120,
+  "medianMs": 16.254597999999987,
+  "p95Ms": 47.37640599999992,
+  "maxMs": 93.42170200000001,
+  "targetP95Ms": 20,
+  "targetMet": false,
+  "finalPopulation": 0
+}
