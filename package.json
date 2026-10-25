@@ -2,7 +2,7 @@
   "name": "legit-research-browser-verification",
   "version": "1.0.0",
   "private": true,
-  "scripts": {"test:browser": "playwright test", "test:game": "node --test tests/game/*.test.mjs"},
+  "scripts": {"test:browser": "playwright test", "test:game": "node --test tests/game/*.test.mjs tests/blockbound/*.test.mjs"},
   "devDependencies": {
     "@playwright/test": "1.64.1",
     "@axe-core/playwright": "4.14.0"

@@ -1,0 +1,288 @@
+/* Circuit Match cabinet styles. Original stylesheet for this draft;
+ * visual language follows the repo's dark neon cabinet. */
+.circuit-page {
+  background: #070b12;
+  color: #eef6f0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+.game-shell {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 0 16px 48px;
+}
+.game-heading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 48px;
+  align-items: flex-end;
+  margin: 28px 0 20px;
+}
+.game-heading .eyebrow {
+  color: #8eacbc;
+  letter-spacing: 0.18em;
+  font-size: 13px;
+  margin: 0 0 8px;
+}
+.game-heading h1 {
+  font-size: clamp(40px, 8vw, 76px);
+  line-height: 0.95;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+.game-heading h1 span {
+  color: #d1f875;
+}
+.game-tagline {
+  color: #b9c9d2;
+  font-size: 18px;
+  margin: 0 0 6px;
+}
+.game-tagline strong {
+  color: #fff;
+}
+.game-cabinet {
+  background: #0d1622;
+  border: 1px solid #223246;
+  border-radius: 18px;
+  padding: 16px;
+  box-shadow: 0 18px 50px #00000088;
+}
+.game-hud {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 32px;
+  justify-content: space-between;
+  padding: 4px 8px 14px;
+}
+.game-hud .hud-label {
+  display: block;
+  color: #8eacbc;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.game-hud strong {
+  font-size: 24px;
+  font-variant-numeric: tabular-nums;
+}
+.arena {
+  position: relative;
+  border: 1px solid #223246;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #090f1c;
+  outline: none;
+}
+.arena:focus-visible {
+  outline: 3px solid #d1f875;
+  outline-offset: 2px;
+}
+.arena canvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  touch-action: manipulation;
+}
+.game-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 10px;
+  padding: 24px;
+  background: #070b12cc;
+}
+.game-overlay[hidden] {
+  display: none;
+}
+.game-overlay h2 {
+  font-size: clamp(28px, 5vw, 44px);
+  margin: 0;
+}
+.game-overlay p {
+  color: #b9c9d2;
+  max-width: 420px;
+  margin: 0;
+}
+.game-overlay .overlay-kicker {
+  color: #d1f875;
+  letter-spacing: 0.18em;
+  font-size: 13px;
+}
+.game-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-top: 14px;
+}
+button {
+  font: inherit;
+  cursor: pointer;
+  border-radius: 10px;
+  border: 1px solid #33475e;
+  background: #16222f;
+  color: #eef6f0;
+  padding: 10px 18px;
+}
+button:hover {
+  border-color: #d1f875;
+}
+button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+.action-button {
+  background: #d1f875;
+  border-color: #d1f875;
+  color: #102226;
+  font-weight: 700;
+}
+.cabinet-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 12px;
+  color: #8eacbc;
+  font-size: 14px;
+}
+.game-meta {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  padding-top: 12px;
+  color: #8eacbc;
+  font-size: 14px;
+}
+.game-guide {
+  display: grid;
+  gap: 24px;
+  margin-top: 36px;
+}
+@media (min-width: 760px) {
+  .game-guide {
+    grid-template-columns: 1.1fr 1.9fr;
+  }
+}
+.game-guide h2 {
+  font-size: 30px;
+  margin: 8px 0 10px;
+}
+.guide-controls {
+  display: grid;
+  gap: 20px;
+}
+.guide-controls > div {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+  gap: 12px;
+}
+.guide-number {
+  color: #d1f875;
+  font-weight: 700;
+}
+.guide-controls h3 {
+  margin: 0 0 4px;
+}
+.guide-controls p {
+  color: #b9c9d2;
+  margin: 0;
+}
+kbd {
+  background: #16222f;
+  border: 1px solid #33475e;
+  border-bottom-width: 2px;
+  border-radius: 6px;
+  padding: 1px 7px;
+  font-family: inherit;
+  font-size: 13px;
+}
+.access-note {
+  color: #8eacbc;
+  font-size: 14px;
+  margin-top: 24px;
+}
+dialog {
+  background: #0d1622;
+  color: #eef6f0;
+  border: 1px solid #33475e;
+  border-radius: 16px;
+  padding: 24px;
+  max-width: 440px;
+}
+dialog::backdrop {
+  background: #000000aa;
+}
+dialog form > div {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+.skip {
+  position: absolute;
+  left: -9999px;
+}
+.skip:focus {
+  left: 16px;
+  top: 16px;
+  background: #d1f875;
+  color: #102226;
+  padding: 8px 12px;
+  border-radius: 8px;
+  z-index: 10;
+}
+@media (prefers-reduced-motion: reduce) {
+  .game-overlay {
+    transition: none;
+  }
+}
+
+/* Ported from the repo's neon-breaker/game.css conventions: classes the
+ * circuit_match.html template uses that are not provided by arcade.css. */
+.circuit-page {
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+}
+.live-dot {
+  display: inline-block;
+  background: #d1f875;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  margin-right: 7px;
+}
+.heading-star {
+  font-size: 36px;
+  color: #ff8d76;
+  margin-left: 16px;
+  vertical-align: middle;
+}
+.cabinet-id {
+  white-space: nowrap;
+  font: 9px ui-monospace, monospace;
+}
+.cabinet-id > span {
+  color: #d1f875;
+}
+.save-best {
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+.save-best input {
+  width: 18px;
+  height: 18px;
+  accent-color: #d1f875;
+}
+.fallback {
+  padding: 20px;
+  border: 1px solid #ff8d76;
+}
+@media (max-width: 760px) {
+  .cabinet-id {
+    display: none;
+  }
+}

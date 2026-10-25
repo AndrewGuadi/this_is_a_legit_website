@@ -1,8 +1,11 @@
 # Legit Arcade
 
-An arcade with **Neon Breaker**, **Infinite Tic-Tac-Toe**, seven future game concepts, and a secondary form-research area. Both games are playable review candidates; final release requires independent review and physical-device evidence. The homepage is `/`, concepts live at `/games/<slug>`, and the preserved forms are at `/forms` and `/apply/<kind>`. The investigator workspace remains `/admin/login`.
+The catalog includes four playable games: Neon Breaker, Circuit Match, Blockbound: First Light, and Infinite Tic-Tac-Toe. Infinite Tic-Tac-Toe is local two-player play on one device.
 
-Game status is tracked in `game_catalog.py`; see [game roadmap](docs/GAME_ROADMAP.md) and [first-game brief](docs/FIRST_GAME_BRIEF.md). Catalog visits do not create observation records. Both games use local modules with no game telemetry or third-party requests. Neon Breaker's optional best score and Infinite Tic-Tac-Toe's optional sound preference stay on the device.
+
+An arcade with **Neon Breaker**, **Circuit Match**, **Blockbound: First Light**, and **Infinite Tic-Tac-Toe**, four playable original games, six future game concepts, and a secondary form-research area. Neon Breaker is a review candidate; final release requires independent TODD review and physical-device evidence. The homepage is `/`, concepts live at `/games/<slug>`, and the preserved forms are at `/forms` and `/apply/<kind>`. The investigator workspace remains `/admin/login`.
+
+Game status is tracked in `game_catalog.py`; see [game roadmap](docs/GAME_ROADMAP.md) and [first-game brief](docs/FIRST_GAME_BRIEF.md). Catalog visits do not create observation records. Neon Breaker uses native Canvas and local modules, with no game telemetry or third-party requests. Optional best-score storage stays on the device.
 
 
 A Flask/SQLite form-observation prototype for Authentic Dynamics LLC. Public, crawlable pages and three conventional application flows collect bounded first-party metadata. All clients receive the same research disclosure: this is not an actual job, grant, directory-placement, or service offer.
@@ -30,11 +33,9 @@ Run `npm run test:game` for deterministic simulation checks and `npm run test:br
 
 The owner authorized direct Codex implementation with a separate local TODD reviewer on 2026-10-20. See [implementation contract](docs/neon-breaker-contract.md). Browser emulation does not establish physical-phone performance.
 
-## Infinite Tic-Tac-Toe
+## Blockbound: First Light
 
-Open `/games/infinite-tic-tac-toe` for an endless local two-player match on one device. Choose Place or Remove, then a cell. Three in a row scores one point and ends only that round. If both players repeat their exact move on the same cell for three consecutive own turns each, the board resets while scores remain. There is no online multiplayer, account, server move traffic, or match persistence.
-
-Use native buttons with mouse/touch or Tab plus arrow keys and Enter/Space. Sound is optional and starts off; only its preference can be stored locally. See the [rules and implementation contract](docs/INFINITE_TIC_TAC_TOE.md). The same `npm run test:game` and `npm run test:browser` commands cover this game.
+Open `/games/blockbound-first-light` for an original blocky 3D city adventure written in C and compiled to a small, dependency-free WebAssembly module. Explore First Light, speak with three residents, recover three light shards, and activate the northern beacon. The checked-in base64-encoded WebAssembly lets the arcade run without a C toolchain. Rebuild it with `python scripts/build_blockbound.py` using Zig or clang+lld; see [the game guide](docs/BLOCKBOUND.md) for controls, architecture, and native test commands. No commercial ROM, copied map, branded character art, account, telemetry, or external runtime service is used.
 
 ## Evidence
 
