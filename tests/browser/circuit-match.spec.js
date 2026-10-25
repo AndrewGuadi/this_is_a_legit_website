@@ -26,9 +26,10 @@ test('Circuit Match supports touch selection, denied storage and responsive layo
   await page.goto('http://127.0.0.1:5081/games/circuit-match');
   await page.getByRole('button',{name:'Start run',exact:true}).tap();
   const box=await page.locator('canvas').boundingBox();
-  await page.touchscreen.tap(box.x+80/720*box.width,box.y+130/800*box.height);
+  await page.locator('canvas').tap({position:{x:80/720*box.width,y:130/800*box.height}});
   await expect(page.locator('#game-status')).toContainText('Tile selected');
-  await page.getByLabel('Save best on this device').check();
+  await page.getByLabel('Save best on this device').click();
+  await expect(page.getByLabel('Save best on this device')).not.toBeChecked();
   await expect(page.locator('#storage-note')).toContainText('Storage unavailable');
   expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);
   const result=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21a','wcag21aa']).analyze();
