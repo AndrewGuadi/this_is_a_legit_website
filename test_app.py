@@ -67,7 +67,7 @@ class ObservationTests(unittest.TestCase):
             route='/games/'+game['slug']
             response=self.client.get(route)
             self.assertEqual(response.status_code,200)
-            if game['slug'] == 'neon-breaker':
+            if game['slug'] in ('neon-breaker', 'circuit-match'):
                 self.assertIn(b'<canvas',response.data)
                 self.assertIn(b'Nothing is sent to a server',response.data)
             else:
