@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 480" role="img" aria-labelledby="title desc">
+<title id="title">Blockbound: First Light</title><desc id="desc">Original geometric artwork of a sunny block-built harbor city and its glowing beacon.</desc>
+<defs><linearGradient id="sky" x2="0" y2="1"><stop stop-color="#8ecbd3"/><stop offset="1" stop-color="#e8dba9"/></linearGradient><linearGradient id="sea" x2="0" y2="1"><stop stop-color="#559caa"/><stop offset="1" stop-color="#285f72"/></linearGradient></defs>
+<rect width="640" height="480" fill="#152e36"/><rect x="24" y="24" width="592" height="432" rx="4" fill="url(#sky)"/>
+<circle cx="505" cy="102" r="42" fill="#f8d884"/><path d="M24 290h592v166H24z" fill="url(#sea)"/><path d="m24 329 242-66 188 67-142 126H24z" fill="#8ca77b"/>
+<path d="m54 363 242-69 126 55-121 82H54z" fill="#bbbf91"/><path d="m70 362 218-58 104 46-103 65H70z" fill="#d4caa0"/>
+<g stroke="#173843" stroke-width="3" stroke-linejoin="round">
+<path d="m115 221 70-28 62 29-70 30z" fill="#e4a279"/><path d="m115 221 62 31v91l-62-31z" fill="#b97063"/><path d="m177 252 70-30v90l-70 31z" fill="#d4886e"/>
+<path d="m353 182 66-26 57 27-67 29z" fill="#8bb5bf"/><path d="m353 182 56 30v105l-56-29z" fill="#527f93"/><path d="m409 212 67-29v104l-67 30z" fill="#6c9cac"/>
+<path d="m105 342 46-18 40 19-46 20z" fill="#ae95c0"/><path d="m105 342 40 21v54l-40-20z" fill="#796d9c"/><path d="m145 363 46-20v55l-46 19z" fill="#9681aa"/>
+<path d="m280 142 35-14 30 14-35 15z" fill="#f4d383"/><path d="m280 142 30 15v100l-30-15z" fill="#b78c57"/><path d="m310 157 35-15v101l-35 14z" fill="#d6ae68"/>
+</g>
+<path d="m313 73 25 45-27 52-25-52z" fill="#b8f3d7"/><path d="m313 73 2 97-29-52z" fill="#e2f5c8"/><path d="m313 73 25 45-23 52z" fill="#65c9bd"/>
+<g fill="#f6dc8e"><path d="m467 350 12 18-12 18-12-18z"/><path d="m228 390 9 14-9 13-9-13z"/><path d="m388 350 8 12-8 12-8-12z"/></g>
+<g stroke="#b6d8cd" stroke-width="3" opacity=".65"><path d="M448 419h133M403 440h167M468 395h113"/></g>
+<g font-family="ui-monospace,monospace" fill="#eff5df"><text x="48" y="65" font-size="13" letter-spacing="3">A SMALL CITY. A BRIGHT QUEST.</text><text x="48" y="425" font-size="18" font-weight="700" letter-spacing="2">BLOCKBOUND</text><text x="48" y="447" font-size="11" letter-spacing="4">FIRST LIGHT</text></g>
+</svg>
