@@ -1,5 +1,15 @@
-"""Arcade catalog source of truth. Neon Breaker is playable; seven future concepts remain planned."""
+"""Arcade catalog. City simulation is a playable alpha; parity remains in development."""
 GAMES = [
+    {
+        "slug": "cmd-city",
+        "title": "CMD City",
+        "genre": "City simulation",
+        "description": "Build a connected city, balance services and trade, and inspect the consequences of every planning decision. Playable alpha; full feature equivalence remains in development.",
+        "controls": "Keyboard: arrows to select tiles, Enter to build, Space to pause. Touch: select a tool and tap a tile; Inspect mode pans the map.",
+        "session": "Save and continue",
+        "status": "playable",
+        "phase": 9,
+    },
     {
         "slug": "neon-breaker",
         "title": "Neon Breaker",

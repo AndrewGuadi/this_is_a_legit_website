@@ -61,13 +61,16 @@ class ObservationTests(unittest.TestCase):
         self.assertEqual(home.status_code,200)
         self.assertIn(b'LEGIT',home.data)
         self.assertIn(b'href="/forms"',home.data)
-        self.assertEqual(len(GAMES),8)
-        self.assertEqual(GAMES[0]['status'],'playable')
+        self.assertEqual(len(GAMES),9)
+        self.assertEqual({g['slug'] for g in GAMES if g['status']=='playable'}, {'neon-breaker','cmd-city'})
         for game in GAMES:
             route='/games/'+game['slug']
             response=self.client.get(route)
             self.assertEqual(response.status_code,200)
-            if game['slug'] == 'neon-breaker':
+            if game['slug'] == 'cmd-city':
+                self.assertIn(b'id="city-map"', response.data)
+                self.assertIn(b'/static/cmd-city/game.mjs', response.data)
+            elif game['slug'] == 'neon-breaker':
                 self.assertIn(b'<canvas',response.data)
                 self.assertIn(b'Nothing is sent to a server',response.data)
             else:

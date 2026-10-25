@@ -1,0 +1,3 @@
+// Callable interface scaffold for genuine behavioral RED; no movement implemented.
+export function planTransit(state){return {busLoad:Array(state.tiles.length).fill(0),railLoad:Array(state.tiles.length).fill(0),busPassengers:0,railPassengers:0};}
+export function routeTransit(){return {mode:'none',moved:0,roadFactor:1};}

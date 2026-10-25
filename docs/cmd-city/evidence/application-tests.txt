@@ -1,0 +1,31 @@
+/workspace/scratch/bf6bfb751ccd/cmduniverse/test_city.py:26: ResourceWarning: unclosed file <_io.BufferedReader name='/workspace/scratch/bf6bfb751ccd/cmduniverse/static/cmd-city/core.mjs'>
+  self.assertEqual(self.client.get('/static/cmd-city/'+name).status_code,200,name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/workspace/scratch/bf6bfb751ccd/cmduniverse/test_city.py:26: ResourceWarning: unclosed file <_io.BufferedReader name='/workspace/scratch/bf6bfb751ccd/cmduniverse/static/cmd-city/content.mjs'>
+  self.assertEqual(self.client.get('/static/cmd-city/'+name).status_code,200,name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/workspace/scratch/bf6bfb751ccd/cmduniverse/test_city.py:26: ResourceWarning: unclosed file <_io.BufferedReader name='/workspace/scratch/bf6bfb751ccd/cmduniverse/static/cmd-city/save.mjs'>
+  self.assertEqual(self.client.get('/static/cmd-city/'+name).status_code,200,name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/workspace/scratch/bf6bfb751ccd/cmduniverse/test_city.py:26: ResourceWarning: unclosed file <_io.BufferedReader name='/workspace/scratch/bf6bfb751ccd/cmduniverse/static/cmd-city/clock.mjs'>
+  self.assertEqual(self.client.get('/static/cmd-city/'+name).status_code,200,name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/workspace/scratch/bf6bfb751ccd/cmduniverse/test_city.py:26: ResourceWarning: unclosed file <_io.BufferedReader name='/workspace/scratch/bf6bfb751ccd/cmduniverse/static/cmd-city/transit.mjs'>
+  self.assertEqual(self.client.get('/static/cmd-city/'+name).status_code,200,name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/workspace/scratch/bf6bfb751ccd/cmduniverse/test_city.py:26: ResourceWarning: unclosed file <_io.BufferedReader name='/workspace/scratch/bf6bfb751ccd/cmduniverse/static/cmd-city/region.mjs'>
+  self.assertEqual(self.client.get('/static/cmd-city/'+name).status_code,200,name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/workspace/scratch/bf6bfb751ccd/cmduniverse/test_city.py:26: ResourceWarning: unclosed file <_io.BufferedReader name='/workspace/scratch/bf6bfb751ccd/cmduniverse/static/cmd-city/game.mjs'>
+  self.assertEqual(self.client.get('/static/cmd-city/'+name).status_code,200,name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/workspace/scratch/bf6bfb751ccd/cmduniverse/test_city.py:26: ResourceWarning: unclosed file <_io.BufferedReader name='/workspace/scratch/bf6bfb751ccd/cmduniverse/static/cmd-city/view.mjs'>
+  self.assertEqual(self.client.get('/static/cmd-city/'+name).status_code,200,name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+/workspace/scratch/bf6bfb751ccd/cmduniverse/test_city.py:26: ResourceWarning: unclosed file <_io.BufferedReader name='/workspace/scratch/bf6bfb751ccd/cmduniverse/static/cmd-city/game.css'>
+  self.assertEqual(self.client.get('/static/cmd-city/'+name).status_code,200,name)
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+----------------------------------------------------------------------
+Ran 33 tests in 1.452s
+
+OK

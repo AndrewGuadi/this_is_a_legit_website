@@ -193,6 +193,8 @@ def create_app(config=None):
         if game is None: abort(404)
         if slug == 'neon-breaker':
             return render_template('neon_breaker.html', game=game)
+        if slug == 'cmd-city':
+            return render_template('cmd_city.html', game=game)
         return render_template('arcade.html', view='game', games=GAMES, game=game)
     @app.get('/terms')
     def terms():

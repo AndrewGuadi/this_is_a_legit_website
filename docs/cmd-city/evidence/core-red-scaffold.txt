@@ -1,0 +1,6 @@
+// Interface scaffold for behavioral RED tests; not a playable simulation.
+export function createCity({seed=2013,name='Riverbend',sandbox=false}={}) {return {version:1,width:40,height:32,seed,rng:seed,name,month:0,cash:5000000,sandbox,taxes:{residential:9,commercial:9,industrial:9},funding:{school:100,clinic:100,fire:100,police:100},policies:{recycling:false,disasters:false},research:{points:0,completed:[]},inventory:{coal:200,ore:0,oil:0,goods:1000,alloy:0,electronics:0},trade:{coal:'off',ore:'off',oil:'off',goods:'off',alloy:'off',electronics:'off'},bonds:[],history:[],events:[],tiles:Array.from({length:1280},()=>({terrain:'land',type:'empty',occupancy:0,level:1,modules:0,fire:0,resource:null,reserve:0,age:0}))};}
+export function measure(){return {population:0,jobs:0,workers:0,employed:0,access:[],roadLoad:[],pollution:[],coverage:{school:[]},utilities:{power:{supply:0,demand:0},water:{supply:0,demand:0}},monthly:{upkeep:0}};}
+export function applyAction(){return {ok:false,message:'Not implemented'};}
+export function advanceMonth(){}
+export function inspectTile(){return {blockers:[]};}

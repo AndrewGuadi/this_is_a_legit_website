@@ -1,6 +1,8 @@
 # CMD City — product and implementation plan
 
-Status: PLANNED; no city game has been implemented or deployed by this change.
+Status: IMPLEMENTED DEVELOPMENT CANDIDATE; feature equivalence is incomplete and production release is pending.
+
+This was the original first-playable plan. Andrew subsequently authorized direct Codex implementation and required feature-to-feature equivalence. `PARITY_TARGET.md`, `PARITY_STATUS.md` and the current verification record supersede its smaller initial scope and historical implementation blocker. The original planning details below remain as design history; they are not a current feature-status report.
 
 Prepared for Andrew's request to add a detailed, original city simulator to `AndrewGuadi/this_is_a_legit_website`, currently served at `https://www.cmduniverse.com/` on PythonAnywhere. Baseline inspected: `3c86263472ded1d060dc9eeaa7c94c9fd0abc6c4`. This document records proposed behavior, not verified game features. No release date or implementation duration is promised.
 
@@ -224,7 +226,7 @@ Independent TODD reviews the exact candidate commit and content inventory, rerun
 6. Larger maps/chunked rendering, replayable scenarios and optional real-world geographic data with attribution and licensing checks.
 7. Cloud saves or multiplayer only after a separate authoritative backend, abuse model and hosting review.
 
-## Current execution state and exact blocker
+## Historical preparation snapshot — direct-Codex blocker subsequently resolved
 
 Verified during preparation:
 
@@ -238,6 +240,6 @@ Verified during preparation:
 
 `AGENTS.md` grants the direct-Codex implementation exception specifically to Neon Breaker. It otherwise retains OpenCode implementation and independently reviewed release gates. The city request authorizes the new game but does not explicitly extend that implementation-platform exception. The applied OpenCode delivery skill also requires user direction before substituting direct Codex for OpenCode.
 
-Smallest next decision: extend the direct-Codex exception to CMD City, retaining tests-first development and independent TODD review. Alternatively, provide an available isolated OpenCode runtime that meets the existing execution rules. After either path is established, proceed through the stages above. Keep this source branch separate from main until an implementation is reviewed; do not deploy a plan as though it were a game.
+**Historical decision, now resolved by Andrew’s explicit approval:** extend the direct-Codex exception to CMD City, retaining tests-first development and independent TODD review. Alternatively, provide an available isolated OpenCode runtime that meets the existing execution rules. After either path is established, proceed through the stages above. Keep this source branch separate from main until an implementation is reviewed; do not deploy a plan as though it were a game.
 
 PythonAnywhere publication also requires the deployed account, project path, virtualenv/static mappings and authorized deployment access to be verified at release time. No working PythonAnywhere deployment credential or current game deployment path was established in this preparation. Never infer access from the public site being reachable, and never commit credentials or production configuration secrets.

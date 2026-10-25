@@ -1,6 +1,10 @@
 # Legit Arcade
 
-An arcade with **Neon Breaker**, a playable original three-stage brick breaker, seven future game concepts, and a secondary form-research area. Neon Breaker is a review candidate; final release requires independent TODD review and physical-device evidence. The homepage is `/`, concepts live at `/games/<slug>`, and the preserved forms are at `/forms` and `/apply/<kind>`. The investigator workspace remains `/admin/login`.
+An arcade with **CMD City**, a playable city-simulation development candidate, **Neon Breaker**, an original three-stage brick breaker, seven planned game concepts, and a secondary form-research area. CMD City runs locally in the browser and includes connected infrastructure, R/C/I growth, employment, roads/rail/bus demand assignment, resource production/trade, city finances, three-city regional shipments and a shared project. It is **not yet feature-equivalent to SimCity**; see [parity target](docs/cmd-city/PARITY_TARGET.md) and [current status](docs/cmd-city/PARITY_STATUS.md).
+
+Open `/games/cmd-city` after starting the Flask app. Cities begin paused. Inspect, build, then resume; save/export includes all three regional cities. All gameplay stays on-device. Direct Codex implementation was explicitly approved by Andrew for CMD City; independent review and normal release gates remain. This source branch does not itself establish a production deployment.
+
+Run `npm run test:game` for both game suites, `npm run test:browser` for browser checks, and `node tests/city/benchmark.mjs` for the synthetic dense-map measurement. A repository-local `.venv` with requirements is sufficient for Flask. For static visual QA, `python tests/city/build_preview.py` renders the actual templates into ignored `dev_docs/city-preview`; never deploy the synthetic preview fixture. Production continues to use the existing Flask/PythonAnywhere entrypoint.
 
 Game status is tracked in `game_catalog.py`; see [game roadmap](docs/GAME_ROADMAP.md) and [first-game brief](docs/FIRST_GAME_BRIEF.md). Catalog visits do not create observation records. Neon Breaker uses native Canvas and local modules, with no game telemetry or third-party requests. Optional best-score storage stays on the device.
 
