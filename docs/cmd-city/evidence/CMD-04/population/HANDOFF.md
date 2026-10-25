@@ -6,7 +6,7 @@ Baseline: `c935bc91988f4882dfce8b858d265dbb6d7a2f5c`. Direct Codex implementatio
 
 A newly staffed service provider previously received no vehicles forever when 64 idle vehicles already belonged to existing providers. A first test captured this real failure (`fleet-red.txt`, exit 1). Fleet quotas now reserve every active journey before distributing remaining slots round-robin across operational providers, keeping existing idle vehicles only within those quotas. Vacant quotas receive new vehicles; the 64-vehicle cap, finite provider staffing/module capacity, existing active IDs/task references and loaded cargo remain intact.
 
-Fairness is bounded by the global cap: more than 64 operational providers cannot all receive a vehicle. Active journeys are never removed to make a new slot. Provider order remains deterministic map order; no unconditional fairness or dynamic demand-priority claim.
+Fairness is bounded by the global cap: more than 64 operational providers cannot all receive a vehicle. Active journeys are never removed to make a new slot. Provider order remains deterministic service-kind then map order; no unconditional fairness or dynamic demand-priority claim.
 
 Two regressions cover a new landfill actually collecting/returning waste after an idle clinic pool fills the cap, and slot redistribution while a blocked loaded garbage trip retains its vehicle/task IDs, backlink, payload and material identity. `fleet-green.txt`: 32 services tests pass. `module-regression.txt`: 64 services/households tests pass. No household source changes.
 

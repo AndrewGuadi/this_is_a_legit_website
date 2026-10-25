@@ -12,7 +12,7 @@ Primitive routing snapshots replace repeated large string signatures. A per-city
 
 ## Verification and limits
 
-Manager: 280 game tests pass (257 city + 23 Neon), no failures/skips; 33 application tests pass. The new behavioral tests captured real RED before implementation for fleet admission and recurring employment starvation. Cache tests verify invalidation and report mutation isolation. The final full browser run and independent review are recorded with the report publication.
+Manager: 280 game tests pass (257 city + 23 Neon), no failures/skips; 33 application tests pass. The new behavioral tests captured real RED before implementation for fleet admission and recurring employment starvation. Cache tests verify invalidation and report mutation isolation. The final full Chromium browser run passed all 176 checks at 360/390/768/1440 widths, no failures/skips (5.9 minutes). The independent review is recorded with the report publication.
 
 Worker sequential final measurements on Node 24.22.1 / Intel Xeon Platinum 8573C:
 
@@ -26,3 +26,5 @@ The sustained world's geometry, initial resources, thresholds and monthly progre
 The 78-scenario feature ledger remains 32 narrow implemented, 33 partial, 13 missing; zero literal reference-equivalence verifications. These fixes do not promote unrelated features. Full scope and reference comparisons remain unfinished, as does the dense performance requirement. The independent 95-point release gate remains unchanged.
 
 Evidence: `evidence/CMD-04/`, including worker provenance, actual RED/GREEN logs, diagnosis, intermediate/final benchmark records and a complete 46-file source inventory. Benchmark script output paths still use their existing CMD-03 scratch location; copied CMD-04 results identify the actual new source hashes.
+
+[Independent CMD-TODD-04 review](TODD_REVIEW_04.md): **REVISE, 85.5/100**. All 46 source hashes match. Independent 280 game, 33 application and eight focused browser checks pass; retention reproduced at 91.35%, dense p95 68.38 ms still fails. Native Production readiness run 25 passed on source `93432d1bec84f40d6eb44f4fcbab5c8e10dcdca2`. No main merge or deployment; full feature equivalence remains incomplete.
