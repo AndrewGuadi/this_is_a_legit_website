@@ -12,6 +12,9 @@ test('Circuit Match starts, selects by keyboard, pauses and resumes', async ({ p
   await expect(page.locator('#game-status')).toContainText('Tile selected');
   await page.locator('#playfield').press('Enter');
   await expect(page.locator('#moves')).toHaveText('20');
+  await page.getByRole('button',{name:'Pause',exact:true}).click();
+  await expect(game).toHaveAttribute('data-state','paused');
+  await page.getByRole('button',{name:'Resume',exact:true}).click();
   await page.locator('#playfield').press('p');
   await expect(game).toHaveAttribute('data-state','paused');
   await page.getByRole('button',{name:'Resume',exact:true}).click();
