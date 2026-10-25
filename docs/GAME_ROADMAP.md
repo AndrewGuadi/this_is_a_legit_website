@@ -4,7 +4,7 @@
 
 **Neon Breaker is approved and implemented as a playable review candidate.** Andrew authorized direct Codex implementation with independent local TODD review on 2026-10-20. Release to main remains gated by the ten-category review and required device evidence. The other seven games remain unapproved concepts.
 
-All eight concepts target mobile, tablet, and desktop browsers with touch and keyboard input. Use original code, names, layouts, graphics, and audio; no branded ROMs, copied game art, or commercial game music. No account, paid asset, advertising integration, external data source, or multiplayer service is needed for the initial concepts. Business assessments below are hypotheses, not measured demand or revenue claims.
+All nine catalog entries target mobile, tablet, and desktop browsers with touch and keyboard input. Use original code, names, layouts, graphics, and audio; no branded ROMs, copied game art, or commercial game music. No account, paid asset, advertising integration, external data source, or multiplayer service is needed for the initial concepts. Business assessments below are hypotheses, not measured demand or revenue claims.
 
 | Order | Game | Owner | Status | Business strategy | Technical feasibility |
 |---:|---|---|---|---|---|
@@ -16,6 +16,7 @@ All eight concepts target mobile, tablet, and desktop browsers with touch and ke
 | 6 | Pocket Paddles | Game implementation team; manager reviews | Planned | A concise duel provides an easy repeat-session format without account setup. Begin with computer opposition rather than costly networking. | Single-player computer paddle with bounded reaction speed and original presentation. Test collision edges, difficulty fairness, and touch precision. Multiplayer is excluded initially. |
 | 7 | Dungeon Dash | Game implementation team; manager reviews | Planned | Exploration adds a longer session for visitors already engaged with the arcade. Content effort makes this a later investment. | Small handcrafted original room set, tile collision, keys, traps, and limited health. Touch movement, readable hazards, and save/reset semantics need careful testing. No generated live content or external API. |
 | 8 | Skyline Sprint | Game implementation team; manager reviews | Planned | Short mastery-oriented routes can encourage retries and round out the catalog. Validate controls before committing to a level pipeline. | Original platform layouts, predictable movement, jump buffering, and bounded obstacles. Collision corners and low-frame-rate fairness are the main risks. No network gameplay. |
+| 9 | Blockbound: First Light | External contribution; independent review required | Playable review candidate | A compact exploration quest tests whether visitors enjoy a longer, calmer adventure without accounts or backend gameplay. | Fixed-memory C/WebAssembly raycaster, collision, dialogue and shard quest. Requires browser, touch, accessibility and independent review before release. |
 
 ## Build order and gates
 

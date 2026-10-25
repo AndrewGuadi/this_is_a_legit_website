@@ -122,7 +122,10 @@ def create_app(config=None):
         return render_template('public.html', body=body, contact=app.config['CONTACT'], **kwargs)
     @app.after_request
     def headers(response):
-        response.headers['Content-Security-Policy'] = "default-src 'none'; style-src 'self'; script-src 'self'; img-src 'self' data:; form-action 'self'; base-uri 'none'; frame-ancestors 'none'"
+        script_policy = "script-src 'self'"
+        if request.path == '/games/blockbound-first-light':
+            script_policy = "script-src 'self' 'wasm-unsafe-eval'"
+        response.headers['Content-Security-Policy'] = "default-src 'none'; style-src 'self'; " + script_policy + "; connect-src 'self'; img-src 'self' data:; form-action 'self'; base-uri 'none'; frame-ancestors 'none'"
         response.headers['X-Content-Type-Options'] = 'nosniff'
         response.headers['Referrer-Policy'] = 'no-referrer'
         response.headers['Cache-Control'] = 'no-store'
@@ -195,6 +198,8 @@ def create_app(config=None):
             return render_template('neon_breaker.html', game=game)
         if slug == 'circuit-match':
             return render_template('circuit_match.html', game=game)
+        if slug == 'blockbound-first-light':
+            return render_template('blockbound.html', game=game)
         return render_template('arcade.html', view='game', games=GAMES, game=game)
     @app.get('/terms')
     def terms():

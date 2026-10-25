@@ -1,6 +1,6 @@
 # Legit Arcade
 
-An arcade with **Neon Breaker**, a playable original three-stage brick breaker, seven future game concepts, and a secondary form-research area. Neon Breaker is a review candidate; final release requires independent TODD review and physical-device evidence. The homepage is `/`, concepts live at `/games/<slug>`, and the preserved forms are at `/forms` and `/apply/<kind>`. The investigator workspace remains `/admin/login`.
+An arcade with **Neon Breaker**, **Blockbound: First Light**, two playable original review candidates, seven future game concepts, and a secondary form-research area. Neon Breaker is a review candidate; final release requires independent TODD review and physical-device evidence. The homepage is `/`, concepts live at `/games/<slug>`, and the preserved forms are at `/forms` and `/apply/<kind>`. The investigator workspace remains `/admin/login`.
 
 Game status is tracked in `game_catalog.py`; see [game roadmap](docs/GAME_ROADMAP.md) and [first-game brief](docs/FIRST_GAME_BRIEF.md). Catalog visits do not create observation records. Neon Breaker uses native Canvas and local modules, with no game telemetry or third-party requests. Optional best-score storage stays on the device.
 
@@ -29,6 +29,10 @@ Open `/games/neon-breaker` on the running app. Arrow keys or A/D move, Space lau
 Run `npm run test:game` for deterministic simulation checks and `npm run test:browser` for browser, touch-emulation and accessibility checks (install dependencies with `npm ci` and `npx playwright install chromium`). Use the project Python environment so the browser fixture can import Flask. For a local synthetic preview without production data, run `python tests/browser/server.py` and open `http://127.0.0.1:5081/games/neon-breaker`. Never deploy that fixture server.
 
 The owner authorized direct Codex implementation with a separate local TODD reviewer on 2026-10-20. See [implementation contract](docs/neon-breaker-contract.md). Browser emulation does not establish physical-phone performance.
+
+## Blockbound: First Light
+
+Open `/games/blockbound-first-light` for an original blocky 3D city adventure written in C and compiled to a small, dependency-free WebAssembly module. Explore First Light, speak with three residents, recover three light shards, and activate the northern beacon. The checked-in base64-encoded WebAssembly lets the arcade run without a C toolchain. Rebuild it with `python scripts/build_blockbound.py` using Zig or clang+lld; see [the game guide](docs/BLOCKBOUND.md) for controls, architecture, and native test commands. No commercial ROM, copied map, branded character art, account, telemetry, or external runtime service is used.
 
 ## Evidence
 
