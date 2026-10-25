@@ -1,3 +1,22 @@
+import { assertCitySaveBudget, serializeCity } from "./save.mjs";
+import {
+  createHouseholds,
+  validateHouseholds,
+  reconcileHouseholds,
+  householdReport,
+  advanceHouseholds,
+  householdWorkers,
+  householdAction,
+  setSectorTaxes,
+} from "./households.mjs";
+import {
+  createServices,
+  serviceReport,
+  advanceServices,
+  serviceAction,
+  preserveDemolition,
+  serviceNeedsDraft,
+} from "./services.mjs";
 import {
   createEnvironment,
   advanceEnvironment,
@@ -14,6 +33,7 @@ import {
 import { planTransit, routeTransit } from "./transit.mjs";
 import {
   TOOLS,
+  FACILITY_JOBS,
   ZONES,
   RESOURCES,
   PRICES,
@@ -81,23 +101,24 @@ const restricted = (s, i) => (s.environment?.radiation[i] || 0) >= 200;
 const active = (t) => t.enabled !== false && t.fire === 0;
 function roadGraph(s) {
   const signature = s.tiles
-    .map((t) => (roads.has(t.type) ? "1" : "0"))
+    .map((t) => (roads.has(t.type) && active(t) ? "1" : "0"))
     .join("");
   const cached = graphCache.get(s);
   if (cached?.signature === signature) return cached.graph;
   const connected = Array(N).fill(false),
     frontage = Array(N).fill(-1),
-    queue = [GATE];
-  connected[GATE] = roads.has(s.tiles[GATE].type);
+    queue = [];
+  connected[GATE] = roads.has(s.tiles[GATE].type) && active(s.tiles[GATE]);
+  if (connected[GATE]) queue.push(GATE);
   for (let k = 0; k < queue.length; k++)
     for (const j of neighbors(queue[k]))
-      if (!connected[j] && roads.has(s.tiles[j].type)) {
+      if (!connected[j] && roads.has(s.tiles[j].type) && active(s.tiles[j])) {
         connected[j] = true;
         queue.push(j);
       }
   for (let i = 0; i < N; i++) {
     if (connected[i]) frontage[i] = i;
-    else
+    else if (!roads.has(s.tiles[i].type))
       for (const j of neighbors(i))
         if (connected[j]) {
           frontage[i] = j;
@@ -109,6 +130,7 @@ function roadGraph(s) {
     frontage: Object.freeze(frontage),
     access: Object.freeze(frontage.map((j) => j >= 0)),
     paths: new Map(),
+    routePaths: new Map(),
     orders: new Map(),
     jobSignature: "",
   };
@@ -164,7 +186,7 @@ function utilities(s, access, reservedFuel = null) {
       { supply: 0, demand: 0, ratio: 1 },
     ]),
   );
-  u.power.supply = s.regionalPower;
+  u.power.supply = access[GATE] ? s.regionalPower : 0;
   let coalNeeded = 0,
     baseCoalSupply = 0,
     rawWater = 0,
@@ -237,6 +259,7 @@ function utilities(s, access, reservedFuel = null) {
 }
 function routeEmployment(s, graph, u, coverage) {
   const roadLoad = Array(N).fill(0),
+    homeEmployment = Array(N).fill(0),
     jobFill = Array(N).fill(0),
     jobs = [];
   const ready = Math.min(u.power.ratio, u.water.ratio) >= 0.9;
@@ -253,24 +276,14 @@ function routeEmployment(s, graph, u, coverage) {
     if (
       (t.type === "commercial" ||
         t.type === "industrial" ||
-        [
-          "factory",
-          "mine",
-          "oilWell",
-          "academy",
-          "waterFilter",
-          "cleanup",
-        ].includes(t.type)) &&
+        Object.hasOwn(FACILITY_JOBS, t.type)) &&
       graph.access[i] &&
       active(t)
     ) {
-      const base =
-        t.type === "factory" || t.type === "academy"
-          ? 12
-          : ["mine", "oilWell", "waterFilter", "cleanup"].includes(t.type)
-            ? 8
-            : t.occupancy;
-      const slots = Math.floor(base * Math.min(u.power.ratio, u.water.ratio));
+      const base = FACILITY_JOBS[t.type] || t.occupancy;
+      const slots = Math.floor(
+        base * facilityScale(s, t) * Math.min(u.power.ratio, u.water.ratio),
+      );
       if (slots) jobs.push({ i, road: graph.frontage[i], left: slots });
     }
   }
@@ -285,7 +298,7 @@ function routeEmployment(s, graph, u, coverage) {
   for (let i = 0; i < N; i++) {
     const home = s.tiles[i];
     if (!housing(home)) continue;
-    let need = Math.floor(home.occupancy * 0.6);
+    let need = householdWorkers(s, i);
     workers += need;
     if (!need || !graph.access[i] || !active(home)) continue;
     const start = graph.frontage[i];
@@ -320,11 +333,10 @@ function routeEmployment(s, graph, u, coverage) {
         .map((j) => j.i);
       graph.orders.set(start, order);
     }
-    const options = order
-      .map((id) => jobByTile.get(id))
-      .filter((j) => j && j.left > 0);
-    for (const job of options) {
+    for (const id of order) {
       if (!need) break;
+      const job = jobByTile.get(id);
+      if (!job || job.left <= 0) continue;
       if (transit.stations.length < 2) {
         const minimum = transit.exchanges.length >= 2 ? busFactor : 1;
         if (
@@ -338,12 +350,19 @@ function routeEmployment(s, graph, u, coverage) {
         )
           continue;
       }
-      const path = [];
-      for (let p = job.road; p !== -1; p = prev[p]) {
-        path.push(p);
-        if (p === start) break;
+      const pathKey = start * N + job.road;
+      let path = graph.routePaths.get(pathKey);
+      if (!path) {
+        path = [];
+        for (let p = job.road; p !== -1; p = prev[p]) {
+          path.push(p);
+          if (p === start) break;
+        }
+        path.reverse();
+        if (graph.routePaths.size >= 512)
+          graph.routePaths.delete(graph.routePaths.keys().next().value);
+        graph.routePaths.set(pathKey, path);
       }
-      path.reverse();
       const requested = Math.min(need, job.left);
       let roadRoom = Infinity;
       for (const p of path)
@@ -383,6 +402,7 @@ function routeEmployment(s, graph, u, coverage) {
       need -= take;
       job.left -= take;
       jobFill[job.i] += take;
+      homeEmployment[i] += take;
       employed += take;
     }
   }
@@ -396,6 +416,7 @@ function routeEmployment(s, graph, u, coverage) {
     employed,
     unemployment: workers ? (100 * (workers - employed)) / workers : 0,
     jobFill,
+    homeEmployment,
     roadLoad,
     traffic: Math.max(0, ...busy),
     busPassengers: transit.busPassengers,
@@ -412,9 +433,10 @@ function cachedEmployment(s, graph, u, coverage) {
     u.power.ratio,
     u.water.ratio,
     s.research.completed.includes("transit"),
+    ...Object.values(s.funding),
     ...s.tiles.map(
       (t, i) =>
-        `${t.type}:${t.occupancy}:${t.modules}:${t.enabled}:${t.fire}:${graph.access[i] ? 1 : 0}`,
+        `${t.type}:${t.occupancy}:${t.modules}:${t.enabled}:${t.fire}:${graph.access[i] ? 1 : 0}:${housing(t) ? householdWorkers(s, i) : 0}`,
     ),
   ].join("|");
   let cached = employmentCache.get(s);
@@ -426,6 +448,7 @@ function cachedEmployment(s, graph, u, coverage) {
   return {
     ...m,
     jobFill: m.jobFill.slice(),
+    homeEmployment: m.homeEmployment.slice(),
     roadLoad: m.roadLoad.slice(),
     railLoad: m.railLoad.slice(),
     busLoad: m.busLoad.slice(),
@@ -460,6 +483,14 @@ export function measure(s, options = {}) {
   // The operational graph shares cached Maps with the physical graph, but its
   // primitive signature must also be retained or each measure re-sorts all jobs.
   road.jobSignature = graph.jobSignature;
+  const services = serviceReport(s, { population: employment.population });
+  const monthlyWaste = s.tiles.reduce((n, t) => n + t.occupancy, 0);
+  u.waste.processingRatio = u.waste.ratio;
+  u.waste.collectionRatio = services.pendingWaste
+    ? clamp(2 - services.pendingWaste / Math.max(1, monthlyWaste), 0, 1)
+    : 1;
+  u.waste.ratio = u.waste.collectionRatio;
+  u.waste.pending = services.pendingWaste;
   const environment = environmentReport(s, {
     ...employment,
     access,
@@ -488,20 +519,32 @@ export function measure(s, options = {}) {
     .filter((i) => i >= 0);
   const avg = (a) =>
     homes.length ? homes.reduce((n, i) => n + a[i], 0) / homes.length : 0;
-  const education = avg(coverage.school),
-    health = clamp(
-      55 +
-        avg(coverage.clinic) * 0.45 -
-        environment.healthPenalty -
-        (1 - u.sewage.ratio) * 30 -
-        (1 - u.waste.ratio) * 25,
-      0,
-      100,
-    );
+  const households = householdReport(s, {
+    ...employment,
+    access: road.access,
+    operationAccess: access,
+    landValue,
+    coverage,
+    utilities: u,
+  });
+  const rates = households.taxes.effective;
+  const education = households.demographics.adults
+    ? (100 * households.demographics.educatedAdults) /
+      households.demographics.adults
+    : 0;
+  const health = clamp(
+    80 -
+      environment.healthPenalty -
+      services.healthPenalty -
+      (1 - u.sewage.ratio) * 30 -
+      (1 - u.waste.ratio) * 25,
+    0,
+    100,
+  );
   const crime = clamp(
     25 +
-      employment.unemployment * 0.35 -
-      avg(coverage.police) * 0.4 +
+      employment.unemployment * 0.35 +
+      services.crimePenalty +
       s.tiles.filter((t) => t.type === "casino").length * 4,
     0,
     100,
@@ -516,7 +559,8 @@ export function measure(s, options = {}) {
       crime * 0.2 -
       (1 - u.power.ratio) * 35 -
       (1 - u.water.ratio) * 35 -
-      (s.taxes.residential - 9) * 2,
+      (rates.residential - 9) * 2 +
+      (households.satisfaction - 60) * 0.2,
     0,
     100,
   );
@@ -536,8 +580,9 @@ export function measure(s, options = {}) {
       30 +
         vacancies * 0.3 +
         (happiness - 50) * 0.8 -
-        (s.taxes.residential - 9) * 4 -
-        employment.unemployment * 0.25,
+        (rates.residential - 9) * 4 -
+        employment.unemployment * 0.25 +
+        (households.satisfaction - 60) * 0.2,
       0,
       100,
     ),
@@ -545,7 +590,7 @@ export function measure(s, options = {}) {
       30 +
         employment.population * 0.2 -
         cap.commercial * 0.6 -
-        (s.taxes.commercial - 9) * 4 +
+        (rates.commercial - 9) * 4 +
         s.tiles.filter((t) => t.type === "tourism").length * 8,
       0,
       100,
@@ -554,7 +599,7 @@ export function measure(s, options = {}) {
       45 +
         employment.workers * 0.2 -
         cap.industrial * 0.4 -
-        (s.taxes.industrial - 9) * 4,
+        (rates.industrial - 9) * 4,
       0,
       100,
     ),
@@ -577,7 +622,8 @@ export function measure(s, options = {}) {
       0,
     ),
     upkeep = 0;
-  const taxBases = { residential: 2400, commercial: 8000, industrial: 6000 };
+  const visitorIncome = income;
+  income += households.taxes.forecast.total;
   for (let i = 0; i < N; i++) {
     const t = s.tiles[i],
       d = TOOLS[t.type];
@@ -588,14 +634,6 @@ export function measure(s, options = {}) {
         facilityScale(s, t) *
         (t.enabled === false ? 0.1 : 1),
     );
-    const key = housing(t) ? "residential" : t.type;
-    if (ZONES.includes(key) && graph.access[i] && active(t)) {
-      const taxable =
-        key === "residential"
-          ? t.occupancy
-          : Math.floor(t.occupancy * operation);
-      income += Math.floor((taxable * taxBases[key] * s.taxes[key]) / 100);
-    }
   }
   const debt = s.bonds.reduce((n, b) => n + Math.min(b.payment, b.balance), 0),
     warnings = [];
@@ -622,6 +660,18 @@ export function measure(s, options = {}) {
     );
   if (s.groundwater <= 0)
     warnings.push("Groundwater exhausted; pump output is zero.");
+  if (services.pendingWaste > 0)
+    warnings.push(
+      `${services.pendingWaste} waste units await actual road collection/return. One month of generation is buffered; processing capacity alone does not clear bins.`,
+    );
+  if (services.untreatedPatients)
+    warnings.push(
+      `${services.untreatedPatients} medical cases need actual pickup, admission and treatment.`,
+    );
+  if (services.unresolvedCrimes)
+    warnings.push(
+      `${services.unresolvedCrimes} crime cases need actual patrol and custody processing.`,
+    );
   const monthly = {
     income,
     upkeep,
@@ -634,6 +684,10 @@ export function measure(s, options = {}) {
     fuelUsed,
     nuclearFuelUsed,
     environment,
+    households,
+    services,
+    visitorIncome,
+    taxRevenue: households.taxes.forecast,
     roadAccess: road.access,
     education,
     health,
@@ -645,13 +699,24 @@ export function measure(s, options = {}) {
     monthly,
     access: road.access,
     operationAccess: access,
-    roadLoad: employment.roadLoad,
+    commuterRoadLoad: employment.roadLoad,
+    shoppingLoad: households.shopping.load.slice(),
+    shoppingMonth: households.taxes.month,
+    roadLoad: employment.roadLoad.map(
+      (n, i) => n + households.shopping.load[i],
+    ),
     pollution,
     landValue,
     coverage,
     warnings,
     counts: cap,
   };
+  result.traffic = Math.max(
+    0,
+    ...result.roadLoad.map((n, i) =>
+      n ? (100 * n) / (TOOLS[s.tiles[i].type]?.capacity || 80) : 0,
+    ),
+  );
   result.civic = civicReport(s, civicMetrics(result));
   return result;
 }
@@ -664,7 +729,7 @@ export function createCity({
   if (!Number.isInteger(seed)) seed = 2013;
   seed = seed >>> 0 || 1;
   const s = {
-    version: 2,
+    version: 3,
     width: W,
     height: H,
     seed,
@@ -765,11 +830,58 @@ export function createCity({
       "Starter town: prebuilt infrastructure and 50,000 in starting treasury.",
     );
   }
+  s.households = createHouseholds(s);
+  s.services = createServices(s);
   return s;
 }
 const success = (message) => ({ ok: true, message }),
   fail = (message) => ({ ok: false, message });
+function restoreCityJournal(city, text) {
+  const restored = JSON.parse(text);
+  for (const key of Object.keys(city))
+    if (!Object.hasOwn(restored, key)) delete city[key];
+  Object.assign(city, restored);
+}
+/** Journal only; successful ordinary actions retain live city/cache identity. */
 export function applyAction(s, a) {
+  const journal = JSON.stringify(s);
+  try {
+    const result = applyActionTransaction(s, a);
+    if (!result.ok) return result;
+    serializeCity(s);
+    return result;
+  } catch (error) {
+    restoreCityJournal(s, journal);
+    return fail(
+      `Action was not applied; the current city was preserved. ${error.message}`,
+    );
+  }
+}
+function applyActionTransaction(s, a) {
+  const destructive =
+    a &&
+    typeof a === "object" &&
+    ((a.type === "environment" && a.action?.type === "radiation") ||
+      (a.type === "disaster" && a.kind !== "fire"));
+  const privateBound =
+    s.households && Object.values(s.households.pending).some((n) => n > 1e15);
+  if (destructive || privateBound) {
+    const draft = structuredClone(s);
+    try {
+      const result = performAction(draft, a);
+      if (!result.ok) return result;
+      validateHouseholds(draft.households, draft);
+      Object.assign(s, draft);
+      return result;
+    } catch {
+      return fail(
+        "This action would exceed supported household or service accounting limits. The current city was preserved.",
+      );
+    }
+  }
+  return performAction(s, a);
+}
+function performAction(s, a) {
   if (
     !a ||
     typeof a !== "object" ||
@@ -778,7 +890,17 @@ export function applyAction(s, a) {
     ![Object.prototype, null].includes(Object.getPrototypeOf(a))
   )
     return fail("Invalid action.");
-  if (a.type === "environment") return environmentAction(s, a.action);
+  if (a.type === "environment") {
+    const result = environmentAction(s, a.action);
+    if (result.ok && a.action.type === "radiation") {
+      const saved = preserveFacility(s, at(a.action.x, a.action.y));
+      if (!saved.ok) return saved;
+      reconcileHouseholds(s);
+    }
+    return result;
+  }
+  if (a.type === "classTax") return householdAction(s, a, measure(s));
+  if (a.type === "serviceIncident") return serviceAction(s, a);
   if (["department", "request", "tutorial", "redeemBond"].includes(a.type))
     return civicAction(s, a, civicMetrics(measure(s)));
   const i = at(a.x, a.y),
@@ -829,6 +951,7 @@ export function applyAction(s, a) {
       stored: 0,
       enabled: true,
     });
+    reconcileHouseholds(s);
     return success(
       `${d.label} built. Monthly upkeep ${(d.upkeep / 100).toFixed(0)}.`,
     );
@@ -840,6 +963,8 @@ export function applyAction(s, a) {
       return fail(
         "Treasury limit reached; decommissioning would exceed supported debt.",
       );
+    const preservation = preserveFacility(s, i);
+    if (!preservation.ok) return preservation;
     s.cash -= 2500;
     Object.assign(t, {
       type: "empty",
@@ -851,6 +976,7 @@ export function applyAction(s, a) {
       stored: 0,
       enabled: true,
     });
+    reconcileHouseholds(s);
     return success("Decommissioned for 25. Future upkeep reduced.");
   }
   if (a.type === "upgrade") {
@@ -885,12 +1011,13 @@ export function applyAction(s, a) {
     return success("Facility module added: capacity and upkeep increased.");
   }
   if (a.type === "toggle") {
-    if (!t || !buildings(t)) return fail("Select a facility.");
+    if (!t || (!buildings(t) && !roads.has(t.type)))
+      return fail("Select a facility or road.");
     t.enabled = !t.enabled;
     return success(
       t.enabled
-        ? "Facility reopened."
-        : "Facility closed; 10% standby upkeep remains.",
+        ? `${roads.has(t.type) ? "Road" : "Facility"} reopened.`
+        : `${roads.has(t.type) ? "Road" : "Facility"} closed; 10% standby upkeep remains.`,
     );
   }
   if (a.type === "tax") {
@@ -901,6 +1028,8 @@ export function applyAction(s, a) {
       a.value > 20
     )
       return fail("Tax rates must be 0–20%.");
+    const taxResult = setSectorTaxes(s, a.sector, a.value);
+    if (!taxResult.ok) return taxResult;
     s.taxes[a.sector] = a.value;
     return success("Tax rate updated for future months.");
   }
@@ -1022,9 +1151,17 @@ export function applyAction(s, a) {
         return fail("No exposed waterfront structures for a flood.");
       for (const j of affected) {
         if (j === GATE || s.tiles[j].type === "empty") continue;
-        Object.assign(s.tiles[j], { type: "ruins", occupancy: 0, fire: 0 });
+        const preserved = preserveFacility(s, j);
+        if (!preserved.ok) return preserved;
+        Object.assign(s.tiles[j], {
+          type: "ruins",
+          occupancy: 0,
+          fire: 0,
+          stored: 0,
+        });
       }
     }
+    reconcileHouseholds(s);
     log(
       s,
       `${a.kind[0].toUpperCase() + a.kind.slice(1)} incident in month ${s.month}.`,
@@ -1033,7 +1170,22 @@ export function applyAction(s, a) {
   }
   return fail("Unknown action.");
 }
+function preserveFacility(s, index) {
+  const result = preserveDemolition(s, index);
+  if (result.ok)
+    s.backlogs.waste = Math.min(
+      1000000,
+      s.services.waste.reduce((n, v) => n + v, 0) +
+        s.services.looseWaste +
+        s.services.vehicles.reduce(
+          (n, v) => n + (v.kind === "garbage" ? v.payload : 0),
+          0,
+        ),
+    );
+  return result;
+}
 function simulateMonth(s) {
+  reconcileHouseholds(s);
   const initial = measure(s);
   advanceEnvironment(s, { ...initial, access: initial.operationAccess });
   // Reserve actual fuel before any mine, factory, trade or recycling transaction.
@@ -1044,6 +1196,7 @@ function simulateMonth(s) {
   s.inventory.coal -= reservedFuel.fuelUsed;
   s.inventory.ore -= reservedFuel.nuclearFuelUsed;
   const monthMeasure = () => measure(s, { reservedFuel });
+  advanceServices(s, { ...initial, roadLoad: initial.roadLoad });
   let m = monthMeasure();
   let power = Math.max(0, m.utilities.power.supply - m.utilities.power.demand),
     water = Math.max(0, m.utilities.water.supply - m.utilities.water.demand);
@@ -1053,18 +1206,20 @@ function simulateMonth(s) {
     const t = s.tiles[i];
     if (!t.fire) continue;
     incidentChanged = true;
-    if (t.fire) {
-      if (m.coverage.fire[i] >= 20) t.fire = Math.max(0, t.fire - 1);
-      else {
-        t.occupancy = Math.floor(t.occupancy * 0.6);
-        t.fire--;
-        if (t.fire === 0) {
-          t.type = "ruins";
-          t.occupancy = 0;
-        }
-      }
+    t.occupancy = Math.floor(t.occupancy * 0.6);
+    t.fire--;
+    if (t.fire === 0) {
+      // The protected regional gateway remains a legal road after its hazard
+      // expires. A closed gateway can separately be reopened by its road action.
+      if (i === GATE) continue;
+      const preserved = preserveFacility(s, i);
+      if (!preserved.ok) throw Error(preserved.message);
+      t.type = "ruins";
+      t.occupancy = 0;
+      t.stored = 0;
     }
   }
+  if (incidentChanged) reconcileHouseholds(s);
   if (incidentChanged) m = monthMeasure();
   let shrunk = false;
   // Shrink first, then reserve the genuinely freed capacity before allocating growth.
@@ -1077,7 +1232,11 @@ function simulateMonth(s) {
       !active(t) ||
       Math.min(m.utilities.power.ratio, m.utilities.water.ratio) < 0.98 ||
       m.happiness < 20 ||
-      m.health < 25;
+      m.health < 25 ||
+      (housing(t) &&
+        m.households.homes[i]?.satisfaction < 30 &&
+        (m.households.homes[i]?.badMonths > 0 ||
+          m.households.homes[i]?.unmet > 0));
     const goodsShort =
       t.type === "commercial" && s.inventory.goods < t.occupancy;
     if (shortage || goodsShort) {
@@ -1089,7 +1248,10 @@ function simulateMonth(s) {
       shrunk = true;
     }
   }
-  if (shrunk) m = monthMeasure();
+  if (shrunk) {
+    reconcileHouseholds(s);
+    m = monthMeasure();
+  }
   power = Math.max(0, m.utilities.power.supply - m.utilities.power.demand);
   water = Math.max(0, m.utilities.water.supply - m.utilities.water.demand);
   const proposals = [];
@@ -1100,13 +1262,26 @@ function simulateMonth(s) {
     t.age++;
     const demand = m.demand[key];
     let want =
-      demand > 15 && s.taxes[key] < 18
+      demand > 15 &&
+      (housing(t)
+        ? (m.households.homes[i]?.taxRate ??
+          m.households.taxes.effective.residential)
+        : m.households.taxes.effective[key]) < 18
         ? Math.min(
             capacity(t) - t.occupancy,
             Math.max(1, Math.floor(demand / 20)),
           )
         : 0;
-    if (housing(t) && m.pollution[i] > 65) want = 0;
+    if (
+      housing(t) &&
+      (m.pollution[i] > 65 ||
+        (m.households.homes[i] &&
+          (m.households.homes[i].satisfaction < 45 ||
+            m.households.homes[i].badMonths > 0 ||
+            m.households.homes[i].unmet >
+              m.households.homes[i].shoppingWanted * 0.5)))
+    )
+      want = 0;
     if (want > 0) {
       proposals.push({ i, want, received: 0 });
       total += want;
@@ -1134,7 +1309,10 @@ function simulateMonth(s) {
     tile.occupancy += received;
     if (housing(tile)) populationRoom -= received;
   }
-  if (assigned > 0) m = monthMeasure();
+  if (assigned > 0) {
+    reconcileHouseholds(s);
+    m = monthMeasure();
+  }
   for (let i = 0; i < N; i++) {
     const t = s.tiles[i];
     if (!m.operationAccess[i] || !active(t)) continue;
@@ -1189,14 +1367,13 @@ function simulateMonth(s) {
         1000000,
         s.research.points + 8 + t.modules * 4,
       );
-    if (t.type === "university" && m.employed > 0)
+    if (
+      t.type === "university" &&
+      m.jobFill[i] > 0 &&
+      Math.min(m.utilities.power.ratio, m.utilities.water.ratio) >= 0.9
+    )
       s.research.points = Math.min(1000000, s.research.points + 2);
   }
-  const shops = s.tiles.reduce(
-    (a, t) => a + (t.type === "commercial" ? t.occupancy : 0),
-    0,
-  );
-  s.inventory.goods = Math.max(0, s.inventory.goods - shops);
   let trade = 0;
   const depots = s.tiles.reduce(
     (n, t, i) =>
@@ -1237,33 +1414,15 @@ function simulateMonth(s) {
     1000000,
     Math.max(0, m.utilities.sewage.demand - m.utilities.sewage.supply),
   );
-  let wasteRemaining = m.utilities.waste.demand;
-  for (let i = 0; i < N; i++) {
-    const t = s.tiles[i];
-    if (!m.operationAccess[i] || !active(t)) continue;
-    const supply = Math.floor(
-      (TOOLS[t.type]?.supply || 0) *
-        (1 + t.modules * 0.5) *
-        m.utilities.power.ratio,
-    );
-    if (t.type === "landfill") {
-      const n = Math.min(wasteRemaining, supply, 30000 - t.stored);
-      t.stored += n;
-      wasteRemaining -= n;
-    }
-    if (t.type === "recycling" && s.policies.recycling) {
-      const n = Math.min(
-        wasteRemaining,
-        supply,
-        (1000000 - s.inventory.ore) * 10,
-      );
-      s.inventory.ore += Math.floor(n / 10);
-      wasteRemaining -= n;
-    }
-  }
-  s.backlogs.waste = Math.min(1000000, wasteRemaining);
   // Financials describe end-of-month occupancy. Fuel was reserved for this month's service.
-  const finance = m.monthly;
+  const householdResult = advanceHouseholds(s, {
+    ...m,
+    roadLoad: m.commuterRoadLoad,
+  });
+  const finance = {
+    ...m.monthly,
+    income: m.visitorIncome + householdResult.bookedTaxes.total,
+  };
   finance.trade = trade;
   finance.net = finance.income - finance.upkeep - finance.debt + trade;
   s.cash += finance.net;
@@ -1287,7 +1446,7 @@ function simulateMonth(s) {
   });
   if (s.history.length > 24) s.history.shift();
   if (s.policies.disasters && random(s) < 0.02)
-    applyAction(s, { type: "disaster", kind: "fire" });
+    performAction(s, { type: "disaster", kind: "fire" });
   const finalMetrics = monthMeasure();
   advanceCivic(s, civicMetrics(finalMetrics));
   return measure(s);
@@ -1329,7 +1488,12 @@ export function inspectTile(s, x, y, m = measure(s)) {
         blockers.push("Insufficient connected water capacity.");
       const key = housing(t) ? "residential" : t.type;
       if (m.demand[key] < 20) blockers.push("Low sector demand.");
-      if (s.taxes[key] >= 18)
+      if (
+        (housing(t)
+          ? (m.households.homes[i]?.taxRate ??
+            m.households.taxes.effective.residential)
+          : m.households.taxes.effective[key]) >= 18
+      )
         blockers.push("Tax rate is suppressing development.");
     }
     if (d) {
@@ -1355,6 +1519,21 @@ export function inspectTile(s, x, y, m = measure(s)) {
     lines.push(
       `Pump contamination ${m.environment.pumpContamination[i].toFixed(1)}/100 · Delivered water contamination ${m.environment.deliveredWaterContamination.toFixed(1)}/100`,
     );
+  const home = m.households.homes[i];
+  if (home?.unmet)
+    blockers.push(
+      "Unmet actual shopping demand suppresses household satisfaction and development.",
+    );
+  if (s.services.waste[i])
+    lines.push(`Uncollected waste at this tile: ${s.services.waste[i]}`);
+  if (s.services.patients[i] || s.services.beds[i])
+    lines.push(
+      `Medical cases waiting ${s.services.patients[i]} · admitted ${s.services.beds[i]}`,
+    );
+  if (s.services.crimes[i] || s.services.custody[i])
+    lines.push(
+      `Crime cases waiting ${s.services.crimes[i]} · custody ${s.services.custody[i]}`,
+    );
   const demand = facilityDemand(t),
     threshold = ["factory", "trade", "port", "academy"].includes(t.type)
       ? 0.9
@@ -1373,17 +1552,7 @@ export function inspectTile(s, x, y, m = measure(s)) {
     operating = false;
     blockers.push("Insufficient supplied water for this facility.");
   }
-  if (
-    [
-      "mine",
-      "oilWell",
-      "factory",
-      "academy",
-      "waterFilter",
-      "cleanup",
-    ].includes(t.type) &&
-    !m.jobFill[i]
-  ) {
+  if (TOOLS[t.type]?.jobs && !m.jobFill[i]) {
     operating = false;
     blockers.push("No filled worker positions at this facility.");
   }
@@ -1432,21 +1601,51 @@ export function inspectTile(s, x, y, m = measure(s)) {
   };
 }
 
+export function monthNeedsDraft(s) {
+  if (Math.abs(s.cash) > 1e12 - 1e10 || serviceNeedsDraft(s)) return true;
+  if (
+    s.services &&
+    s.tiles.some(
+      (t, i) =>
+        s.services.waste[i] + t.stored > 1e12 - 10000 ||
+        s.services.patients[i] + s.services.beds[i] > 1e12 - 10000 ||
+        s.services.crimes[i] + s.services.custody[i] > 1e12 - 10000,
+    )
+  )
+    return true;
+  const h = s.households;
+  return (
+    !!h &&
+    (h.homes.reduce((n, x) => n + (x?.arrears || 0), 0) > 1e9 ||
+      Object.values(h.pending).some((n) => n > 1e15))
+  );
+}
 // Only boundary saves use a draft. Ordinary monthly play keeps the fast in-place path.
 export function advanceMonth(s) {
   if (s.month >= 1000000)
     throw Error(
       "This city has reached its supported month limit. Export it or create a new region.",
     );
-  if (Math.abs(s.cash) > 1e12 - 1e10) {
-    const draft = structuredClone(s);
-    const result = simulateMonth(draft);
-    if (!Number.isSafeInteger(draft.cash) || Math.abs(draft.cash) > 1e12)
-      throw Error(
-        "Treasury limit reached. The city was preserved; export it or adjust its budget.",
-      );
-    Object.assign(s, draft);
+  const journal = JSON.stringify(s);
+  let mutated = false;
+  try {
+    if (monthNeedsDraft(s)) {
+      const draft = structuredClone(s),
+        result = simulateMonth(draft);
+      if (!Number.isSafeInteger(draft.cash) || Math.abs(draft.cash) > 1e12)
+        throw Error(
+          "Treasury limit reached. The city was preserved; export it or adjust its budget.",
+        );
+      assertCitySaveBudget(draft);
+      Object.assign(s, draft);
+      return result;
+    }
+    mutated = true;
+    const result = simulateMonth(s);
+    assertCitySaveBudget(s);
     return result;
+  } catch (error) {
+    if (mutated) restoreCityJournal(s, journal);
+    throw error;
   }
-  return simulateMonth(s);
 }

@@ -2,7 +2,13 @@
  * Original offline regional cooperation. No network, account, AI opponent or
  * cross-city commuter is implied by these three independently simulated cities.
  */
-import { createCity, advanceMonth, measure } from "./core.mjs";
+import {
+  createCity,
+  applyAction,
+  advanceMonth,
+  measure,
+  monthNeedsDraft,
+} from "./core.mjs";
 import { parseCity } from "./save.mjs";
 import { RESOURCES } from "./content.mjs";
 
@@ -98,7 +104,44 @@ export function regionalBenefits(region) {
   };
 }
 
+function restoreRegionJournal(region, text) {
+  const restored = JSON.parse(text),
+    cities = region.cities;
+  for (let i = 0; i < cities.length; i++) {
+    const state = cities[i].state;
+    for (const key of Object.keys(state))
+      if (!Object.hasOwn(restored.cities[i].state, key)) delete state[key];
+    Object.assign(state, restored.cities[i].state);
+    Object.assign(cities[i], restored.cities[i], { state });
+  }
+  for (const key of Object.keys(region))
+    if (!Object.hasOwn(restored, key)) delete region[key];
+  Object.assign(region, restored, { cities });
+}
+function regionalTransaction(region, run) {
+  const journal = JSON.stringify(region);
+  try {
+    const result = run();
+    if (!result.ok) return result;
+    serializeRegion(region);
+    return result;
+  } catch (error) {
+    restoreRegionJournal(region, journal);
+    return fail(
+      `Action was not applied; the entire region was preserved. ${error.message}`,
+    );
+  }
+}
+/** Active-city actions also obey the complete region's independent byte budget. */
+export function regionCityAction(region, action) {
+  return regionalTransaction(region, () =>
+    applyAction(region.cities[region.active].state, action),
+  );
+}
 export function regionAction(region, action) {
+  return regionalTransaction(region, () => performRegionAction(region, action));
+}
+function performRegionAction(region, action) {
   if (!action || typeof action !== "object" || Array.isArray(action))
     return fail("Choose a regional action.");
   if (action.type === "switch") {
@@ -353,14 +396,25 @@ export function advanceRegion(region) {
     throw Error(
       "This region has reached its supported month limit. Export it or start a new region.",
     );
-  if (region.cities.some((c) => Math.abs(c.state.cash) > 1e12 - 1e10)) {
-    const draft = structuredClone(region);
-    const result = simulateRegion(draft);
-    const cities = region.cities;
-    for (let i = 0; i < cities.length; i++)
-      Object.assign(cities[i].state, draft.cities[i].state);
-    Object.assign(region, draft, { cities });
+  const journal = JSON.stringify(region);
+  let mutated = false;
+  try {
+    if (region.cities.some((c) => monthNeedsDraft(c.state))) {
+      const draft = structuredClone(region),
+        result = simulateRegion(draft);
+      serializeRegion(draft);
+      const cities = region.cities;
+      for (let i = 0; i < cities.length; i++)
+        Object.assign(cities[i].state, draft.cities[i].state);
+      Object.assign(region, draft, { cities });
+      return result;
+    }
+    mutated = true;
+    const result = simulateRegion(region);
+    serializeRegion(region);
     return result;
+  } catch (error) {
+    if (mutated) restoreRegionJournal(region, journal);
+    throw error;
   }
-  return simulateRegion(region);
 }

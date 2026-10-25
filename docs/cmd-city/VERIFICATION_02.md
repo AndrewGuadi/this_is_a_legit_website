@@ -1,5 +1,7 @@
 # CMD City continuation verification — CMD-02
 
+Historical CMD-02 source record. See [CMD-03 verification](VERIFICATION_03.md) for the subsequent household/service implementation and its unresolved performance and workload targets. Earlier passing benchmarks do not certify the changed simulation.
+
 The confirmed comparison is **SimCity (2013) plus Cities of Tomorrow**. This is continued implementation of the requested original feature equivalent, not a claim that the complete target has been delivered. No main merge or PythonAnywhere deployment is established by this record. Independent acceptance still uses the unchanged ten criteria and 95-point gate.
 
 ## Delivered player behavior

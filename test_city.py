@@ -22,7 +22,7 @@ class CityIntegrationTests(unittest.TestCase):
         self.assertIn(b'https://example.com/games/cmd-city',self.client.get('/sitemap.xml').data)
     def test_city_assets_are_local_and_views_do_not_collect_observations(self):
         self.assertEqual(self.client.get('/games/cmd-city').status_code,200)
-        for name in ['core.mjs','content.mjs','save.mjs','clock.mjs','transit.mjs','region.mjs','civic.mjs','environment.mjs','game.mjs','view.mjs','game.css']:
+        for name in ['core.mjs','content.mjs','save.mjs','clock.mjs','transit.mjs','region.mjs','civic.mjs','environment.mjs','households.mjs','services.mjs','game.mjs','view.mjs','game.css']:
             with self.client.get('/static/cmd-city/'+name) as response:
                 self.assertEqual(response.status_code,200,name)
         response=self.client.get('/admin/events',headers={'Authorization':'Bearer '+'a'*48})

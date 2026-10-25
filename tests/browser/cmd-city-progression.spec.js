@@ -254,6 +254,10 @@ test("Finance redemption requires confirmation and removes the actual obligation
     if (["wind", "water", "sewage", "landfill"].includes(tile.type))
       tile.modules = 3;
   }
+  const {createHouseholds}=await model("households.mjs");
+  const {createServices}=await model("services.mjs");
+  city.households=createHouseholds(city);
+  city.services=createServices(city);
   expect(
     applyAction(city, { type: "department", department: "finance" }).ok,
   ).toBe(true);

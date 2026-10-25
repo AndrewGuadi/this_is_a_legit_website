@@ -1,5 +1,7 @@
 # CMD City — CMD-02 parity progress snapshot
 
+Historical CMD-02 assessment. See [CMD-03 progress](PARITY_STATUS_03.md) for the subsequent implementation; the original assessment below remains intact for provenance.
+
 ## Scope and conclusion
 
 The user has confirmed **SimCity (2013) plus Cities of Tomorrow**. Edition uncertainty is resolved. The exact reference building/module/research inventory and reference-game comparisons remain incomplete; see `REFERENCE_INVENTORY.md`.

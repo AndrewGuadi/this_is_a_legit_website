@@ -1,9 +1,12 @@
+import { createHouseholds, validateHouseholds } from "./households.mjs";
+import { createServices, validateServices } from "./services.mjs";
 import { createEnvironment, validateEnvironment } from "./environment.mjs";
 import { createCivic, validateCivic } from "./civic.mjs";
 import { TOOLS, RESOURCES, RESEARCH, capacity } from "./content.mjs";
-const MAX = 1048576;
+export const MAX_CITY_SAVE_BYTES = 1048576;
+const MAX = MAX_CITY_SAVE_BYTES;
 const bad = () => {
-  throw Error("This file is not a valid CMD City version 1 or 2 save.");
+  throw Error("This file is not a valid CMD City version 1, 2 or 3 save.");
 };
 const integer = (n, a, b) => Number.isSafeInteger(n) && n >= a && n <= b;
 const object = (v) => v && typeof v === "object" && !Array.isArray(v);
@@ -28,7 +31,7 @@ export function parseCity(text) {
   } catch {
     bad();
   }
-  if (!object(s) || ![1, 2].includes(s.version)) bad();
+  if (!object(s) || ![1, 2, 3].includes(s.version)) bad();
   const version = s.version;
   keys(s, [
     "version",
@@ -53,10 +56,11 @@ export function parseCity(text) {
     "backlogs",
     "regionalPower",
     "tiles",
-    ...(version === 2 ? ["environment", "civic"] : []),
+    ...(version >= 2 ? ["environment", "civic"] : []),
+    ...(version === 3 ? ["households", "services"] : []),
   ]);
   if (
-    ![1, 2].includes(s.version) ||
+    ![1, 2, 3].includes(s.version) ||
     s.width !== 40 ||
     s.height !== 32 ||
     !integer(s.seed, 1, 4294967295) ||
@@ -178,11 +182,15 @@ export function parseCity(text) {
       !integer(h.population, 0, 1000000) ||
       !integer(h.happiness, 0, 100) ||
       !integer(h.cash, -1e12, 1e12) ||
-      !integer(h.income, 0, 1e10) ||
+      !integer(h.income, 0, version === 3 ? 2e12 : 1e10) ||
       !integer(h.upkeep, 0, 1e10) ||
       !integer(h.debt, 0, 1e10) ||
       !integer(h.trade, -1e10, 1e10) ||
-      !integer(h.net, -1e10, 1e10) ||
+      !integer(
+        h.net,
+        version === 3 ? -2e12 : -1e10,
+        version === 3 ? 2e12 : 1e10,
+      ) ||
       h.net !== h.income - h.upkeep - h.debt + h.trade
     )
       bad();
@@ -205,10 +213,38 @@ export function parseCity(text) {
   if (s.environment.lastMonth !== s.month - 1) bad();
   validateCivic(s.civic, s.month, s.sandbox);
   if (s.civic.lastMonth !== s.month) bad();
+  if (version < 3) {
+    s.households = createHouseholds(s);
+    for (const sector of ["residential", "commercial", "industrial"])
+      s.households.wealthTaxes[sector] = [
+        s.taxes[sector],
+        s.taxes[sector],
+        s.taxes[sector],
+      ];
+    s.services = createServices(s);
+    s.version = 3;
+  }
+  validateHouseholds(s.households, s);
+  validateServices(s.services, s);
+  const pendingWaste =
+    s.services.waste.reduce((n, v) => n + v, 0) +
+    s.services.looseWaste +
+    s.services.vehicles.reduce(
+      (n, v) => n + (v.kind === "garbage" ? v.payload : 0),
+      0,
+    );
+  if (s.backlogs.waste !== Math.min(1000000, pendingWaste)) bad();
   return s;
 }
+/** Exact post-transaction byte bound; never guesses from entity counts. */
+export function assertCitySaveBudget(city) {
+  const text = JSON.stringify(city);
+  if (typeof text !== "string" || new TextEncoder().encode(text).length > MAX)
+    throw Error("This city would exceed the 1 MiB save/export limit.");
+  return text;
+}
 export function serializeCity(s) {
-  const text = JSON.stringify(s);
+  const text = assertCitySaveBudget(s);
   parseCity(text);
   return text;
 }

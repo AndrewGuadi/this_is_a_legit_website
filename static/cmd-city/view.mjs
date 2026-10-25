@@ -197,6 +197,18 @@ export function createView(canvas) {
       ctx.lineWidth = 1.2;
       ctx.strokeRect(px + pad - 1, py + pad - 1, w + 2, w + 2);
     }
+    if (t.enabled === false) {
+      ctx.fillStyle = "#20332b88";
+      ctx.fillRect(px + 2, py + 2, UNIT - 4, UNIT - 4);
+      ctx.strokeStyle = "#f3d6ae";
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(px + 8, py + 8);
+      ctx.lineTo(px + 16, py + 16);
+      ctx.moveTo(px + 16, py + 8);
+      ctx.lineTo(px + 8, py + 16);
+      ctx.stroke();
+    }
   }
   function building(t, x, y, index) {
     const px = x * UNIT,
@@ -265,7 +277,8 @@ export function createView(canvas) {
     }
     if (t.type === "water" || t.type === "sewage" || t.type === "waterFilter") {
       cube(px + 4, py + 10, 17, 11, 5, "#99b6ad");
-      ctx.fillStyle = t.type === "water" || t.type === "waterFilter" ? "#9dd1ce" : "#738b87";
+      ctx.fillStyle =
+        t.type === "water" || t.type === "waterFilter" ? "#9dd1ce" : "#738b87";
       ctx.beginPath();
       ctx.ellipse(px + 12, py + 5, 7, 4, 0, 0, Math.PI * 2);
       ctx.fill();
@@ -392,7 +405,12 @@ export function createView(canvas) {
     if (overlay === "none") return;
     for (let i = 0; i < s.tiles.length; i++) {
       const t = s.tiles[i];
-      if (t.terrain === "water" && !ROAD.has(t.type) && !["pollution", "air", "ground", "radiation"].includes(overlay)) continue;
+      if (
+        t.terrain === "water" &&
+        !ROAD.has(t.type) &&
+        !["pollution", "air", "ground", "radiation"].includes(overlay)
+      )
+        continue;
       let color = null;
       if (overlay === "access")
         color = m.access[i]
@@ -428,6 +446,10 @@ export function createView(canvas) {
         );
         color = `rgba(134,202,222,${n / 150})`;
       }
+      if (overlay === "wealth") {
+        const home = m.households?.homes[i];
+        if (home) color = ["#c7e49aa6", "#91d3e6a6", "#d5b4e8b0"][home.wealth];
+      }
       if (color) {
         ctx.fillStyle = color;
         ctx.fillRect(
@@ -436,6 +458,62 @@ export function createView(canvas) {
           UNIT - 1,
           UNIT - 1,
         );
+      }
+      if (overlay === "wealth" && m.households?.homes[i]) {
+        ctx.fillStyle = "#1a2d2a";
+        ctx.font = "bold 9px system-ui";
+        ctx.textAlign = "center";
+        ctx.fillText(
+          ["L", "M", "H"][m.households.homes[i].wealth],
+          (i % s.width) * UNIT + 12,
+          Math.floor(i / s.width) * UNIT + 15,
+        );
+      }
+    }
+  }
+  function serviceVehicles(s, m) {
+    for (const vehicle of m.services?.vehicles || []) {
+      if (
+        !Number.isInteger(vehicle.position) ||
+        vehicle.position < 0 ||
+        vehicle.position >= s.tiles.length
+      )
+        continue;
+      // This is a saved simulation position, never a render-time interpolation.
+      const dx = vehicle.id % 2 ? 2 : -2,
+        dy = ((vehicle.id % 3) - 1) * 2,
+        x = (vehicle.position % s.width) * UNIT + 8 + dx,
+        y = Math.floor(vehicle.position / s.width) * UNIT + 9 + dy;
+      ctx.fillStyle = "#172d2980";
+      ctx.fillRect(x + 1, y + 2, 9, 6);
+      ctx.fillStyle =
+        vehicle.status === "waiting"
+          ? "#efc579"
+          : {
+              fire: "#e99370",
+              medical: "#edf1df",
+              police: "#8ab4df",
+              garbage: "#a6c88b",
+            }[vehicle.kind];
+      ctx.strokeStyle = "#233d33";
+      ctx.lineWidth = 0.7;
+      ctx.fillRect(x, y, 8, 5);
+      ctx.strokeRect(x, y, 8, 5);
+      ctx.fillStyle = "#486762";
+      ctx.fillRect(x + 5, y + 1, 2, 3);
+      if (vehicle.kind === "medical") {
+        ctx.fillStyle = "#bd715b";
+        ctx.fillRect(x + 1, y + 2, 3, 1);
+        ctx.fillRect(x + 2, y + 1, 1, 3);
+      }
+      if (vehicle.status === "waiting") {
+        ctx.strokeStyle = "#68462d";
+        ctx.beginPath();
+        ctx.moveTo(x + 1, y + 1);
+        ctx.lineTo(x + 4, y + 4);
+        ctx.moveTo(x + 4, y + 1);
+        ctx.lineTo(x + 1, y + 4);
+        ctx.stroke();
       }
     }
   }
@@ -475,6 +553,7 @@ export function createView(canvas) {
         if (!ROAD.has(t.type)) building(t, x, y, y * s.width + x);
       }
     dataOverlay(s, m, overlay);
+    serviceVehicles(s, m);
     ctx.strokeStyle = "#dbe8bb90";
     ctx.lineWidth = 1;
     ctx.strokeRect(0, 0, s.width * UNIT, s.height * UNIT);

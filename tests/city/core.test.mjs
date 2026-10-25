@@ -133,9 +133,12 @@ test("removing a connecting road disables downstream jobs and supply", () => {
   utilities(s);
   build(s, "industrial", 12, 15);
   s.tiles[idx(s, 12, 15)].occupancy = 10;
-  assert.ok(measure(s).jobs > 0);
+  const jobsBefore = measure(s).jobs;
+  assert.ok(jobsBefore >= 10);
   assert.equal(applyAction(s, { type: "bulldoze", x: 10, y: 16 }).ok, true);
-  assert.equal(measure(s).jobs, 0);
+  // The disconnected industrial positions disappear; upstream landfill workers
+  // are now real jobs and remain connected to their own gateway road.
+  assert.equal(measure(s).jobs, jobsBefore - 10);
   assert.ok(
     inspectTile(s, 12, 15).blockers.some((x) => /road|access|connect/i.test(x)),
   );
@@ -447,8 +450,13 @@ test("unprocessed waste persists and harms health rather than disappearing", () 
   const a = createCity(),
     b = structuredClone(a);
   for (const t of b.tiles) if (t.type === "landfill") t.enabled = false;
-  advanceMonth(a);
-  advanceMonth(b);
+  // Actual road collection allows one month of bins before health penalties;
+  // a closed facility leaves a genuine multi-month backlog rather than an
+  // instantaneous radius/processing-capacity result.
+  for (let n = 0; n < 2; n++) {
+    advanceMonth(a);
+    advanceMonth(b);
+  }
   assert.ok(b.backlogs.waste > 0);
   assert.ok(measure(b).health < measure(a).health);
   const debt = b.backlogs.waste;

@@ -1,3 +1,5 @@
+import { createHouseholds } from "../../static/cmd-city/households.mjs";
+import { createServices } from "../../static/cmd-city/services.mjs";
 /** Reproducible synthetic stress measurement, not physical-phone evidence. */
 import os from "node:os";
 import {
@@ -35,6 +37,10 @@ for (let i = 0; i < s.tiles.length; i++) {
   }
 }
 s.tiles[640].type = "road";
+// This synthetic city is assembled outside player actions. Declare its initial
+// demographic capital and material baselines once, never reset during the run.
+s.households = createHouseholds(s);
+s.services = createServices(s);
 const initial = measure(s),
   times = [];
 for (let i = 0; i < 120; i++) {

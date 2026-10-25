@@ -1,0 +1,2 @@
+{"baseline":"5cebb4748ec1ad1c69c79aef924b46238f02fe6b","oldCityVersions":[2,2,2],"newCityVersions":[3,3,3],"allPriorFieldsPreserved":true,"projectAndShipmentPreserved":true,"deliveredOnce":true,"deterministicNextMonth":true}
+{"baseline":"61bbe2df9acf6a6ae3620038212f8bf4841fec50","oldCityVersions":[1,1,1],"newCityVersions":[3,3,3],"allPriorFieldsPreserved":true,"projectAndShipmentPreserved":true,"deliveredOnce":true,"deterministicNextMonth":true}

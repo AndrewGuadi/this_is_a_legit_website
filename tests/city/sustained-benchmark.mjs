@@ -1,3 +1,5 @@
+import { createHouseholds } from "../../static/cmd-city/households.mjs";
+import { createServices } from "../../static/cmd-city/services.mjs";
 /** Sustained synthetic-load evidence. No per-month state replenishment or model overrides. */
 import os from "node:os";
 import fs from "node:fs";
@@ -16,7 +18,7 @@ import { serializeCity, parseCity } from "../../static/cmd-city/save.mjs";
 const W = 40,
   H = 32,
   MONTHS = 120;
-const output = path.resolve("dev_docs/evidence/CMD-02/sustained");
+const output = path.resolve("dev_docs/evidence/CMD-03/sustained");
 const city = createCity({
   starter: false,
   seed: 42002,
@@ -104,10 +106,16 @@ city.policies.recycling = true;
 city.policies.disasters = false;
 city.environment.wind = "E";
 city.funding = { school: 150, clinic: 150, fire: 100, police: 150 };
-assert.equal(city.version, 2);
+// Declare the assembled fixture's household external-capital and material
+// baselines once, before validation. No demographic/material reset occurs later.
+city.households = createHouseholds(city);
+city.services = createServices(city);
+assert.equal(city.version, 3);
 assert.equal(city.month, 0);
 assert.equal(city.environment.lastMonth, -1);
 assert.equal(city.civic.lastMonth, 0);
+assert.equal(city.households.lastMonth, 0);
+assert.equal(city.services.lastMonth, -1);
 assert.equal(city.civic.eligible, false);
 const beforeJSON = serializeCity(city);
 assert.deepEqual(parseCity(beforeJSON), city);
@@ -170,6 +178,8 @@ assert.deepEqual(parseCity(finalJSON), city);
 assert.equal(city.month, MONTHS);
 assert.equal(city.environment.lastMonth, MONTHS - 1);
 assert.equal(city.civic.lastMonth, MONTHS);
+assert.equal(city.households.lastMonth, MONTHS);
+assert.equal(city.services.lastMonth, MONTHS - 1);
 const times = samples.map((s) => s.elapsedMs).sort((a, b) => a - b);
 const numeric = (key) => [initial[key], ...samples.map((s) => s[key])];
 const range = (key) => ({
@@ -184,7 +194,7 @@ const digest = (relative) =>
     .update(fs.readFileSync(new URL(`../../${relative}`, import.meta.url)))
     .digest("hex");
 const summary = {
-  scenario: "Schema2 fully built 40x32 finite-water sustained workload",
+  scenario: "Schema3 fully built 40x32 finite-water sustained workload",
   synthetic: true,
   modelOverrides: false,
   midRunReplenishment: false,
@@ -217,11 +227,19 @@ const summary = {
     finalBytes: Buffer.byteLength(finalJSON),
   },
   markers: {
-    initial: { month: 0, environmentLastMonth: -1, civicLastMonth: 0 },
+    initial: {
+      month: 0,
+      environmentLastMonth: -1,
+      civicLastMonth: 0,
+      householdsLastMonth: 0,
+      servicesLastMonth: -1,
+    },
     final: {
       month: city.month,
       environmentLastMonth: city.environment.lastMonth,
       civicLastMonth: city.civic.lastMonth,
+      householdsLastMonth: city.households.lastMonth,
+      servicesLastMonth: city.services.lastMonth,
     },
   },
   sourceHashes: Object.fromEntries(
@@ -230,6 +248,8 @@ const summary = {
       "static/cmd-city/content.mjs",
       "static/cmd-city/environment.mjs",
       "static/cmd-city/civic.mjs",
+      "static/cmd-city/households.mjs",
+      "static/cmd-city/services.mjs",
       "static/cmd-city/save.mjs",
       "tests/city/sustained-benchmark.mjs",
     ].map((f) => [f, digest(f)]),

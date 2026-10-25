@@ -9,7 +9,23 @@ const tool = (label, group, cost, upkeep, color, description, extra = {}) =>
     description,
     ...extra,
   });
-export const TOOLS = Object.freeze({
+export const FACILITY_JOBS = Object.freeze({
+  factory: 12,
+  mine: 8,
+  oilWell: 8,
+  academy: 12,
+  waterFilter: 8,
+  cleanup: 8,
+  school: 8,
+  university: 12,
+  clinic: 8,
+  hospital: 12,
+  fire: 8,
+  police: 8,
+  landfill: 8,
+  recycling: 8,
+});
+const definitions = {
   road: tool(
     "Local road",
     "Transport",
@@ -139,7 +155,7 @@ export const TOOLS = Object.freeze({
     1100,
     40,
     "#b5a177",
-    "Handles 900 waste units per month until its local storage fills.",
+    "Eight staffed positions dispatch road pickups; actual returns are limited by 900 monthly throughput and 30,000 stored units.",
     { supply: 900, utility: "waste" },
   ),
   recycling: tool(
@@ -148,7 +164,7 @@ export const TOOLS = Object.freeze({
     2500,
     90,
     "#92b98b",
-    "Processes 1,200 waste units and recovers ore when recycling is enabled.",
+    "Eight staffed positions collect waste by road; actual recycling deliveries process up to 1,200 units and recover finite ore.",
     { supply: 1200, utility: "waste" },
   ),
   park: tool(
@@ -166,7 +182,7 @@ export const TOOLS = Object.freeze({
     1700,
     75,
     "#e6c17c",
-    "Local education coverage, scaled by its funding.",
+    "Eight staffed positions support finite road-reachable child enrollment, scaled by funding.",
     { radius: 7 },
   ),
   university: tool(
@@ -175,7 +191,7 @@ export const TOOLS = Object.freeze({
     5500,
     180,
     "#b8a0d4",
-    "Wider education coverage and research capacity.",
+    "Twelve staffed positions support finite twelve-month adult training and research.",
     { radius: 11 },
   ),
   clinic: tool(
@@ -184,7 +200,7 @@ export const TOOLS = Object.freeze({
     1700,
     75,
     "#f1a8a1",
-    "Provides local health coverage.",
+    "Eight staffed positions dispatch ambulances to actual cases; admitted patients need finite treatment.",
     { radius: 7 },
   ),
   hospital: tool(
@@ -193,7 +209,7 @@ export const TOOLS = Object.freeze({
     5500,
     190,
     "#f1bcb3",
-    "Wider health coverage.",
+    "Twelve staffed positions provide larger ambulance, bed and treatment capacity.",
     { radius: 11 },
   ),
   fire: tool(
@@ -202,7 +218,7 @@ export const TOOLS = Object.freeze({
     1900,
     80,
     "#df8d71",
-    "Local fire response reduces active incidents.",
+    "Eight staffed positions send road vehicles; only actual arrival extinguishes fire.",
     { radius: 8 },
   ),
   police: tool(
@@ -211,7 +227,7 @@ export const TOOLS = Object.freeze({
     1900,
     80,
     "#8ba5db",
-    "Local prevention reduces the crime pressure indicator.",
+    "Eight staffed positions dispatch patrols; actual pickup, custody and later processing resolve cases.",
     { radius: 8 },
   ),
   bus: tool(
@@ -322,7 +338,15 @@ export const TOOLS = Object.freeze({
     "Research-gated vertical housing. Mixed-use floors remain planned.",
     { capacity: 180 },
   ),
-});
+};
+export const TOOLS = Object.freeze(
+  Object.fromEntries(
+    Object.entries(definitions).map(([id, definition]) => [
+      id,
+      Object.freeze({ ...definition, jobs: FACILITY_JOBS[id] || 0 }),
+    ]),
+  ),
+);
 export const ZONES = ["residential", "commercial", "industrial"];
 export const RESOURCES = [
   "coal",
