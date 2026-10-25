@@ -266,7 +266,11 @@ test("a validated terminal-month save pauses safely and leaves recovery controls
   const fs = require("node:fs/promises");
   const region = JSON.parse(await fs.readFile(await file.path(), "utf8"));
   region.month = 1000000;
-  for (const c of region.cities) c.state.month = 1000000;
+  for (const c of region.cities) {
+    c.state.month = 1000000;
+    c.state.civic.lastMonth = 1000000;
+    c.state.environment.lastMonth = 999999;
+  }
   await page
     .locator("#import-city")
     .setInputFiles({

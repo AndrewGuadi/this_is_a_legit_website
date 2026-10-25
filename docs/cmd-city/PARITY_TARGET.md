@@ -4,7 +4,7 @@
 
 Andrew approved direct Codex implementation with independent review, then explicitly required feature-to-feature equivalence. That instruction expands the small first-playable scope in `BUILD_PLAN.md`; its later-release exclusions must not be mistaken for exclusions from the final parity target.
 
-**Working comparison:** SimCity (2013) plus Cities of Tomorrow. This edition is the implementer's stated assumption, not a user-confirmed edition. SimCity 4, SimCity 2000 and SimCity BuildIt have different systems. Reconfirm the comparison if the user names one of them. Separately catalog other add-ons rather than silently blending every franchise release into one baseline.
+**Confirmed comparison:** SimCity (2013) plus Cities of Tomorrow. Andrew confirmed this edition and authorized continued implementation on October 25, 2026. SimCity 4, SimCity 2000 and SimCity BuildIt have different systems. Separately catalog other add-ons rather than silently blending every franchise release into one baseline.
 
 The project remains an original game: original source, art, names, interface and balancing. Equivalence means comparable player capabilities and connected consequences, not use of EA assets, exact numerical tuning, undocumented engine internals or reproduction of bugs. No current implementation is certified equivalent by this document.
 

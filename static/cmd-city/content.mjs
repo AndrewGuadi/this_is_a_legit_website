@@ -1,13 +1,14 @@
 /** Original balancing units. Costs are integer minor currency units, not real city estimates. */
-const tool = (label, group, cost, upkeep, color, description, extra = {}) => ({
-  label,
-  group,
-  cost: cost * 100,
-  upkeep: upkeep * 100,
-  color,
-  description,
-  ...extra,
-});
+const tool = (label, group, cost, upkeep, color, description, extra = {}) =>
+  Object.freeze({
+    label,
+    group,
+    cost: cost * 100,
+    upkeep: upkeep * 100,
+    color,
+    description,
+    ...extra,
+  });
 export const TOOLS = Object.freeze({
   road: tool(
     "Local road",
@@ -71,6 +72,39 @@ export const TOOLS = Object.freeze({
     "#b6e0dc",
     "800 units of clean power distributed through connected roads.",
     { supply: 800, utility: "power" },
+  ),
+  nuclear: tool(
+    "Nuclear power plant",
+    "Utilities",
+    12000,
+    420,
+    "#b7c6b0",
+    "2,400 power units per base plant; reserves 2 finite ore units monthly. An explicit radiation scenario can contaminate its surroundings.",
+    { supply: 2400, utility: "power" },
+  ),
+  waterFilter: tool(
+    "Water filtration",
+    "Utilities",
+    3600,
+    120,
+    "#8bd3ce",
+    "Eight staffed positions treat up to 500 delivered water units monthly with 90% removal on the filtered share.",
+  ),
+  cleanup: tool(
+    "Environmental cleanup",
+    "Utilities",
+    3000,
+    110,
+    "#acbd88",
+    "Eight staffed positions remediate finite ground and radiation contamination each month; road and utility access required.",
+  ),
+  townHall: tool(
+    "Town Hall",
+    "Government",
+    2000,
+    80,
+    "#d8d2b2",
+    "Opens civic departments, requests, tutorial progression and government capacity. Connect its site to a supplied road gateway.",
   ),
   coalPlant: tool(
     "Thermal power plant",

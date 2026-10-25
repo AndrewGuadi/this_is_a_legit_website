@@ -263,9 +263,9 @@ export function createView(canvas) {
       }
       return;
     }
-    if (t.type === "water" || t.type === "sewage") {
+    if (t.type === "water" || t.type === "sewage" || t.type === "waterFilter") {
       cube(px + 4, py + 10, 17, 11, 5, "#99b6ad");
-      ctx.fillStyle = t.type === "water" ? "#9dd1ce" : "#738b87";
+      ctx.fillStyle = t.type === "water" || t.type === "waterFilter" ? "#9dd1ce" : "#738b87";
       ctx.beginPath();
       ctx.ellipse(px + 12, py + 5, 7, 4, 0, 0, Math.PI * 2);
       ctx.fill();
@@ -392,7 +392,7 @@ export function createView(canvas) {
     if (overlay === "none") return;
     for (let i = 0; i < s.tiles.length; i++) {
       const t = s.tiles[i];
-      if (t.terrain === "water" && !ROAD.has(t.type)) continue;
+      if (t.terrain === "water" && !ROAD.has(t.type) && !["pollution", "air", "ground", "radiation"].includes(overlay)) continue;
       let color = null;
       if (overlay === "access")
         color = m.access[i]
@@ -407,8 +407,12 @@ export function createView(canvas) {
             : t.type !== "empty"
               ? "#f1ad7190"
               : null;
-      if (overlay === "pollution")
-        color = `rgba(196,79,47,${(m.pollution[i] || 0) / 130})`;
+      if (overlay === "pollution" || overlay === "air")
+        color = `rgba(196,79,47,${(m.environment?.air[i] ?? m.pollution[i] ?? 0) / 125})`;
+      if (overlay === "ground")
+        color = `rgba(178,111,43,${(m.environment?.ground[i] || 0) / 120})`;
+      if (overlay === "radiation")
+        color = `rgba(145,70,180,${(m.environment?.radiation[i] || 0) / 110})`;
       if (overlay === "landValue")
         color = `rgba(214,239,137,${(m.landValue[i] || 0) / 150})`;
       if (overlay === "traffic" && ROAD.has(t.type)) {

@@ -399,3 +399,37 @@ test("region cash boundary failure preserves all cities and accepted shipments a
   assert.deepEqual(r, before);
   assert.doesNotThrow(() => serializeRegion(r));
 });
+
+for (const [affected, endpoint] of [
+  [0, "sender"],
+  [1, "receiver"],
+]) {
+  test(`radiation disables new regional shipments at the ${endpoint} without reserving cargo or cash`, () => {
+    const r = createRegion();
+    r.cities[0].state.inventory.ore = 40;
+    const city = r.cities[affected].state;
+    const depot = city.tiles.findIndex((t) => t.type === "trade");
+    city.environment.radiation[depot] = 300;
+    failUnchanged(r, {
+      type: "shipment",
+      from: 0,
+      to: 1,
+      resource: "ore",
+      amount: 20,
+    });
+  });
+}
+
+test("radiation disables new regional project contributions without changing any city or project", () => {
+  const r = createRegion();
+  const city = r.cities[0].state;
+  city.inventory.goods = 100;
+  const depot = city.tiles.findIndex((t) => t.type === "trade");
+  city.environment.radiation[depot] = 300;
+  failUnchanged(r, {
+    type: "contribute",
+    from: 0,
+    resource: "goods",
+    amount: 20,
+  });
+});

@@ -1,5 +1,7 @@
 # CMD City — implementation progress ledger
 
+Historical CMD-01 snapshot. See [CMD-02 progress](PARITY_STATUS_02.md) for the current continuation and confirmed reference edition; the original assessment below is retained for provenance.
+
 This ledger assesses the working-tree implementation against the 78 stable IDs in `PARITY_TARGET.md`. It is a source/test inspection snapshot, **not an independent release acceptance or a claim of SimCity feature equivalence**. The comparison remains the stated working assumption: SimCity (2013) plus Cities of Tomorrow; detailed edition and expansion-reference observations remain unresolved.
 
 ## How to read the statuses

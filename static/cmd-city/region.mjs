@@ -51,7 +51,7 @@ function workingTradeFacility(state) {
   return state.tiles.some(
     (tile, index) =>
       ["trade", "port"].includes(tile.type) &&
-      metrics.access[index] &&
+      metrics.operationAccess[index] &&
       tile.enabled !== false &&
       tile.fire === 0,
   );

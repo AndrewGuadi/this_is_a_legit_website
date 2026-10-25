@@ -1,7 +1,9 @@
+import { createEnvironment, validateEnvironment } from "./environment.mjs";
+import { createCivic, validateCivic } from "./civic.mjs";
 import { TOOLS, RESOURCES, RESEARCH, capacity } from "./content.mjs";
 const MAX = 1048576;
 const bad = () => {
-  throw Error("This file is not a valid CMD City version 1 save.");
+  throw Error("This file is not a valid CMD City version 1 or 2 save.");
 };
 const integer = (n, a, b) => Number.isSafeInteger(n) && n >= a && n <= b;
 const object = (v) => v && typeof v === "object" && !Array.isArray(v);
@@ -26,6 +28,8 @@ export function parseCity(text) {
   } catch {
     bad();
   }
+  if (!object(s) || ![1, 2].includes(s.version)) bad();
+  const version = s.version;
   keys(s, [
     "version",
     "width",
@@ -49,9 +53,10 @@ export function parseCity(text) {
     "backlogs",
     "regionalPower",
     "tiles",
+    ...(version === 2 ? ["environment", "civic"] : []),
   ]);
   if (
-    s.version !== 1 ||
+    ![1, 2].includes(s.version) ||
     s.width !== 40 ||
     s.height !== 32 ||
     !integer(s.seed, 1, 4294967295) ||
@@ -77,7 +82,9 @@ export function parseCity(text) {
     !Array.isArray(s.research.completed) ||
     s.research.completed.length > 4 ||
     new Set(s.research.completed).size !== s.research.completed.length ||
-    s.research.completed.some((v) => !Object.hasOwn(RESEARCH, v))
+    s.research.completed.some(
+      (v) => typeof v !== "string" || !Object.hasOwn(RESEARCH, v),
+    )
   )
     bad();
   for (const name of s.research.completed)
@@ -90,6 +97,7 @@ export function parseCity(text) {
   )
     bad();
   if (!Array.isArray(s.tiles) || s.tiles.length !== 1280) bad();
+  let population = 0;
   for (let i = 0; i < s.tiles.length; i++) {
     const t = s.tiles[i];
     keys(t, [
@@ -119,13 +127,21 @@ export function parseCity(text) {
       !integer(t.occupancy, 0, capacity(t))
     )
       bad();
+    if (
+      version === 1 &&
+      ["townHall", "waterFilter", "cleanup", "nuclear"].includes(t.type)
+    )
+      bad();
     if (t.terrain === "water" && !["empty", "bridge", "ruins"].includes(t.type))
       bad();
     if (t.type === "bridge" && t.terrain !== "water") bad();
     if (t.type === "mine" && !["coal", "ore"].includes(t.resource)) bad();
     if (t.type === "oilWell" && t.resource !== "oil") bad();
     if (t.type === "tower" && !s.research.completed.includes("vertical")) bad();
+    if (t.type === "tower" || t.type === "residential")
+      population += t.occupancy;
   }
+  if (population > 1000000) bad();
   if (
     !["road", "avenue"].includes(s.tiles[640].type) ||
     s.tiles[640].terrain !== "land"
@@ -178,6 +194,17 @@ export function parseCity(text) {
     s.events.some((v) => typeof v !== "string" || v.length > 500)
   )
     bad();
+  if (version === 1) {
+    // Validate the complete legacy schema before adding either new subsystem.
+    s.version = 2;
+    s.environment = createEnvironment(s.width, s.height);
+    s.environment.lastMonth = s.month - 1;
+    s.civic = createCivic({ sandbox: s.sandbox, month: s.month });
+  }
+  validateEnvironment(s.environment, s.width, s.height, s.month);
+  if (s.environment.lastMonth !== s.month - 1) bad();
+  validateCivic(s.civic, s.month, s.sandbox);
+  if (s.civic.lastMonth !== s.month) bad();
   return s;
 }
 export function serializeCity(s) {

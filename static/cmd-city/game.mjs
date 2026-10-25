@@ -16,6 +16,7 @@ import {
 } from "./region.mjs";
 import { createClock, setRunning, setSpeed, advanceClock } from "./clock.mjs";
 import { createView } from "./view.mjs";
+import { createCivic, REQUESTS } from "./civic.mjs";
 
 const $ = (id) => document.getElementById(id);
 const STORAGE = "cmd-city-save-v1",
@@ -69,6 +70,10 @@ const glyphs = {
   casino: "♢",
   academy: "⌬",
   tower: "▤",
+  townHall: "▥",
+  waterFilter: "◈",
+  cleanup: "↻",
+  nuclear: "☢",
 };
 const overlays = {
   none: "CITY VIEW · Roads connect homes, jobs and services.",
@@ -76,7 +81,10 @@ const overlays = {
     "ROAD ACCESS · Green reaches the regional gateway. Orange is disconnected.",
   power: "ELECTRICITY · Connected capacity serves occupied demand.",
   water: "WATER · Connected pumps draw from a finite aquifer.",
-  pollution: "POLLUTION · Stronger orange means more local emissions.",
+  pollution: "AIR POLLUTION · Legacy view of persistent wind-carried air contamination.",
+  air: "AIR POLLUTION · Wind carries persistent air contamination across the map.",
+  ground: "GROUND CONTAMINATION · Soil effects can remain after demolition.",
+  radiation: "RADIATION · Purple indicates contamination; strong exposure restricts new development.",
   landValue: "LAND VALUE · Brighter green indicates higher land value.",
   traffic:
     "ROAD TRAFFIC · Assigned commutes, from green to orange at capacity.",
@@ -267,6 +275,7 @@ function updateInspector() {
         ? "Reopen selected facility"
         : "Suspend selected facility";
   }
+  updateEnvironmentSelection();
 }
 function renderUtilities() {
   const labels = {
@@ -293,6 +302,159 @@ function renderUtilities() {
       return row;
     }),
   );
+}
+function textNode(tag, text, className = "") {
+  const node = document.createElement(tag);
+  node.textContent = text;
+  if (className) node.className = className;
+  return node;
+}
+function initializeProgression() {
+  // These controls are created once. Monthly report refreshes preserve focused
+  // inputs/buttons instead of replacing an entire interactive subtree.
+  const departmentDescriptions = {
+    utilities: "Permits new water filtration facilities.",
+    safety: "Permits new hospitals.",
+    finance: "Permits early bond redemption from an operating Town Hall.",
+    education: "Permits new universities and Civic Research Institutes.",
+    transportation: "Permits new air terminals.",
+    tourism: "Permits new entertainment districts.",
+  };
+  for (const department of metrics.civic.departments) {
+    const card = textNode("article", "", "department-card");
+    card.id = `department-${department.id}`;
+    const heading = textNode("h4", department.label);
+    const price = textNode("span", money(department.cost), "department-price");
+    const reason = textNode("p", "", "fine-print");
+    reason.id = `department-${department.id}-reason`;
+    const button = textNode("button", `Install ${department.label}`);
+    button.type = "button";
+    button.id = `install-${department.id}`;
+    button.setAttribute("aria-describedby", reason.id);
+    button.addEventListener("click", () => act({type:"department", department:department.id}));
+    const purpose=textNode("p",departmentDescriptions[department.id],"department-purpose");
+    card.append(heading, price, purpose, reason, button);
+    $("department-cards").append(card);
+  }
+  for (const request of metrics.civic.requests) {
+    const card = textNode("article", "", "request-card");
+    card.id = `request-${request.id}`;
+    const heading = textNode("h4", request.title); heading.tabIndex = -1; heading.id=`request-${request.id}-title`;
+    const description = textNode("p", request.description, "request-description");
+    const status = textNode("span", "", "civic-status"); status.id = `request-${request.id}-status`;
+    const progress = document.createElement("progress"); progress.max = request.target; progress.value = 0;
+    progress.id = `request-${request.id}-progress`; progress.setAttribute("aria-label", `${request.title} progress`);
+    const detail = textNode("p", "", "request-detail"); detail.id = `request-${request.id}-detail`;
+    const reason = textNode("p", "", "fine-print"); reason.id = `request-${request.id}-reason`;
+    const actions = textNode("div", "", "civic-actions");
+    for (const [operation, label] of [["accept","Accept request"],["reject","Reject request"],["cancel","Cancel request"],["claim","Claim reward"]]) {
+      const button = textNode("button", label); button.type = "button"; button.id = `request-${request.id}-${operation}`;
+      button.setAttribute("aria-describedby", `${heading.id} ${reason.id}`);
+      button.addEventListener("click", () => {
+        const perform = () => {
+          const result = act({type:"request",id:request.id,operation});
+          if(result.ok) {
+            const next = Array.from(actions.querySelectorAll("button")).find(b=>!b.hidden&&!b.disabled);
+            (next || heading).focus({preventScroll:true});
+          }
+        };
+        if(operation === "reject" || operation === "cancel") ask(`${operation === "reject" ? "Reject" : "Cancel"} this request?`, `${request.title} will not be available to accept again. No reward will be paid.`, operation === "reject" ? "Reject request" : "Cancel request", perform);
+        else perform();
+      });
+      actions.append(button);
+    }
+    card.append(heading,description,status,progress,detail,reason,actions);
+    $("request-cards").append(card);
+  }
+  for (const achievement of metrics.civic.achievements) {
+    const card = textNode("li", "", "achievement-card"); card.id=`achievement-${achievement.id}`;
+    card.append(textNode("strong",achievement.title), textNode("span","","achievement-state"), textNode("p",achievement.description));
+    $("achievement-cards").append(card);
+  }
+  for(let index=0;index<3;index++) {
+    const row = textNode("div","","bond-row"); row.id=`bond-${index}`;
+    const description=textNode("p",""), button=textNode("button","Redeem bond early");
+    button.type="button";button.dataset.bond=String(index);
+    button.addEventListener("click",()=>{
+      const bond=city.bonds[index];if(!bond)return;
+      ask("Redeem this bond early?",`Pay the entire remaining ${money(bond.balance)} from treasury now. This removes the obligation once. Previous operating history stays unchanged; an operating Town Hall and Finance department are required.`,"Redeem obligation",()=>act({type:"redeemBond",index}));
+    });
+    row.append(description,button);$("bond-obligations").append(row);
+  }
+  for(const [id,operation] of [["tutorial-check","check"],["tutorial-dismiss","dismiss"],["tutorial-resume","resume"]]) $(id).addEventListener("click",()=>{
+    const result=act({type:"tutorial",operation});
+    if(result.ok&&operation==="dismiss")$("tutorial-resume").focus({preventScroll:true});
+    if(result.ok&&operation==="resume")$("tutorial-check").focus({preventScroll:true});
+  });
+  $("tutorial-replay").addEventListener("click",()=>ask("Replay the city guide?","The guide restarts at its first step. The existing city, money, requests and achievements stay intact. Replay pays no reward.","Replay guide",()=>act({type:"tutorial",operation:"replay"})));
+  $("wind-direction").addEventListener("change",()=>act({type:"environment",action:{type:"wind",direction:$("wind-direction").value}}));
+  $("reactor-incident").addEventListener("click",()=>{
+    const target={...selected};
+    ask("Trigger a reactor incident?",`The nuclear facility at ${target.x}, ${target.y} will be ruined and the surrounding area contaminated. Radiation persists, can restrict new development and affect residents. This is a deliberate game scenario; export a recovery copy before confirming if needed.`,"Confirm reactor incident",()=>act({type:"environment",action:{type:"radiation",...target}}));
+  });
+}
+function renderProgression() {
+  const civic=metrics.civic,g=civic.government;
+  $("government-status").textContent=`${g.label} · Tier ${g.tier} · ${g.slots} department slot${g.slots===1?"":"s"} · ${g.slotsRemaining} available. Peak population ${whole(g.peakPopulation)}.`;
+  $("town-hall-status").textContent=g.townHallReady?"Town Hall is open, supplied and connected to the regional gateway.":g.townHallReason;
+  $("town-hall-status").classList.toggle("needs-attention",!g.townHallReady);
+  $("government-next").textContent=g.nextPopulation===null?"The highest government tier is attained.":`Next government tier at a peak population of ${whole(g.nextPopulation)}. Attained tiers and purchased departments survive later population declines.`;
+  $("eligibility-note").textContent=civic.eligible?"Badge eligibility: standard city. Achievements record earned progress.":"Badge eligibility: this city is permanently ineligible for badges because of its sandbox history. Requests and tutorial controls remain available.";
+  for(const d of civic.departments) {
+    const card=$(`department-${d.id}`),button=$(`install-${d.id}`);
+    card.classList.toggle("installed",d.installed);
+    $(`department-${d.id}-reason`).textContent=d.installed?"Installed · one government slot occupied.":d.available?`Available at ${money(d.cost)}. Install to occupy one department slot.`:d.reason;
+    button.textContent=d.installed?`${d.label} installed`:`Install ${d.label}`;
+    button.disabled=!d.available||d.installed;
+  }
+  for(const r of civic.requests) {
+    $(`request-${r.id}-status`).textContent=r.status[0].toUpperCase()+r.status.slice(1);
+    $(`request-${r.id}-progress`).value=r.progress;
+    $(`request-${r.id}-detail`).textContent=`${whole(r.progress)} / ${whole(r.target)} · One-time reward ${money(r.reward)}${r.deadlineMonth===null?` · ${REQUESTS[r.id].duration} game months from acceptance`:` · Deadline month ${r.deadlineMonth} (${r.remainingMonths} remaining)`}`;
+    $(`request-${r.id}-reason`).textContent=r.status==="offered"&&r.canAccept?"":r.reason;
+    for(const operation of ["accept","reject","cancel","claim"]) {
+      const b=$(`request-${r.id}-${operation}`);
+      b.hidden=operation==="accept"||operation==="reject"?r.status!=="offered":operation==="cancel"?r.status!=="active":r.status!=="completed";
+      b.disabled=operation==="accept"?!r.canAccept:operation==="claim"?!r.canClaim:false;
+    }
+  }
+  const t=civic.tutorial;
+  $("tutorial-progress").textContent=t.completed?"8 / 8 · Complete":`${t.step+1} / 8${t.dismissed?" · Dismissed":""}`;
+  $("tutorial-title").textContent=t.title;
+  $("tutorial-instruction").textContent=t.dismissed?"The guide is hidden. Resume to continue from this same step.":t.instruction;
+  $("tutorial-ready").textContent=t.completed?"Guide complete. Your city continues to operate normally.":t.progress?"Current objective is satisfied. Check the step to continue.":"Meet the displayed objective before checking this step.";
+  $("tutorial-check").disabled=t.completed||t.dismissed||!t.progress;
+  $("tutorial-dismiss").hidden=t.dismissed||t.completed;
+  $("tutorial-resume").hidden=!t.dismissed;
+  for(const a of civic.achievements) {
+    const card=$(`achievement-${a.id}`);card.classList.toggle("earned",a.earned);
+    card.querySelector(".achievement-state").textContent=!a.eligible?"Ineligible":a.earned?"Earned ✓":"Not earned";
+  }
+  for(let index=0;index<3;index++) {
+    const row=$(`bond-${index}`),bond=city.bonds[index];row.hidden=!bond;if(!bond)continue;
+    row.querySelector("p").textContent=`Bond ${index+1}: ${money(bond.balance)} remaining · ${bond.months} payments left.`;
+    const finance=city.civic.departments.includes("finance"),canPay=city.cash>=bond.balance;
+    const button=row.querySelector("button");button.disabled=!finance||!g.townHallReady||!canPay;
+    button.title=!finance?"Install Finance to redeem an obligation early.":!g.townHallReady?g.townHallReason:!canPay?"Treasury must cover the full remaining balance.":`Pay ${money(bond.balance)} to remove this obligation.`;
+  }
+}
+function updateEnvironmentSelection() {
+  const e=metrics.environment,i=selected.y*city.width+selected.x;
+  if(!e)return;
+  const reactor=city.tiles[i].type==="nuclear";
+  $("reactor-incident").disabled=!reactor;
+  $("reactor-target").textContent=reactor?`Selected nuclear facility: column ${selected.x}, row ${selected.y}. The scenario affects this site.`:"Inspect an actual nuclear facility to enable the scenario. An already ruined site cannot trigger it again.";
+}
+function renderEnvironment() {
+  const e=metrics.environment,directions={N:"Northbound",E:"Eastbound",S:"Southbound",W:"Westbound"};
+  setInput("wind-direction",city.environment.wind);
+  $("environment-wind").textContent=`Air movement: ${directions[city.environment.wind]} (${city.environment.wind}). Changes apply to the next monthly advection step.`;
+  ledger($("environment-report"),[["Forecast air emissions",`${whole(e.emissions.air)} game units`],["Forecast ground emissions",`${whole(e.emissions.ground)} game units`],["Resident air exposure",`${whole(e.residentAirExposure)}/100`],["Resident radiation exposure",`${whole(e.residentRadiationExposure)}/100`],["Environmental health penalty",`${whole(e.healthPenalty)} indicator points`]]);
+  const restricted=e.restricted.filter(Boolean).length;
+  $("radiation-status").textContent=`${whole(restricted)} restricted tile${restricted===1?"":"s"}. Radiation can restrict new non-recovery construction; connected cleanup works gradually.`;
+  $("radiation-status").classList.toggle("needs-attention",restricted>0);
+  ledger($("water-quality-report"),[["Pump-weighted raw contamination",`${whole(e.pumpWeightedRawContamination)}/100`],["Delivered water contamination",`${whole(e.deliveredWaterContamination)}/100`],["Actual delivered water",`${whole(e.deliveredWater)} units/month`],["Staffed filtration capacity",`${whole(e.waterFilterCapacity)} units/month`],["Water actually filtered",`${whole(e.filteredWater)} units/month`]]);
+  updateEnvironmentSelection();
 }
 function renderManagement() {
   const booked = city.history.at(-1),
@@ -382,6 +544,8 @@ function renderManagement() {
       : ["No city events yet."],
   );
   setInput("city-name", city.name);
+  renderProgression();
+  renderEnvironment();
 }
 function update() {
   $("city-name-display").textContent = city.name;
@@ -484,8 +648,12 @@ function wrapCity(solo) {
   const r = createRegion({ seed: solo.seed });
   r.month = solo.month;
   r.cities[0].state = solo;
-  for (let i = 1; i < r.cities.length; i++)
-    r.cities[i].state.month = solo.month;
+  for (let i = 1; i < r.cities.length; i++) {
+    const companion = r.cities[i].state;
+    companion.month = solo.month;
+    companion.civic = createCivic({ month: solo.month, sandbox: companion.sandbox });
+    companion.environment.lastMonth = solo.month - 1;
+  }
   r.events.push(
     `Single-city import: two fresh towns initialized at calendar month ${solo.month}; their prior months were not simulated.`,
   );
@@ -1036,6 +1204,7 @@ function frame(time) {
 try {
   view = createView(canvas);
   initializeControls();
+  initializeProgression();
   initializeRegion();
   initializeMapInput();
   try {

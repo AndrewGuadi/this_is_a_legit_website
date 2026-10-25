@@ -1,0 +1,495 @@
+Actual RED/corrective executions, excerpts only; trailing whitespace normalized. Full logs remain under dev_docs/evidence/CMD-02. No missing-module/setup/syntax run is counted as behavioral RED.
+
+
+SOURCE: dev_docs/evidence/CMD-02/civic/red.txt
+✔ fresh state is deterministic, bounded and migration starts at the supplied month (1.578572ms)
+✖ government observes actual peak population and never loses a tier after decline (1.625572ms)
+✖ town hall opening requires a gateway and real supply without a self-readiness loop (0.446507ms)
+✖ installing a department needs an open supplied connected hall, costs once and enforces slots (4.455896ms)
+✔ extra halls do not multiply slots and inactive hall variants cannot host departments (9.527627ms)
+✔ department money bounds and catalog lookups reject before mutation (9.232011ms)
+✖ advanced construction uses the specified departments and sandbox bypasses building restrictions (0.450472ms)
+✖ migration never disables existing advanced facilities or unlocks unlimited new ones by their presence (1.315505ms)
+✖ accept, reject and cancel are finite real request transitions (1.057146ms)
+✖ completed requests pay only on explicit claim and only once (0.387661ms)
+✖ cash overflow rejects a claim while preserving its eligibility for later claim (0.255085ms)
+✖ consecutive booked operating months drive requests; report and repeated tick cannot create progress (0.308975ms)
+✖ requests can complete at their deadline and otherwise expire with no reward (0.27879ms)
+✔ invalid or inherited request IDs and operations preserve all city fields (8.80178ms)
+✖ tutorial checks actual prerequisites, advances once per observation and can be dismissed or replayed explicitly (0.404896ms)
+✖ normal achievements grant no cash and sandbox ineligibility is permanent (3.756006ms)
+✖ validator rejects malformed state, inconsistent tiers, timestamps, eligibility and unbounded collections (0.307413ms)
+✖ skipped months, unsupported dates and invalid metric observations cannot invent historical progress (0.239622ms)
+[... excerpt omitted ...]
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+
+SOURCE: dev_docs/evidence/CMD-02/civic/finance-red.txt
+✔ fresh state is deterministic, bounded and migration starts at the supplied month (1.855157ms)
+✔ government observes actual peak population and never loses a tier after decline (1.882889ms)
+✔ town hall opening requires a gateway and real supply without a self-readiness loop (1.370888ms)
+✔ installing a department needs an open supplied connected hall, costs once and enforces slots (30.283376ms)
+✔ extra halls do not multiply slots and inactive hall variants cannot host departments (9.082456ms)
+✔ department money bounds and catalog lookups reject before mutation (12.577126ms)
+✔ advanced construction uses the specified departments and sandbox bypasses building restrictions (0.739844ms)
+✔ migration never disables existing advanced facilities or unlocks unlimited new ones by their presence (2.281122ms)
+✔ accept, reject and cancel are finite real request transitions (3.790954ms)
+✔ completed requests pay only on explicit claim and only once (1.81569ms)
+✔ cash overflow rejects a claim while preserving its eligibility for later claim (2.239501ms)
+✔ consecutive booked operating months drive requests; report and repeated tick cannot create progress (2.158492ms)
+✔ requests can complete at their deadline and otherwise expire with no reward (3.691037ms)
+✔ invalid or inherited request IDs and operations preserve all city fields (9.375945ms)
+✔ tutorial checks actual prerequisites, advances once per observation and can be dismissed or replayed explicitly (1.671779ms)
+✔ normal achievements grant no cash and sandbox ineligibility is permanent (0.744982ms)
+✔ validator rejects malformed state, inconsistent tiers, timestamps, eligibility and unbounded collections (0.861031ms)
+✔ skipped months, unsupported dates and invalid metric observations cannot invent historical progress (3.867285ms)
+[... excerpt omitted ...]
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+
+SOURCE: dev_docs/evidence/CMD-02/civic/strict-id-red.txt
+✔ fresh state is deterministic, bounded and migration starts at the supplied month (1.733428ms)
+✔ government observes actual peak population and never loses a tier after decline (1.890519ms)
+✔ town hall opening requires a gateway and real supply without a self-readiness loop (1.330876ms)
+✔ installing a department needs an open supplied connected hall, costs once and enforces slots (19.272468ms)
+✔ extra halls do not multiply slots and inactive hall variants cannot host departments (7.767287ms)
+✔ department money bounds and catalog lookups reject before mutation (8.051444ms)
+✔ advanced construction uses the specified departments and sandbox bypasses building restrictions (0.617848ms)
+✔ migration never disables existing advanced facilities or unlocks unlimited new ones by their presence (1.318098ms)
+✔ accept, reject and cancel are finite real request transitions (4.237108ms)
+✔ completed requests pay only on explicit claim and only once (1.581514ms)
+✔ cash overflow rejects a claim while preserving its eligibility for later claim (1.46958ms)
+✔ consecutive booked operating months drive requests; report and repeated tick cannot create progress (1.974653ms)
+✔ requests can complete at their deadline and otherwise expire with no reward (3.310276ms)
+✔ invalid or inherited request IDs and operations preserve all city fields (9.052897ms)
+✔ tutorial checks actual prerequisites, advances once per observation and can be dismissed or replayed explicitly (1.879383ms)
+✔ normal achievements grant no cash and sandbox ineligibility is permanent (0.609426ms)
+✔ validator rejects malformed state, inconsistent tiers, timestamps, eligibility and unbounded collections (0.723904ms)
+✔ skipped months, unsupported dates and invalid metric observations cannot invent historical progress (2.846794ms)
+[... excerpt omitted ...]
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+
+SOURCE: dev_docs/evidence/CMD-02/environment/red.txt
+✖ new environment uses independent bounded arrays and strict dimensions (1.947877ms)
+✖ validator rejects malformed arrays, values, keys, wind and future months without mutation (0.601596ms)
+✖ reports are pure and sources require real operation and filled jobs (4.917947ms)
+✖ thermal pollution follows actual shared fuel rather than plant count alone (1.462393ms)
+✖ wind performs directional advection with explicit bounded air accounting (0.480467ms)
+✖ same-month calls cannot duplicate emissions, decay or cleanup (1.649718ms)
+✖ ground contamination persists after emitter removal and later decays slowly (0.506885ms)
+✖ water quality is weighted by operating pump throughput and actual delivery (0.492545ms)
+✖ filter throughput cleans only the share it can actually process (0.25156ms)
+✖ nuclear incident requires a real plant, persists and disables its source (0.333061ms)
+✖ radiation exposure and contaminated water have tangible bounded health penalties (1.224762ms)
+✖ cleanup is local, staffed, supplied, finite and cannot repeat in the same month (0.8152ms)
+✖ unpowered, unstaffed or closed cleanup facility cannot perform remediation (0.348002ms)
+✖ invalid environment actions preserve all fields including RNG-like and treasury data (2.549061ms)
+✖ continued emissions and repeated incidents remain integer-bounded over long play (2.05903ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 0
+[... excerpt omitted ...]
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+
+SOURCE: dev_docs/evidence/CMD-02/environment/shared-stock-red.txt
+✔ new environment uses independent bounded arrays and strict dimensions (1.558096ms)
+✔ validator rejects malformed arrays, values, keys, wind and future months without mutation (2.224173ms)
+✔ reports are pure and sources require real operation and filled jobs (2.238684ms)
+✔ thermal pollution follows actual shared fuel rather than plant count alone (1.381436ms)
+✔ wind performs directional advection with explicit bounded air accounting (0.877267ms)
+✔ same-month calls cannot duplicate emissions, decay or cleanup (0.971775ms)
+✔ ground contamination persists after emitter removal and later decays slowly (1.122687ms)
+✔ water quality is weighted by operating pump throughput and actual delivery (1.903963ms)
+✔ filter throughput cleans only the share it can actually process (0.612828ms)
+✔ nuclear incident requires a real plant, persists and disables its source (2.14066ms)
+✔ radiation exposure and contaminated water have tangible bounded health penalties (0.385666ms)
+✔ cleanup is local, staffed, supplied, finite and cannot repeat in the same month (0.786594ms)
+✔ unpowered, unstaffed or closed cleanup facility cannot perform remediation (0.530318ms)
+✔ invalid environment actions preserve all fields including RNG-like and treasury data (1.333416ms)
+✔ continued emissions and repeated incidents remain integer-bounded over long play (23.373503ms)
+✖ emission forecast reserves shared factory inputs once without changing inventories (1.309511ms)
+✖ emission forecast shares finite inventory headroom across mines (0.622463ms)
+✖ emission forecast reserves industrial goods headroom across all producing lots (0.434166ms)
+[... excerpt omitted ...]
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 85,
+    expected: 100,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+
+SOURCE: dev_docs/evidence/CMD-02/integration/red.log
+✖ schema2 cities have persistent environment, civic state and a connected prebuilt starter hall (5.259816ms)
+✖ persistent environment is advanced before growth and reports never advance fields or civic progress (41.988523ms)
+✖ environmental actions route through core and invalid actions preserve cash RNG and fields (2.253421ms)
+✖ radiation persists through demolition and prevents new buildings and occupancy growth (1.887966ms)
+✖ radiation disables existing facilities but leaves recovery roads and cleanup operational (4.276054ms)
+✖ filter and cleanup provide actual eight-slot jobs, require workers and charge their stated upkeep (1.690607ms)
+✖ nuclear supply scales modules and shares finite ore globally without exposing fuel in utility display (2.411503ms)
+✖ nuclear fuel is reserved before a lower-index factory can consume the same ore (8.139575ms)
+✖ persistent contaminated delivery harms health and a staffed filter reduces it without creating water (0.509837ms)
+✖ town hall site and supply rules reject atomically and civic actions receive authoritative metrics (1.517042ms)
+✖ new advanced permits never deactivate actual migrated advanced buildings (0.541103ms)
+✖ request completion occurs after ledger and explicit claims pay exactly once without rewriting history (0.396321ms)
+✖ bond redemption pays actual outstanding obligation once and respects funds and index boundaries (0.46436ms)
+✖ schema2 round trip preserves environment, civic progress and exact deterministic future (32.81908ms)
+✖ strict legacy migration preserves inventories cash RNG all tiles history and does not fabricate past progress (20.961638ms)
+✖ schema validation rejects partial migration tampering future processed months and malformed nested fields (17.66529ms)
+✖ legacy region wrapper remains version1 while all three cities migrate independently and conserve regional stock (69.551063ms)
+ℹ tests 17
+[... excerpt omitted ...]
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 1,
+    expected: 2,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+
+SOURCE: dev_docs/evidence/CMD-02/integration/population-red.log
+✖ imports cannot exceed the aggregate supported population even when every tower fits its own capacity (11.703083ms)
+✔ a near-limit accepted population remains supported after a simulated month (41.06325ms)
+ℹ tests 2
+ℹ suites 0
+ℹ pass 1
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 136.330066
+
+✖ failing tests:
+
+test at tests/city/progression.test.mjs:418:1
+✖ imports cannot exceed the aggregate supported population even when every tower fits its own capacity (11.703083ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///workspace/scratch/bf6bfb751ccd/cmduniverse/tests/city/progression.test.mjs:423:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+[... excerpt omitted ...]
+      at TestContext.<anonymous> (file:///workspace/scratch/bf6bfb751ccd/cmduniverse/tests/city/progression.test.mjs:423:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+
+SOURCE: dev_docs/evidence/CMD-02/integration/forecast-red.log
+✖ within-month environmental forecasts cannot reserve already deducted nuclear fuel twice (17.109264ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 106.093964
+
+✖ failing tests:
+
+test at tests/city/progression.test.mjs:34:1
+✖ within-month environmental forecasts cannot reserve already deducted nuclear fuel twice (17.109264ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  undefined !== 16
+
+[... excerpt omitted ...]
+      at TestContext.<anonymous> (file:///workspace/scratch/bf6bfb751ccd/cmduniverse/tests/city/progression.test.mjs:34:494)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: 16,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+
+SOURCE: dev_docs/evidence/CMD-02/integration/identifiers-red.log
+✖ core lookup identifiers require strings and reject array or object coercion without mutation (6.317492ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 93.787767
+
+✖ failing tests:
+
+test at tests/city/progression.test.mjs:32:1
+✖ core lookup identifiers require strings and reject array or object coercion without mutation (6.317492ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  true !== false
+
+[... excerpt omitted ...]
+      at TestContext.<anonymous> (file:///workspace/scratch/bf6bfb751ccd/cmduniverse/tests/city/progression.test.mjs:32:411)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+
+SOURCE: dev_docs/evidence/CMD-02/ui/red.log
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> legit-research-browser-verification@1.0.0 test:browser
+> playwright test tests/browser/cmd-city-progression.spec.js --project=chromium-1440
+
+[WebServer] WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+[WebServer]  * Running on http://127.0.0.1:5081
+[WebServer] Press CTRL+C to quit
+[WebServer] 127.0.0.1 - - [25/Oct/2026 13:49:32] "GET / HTTP/1.1" 200 -
+
+Running 3 tests using 1 worker
+
+(node:33) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 127.0.0.1 - - [25/Oct/2026 13:49:33] "GET /games/cmd-city HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 13:49:33] "GET /static/cmd-city/game.css HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 13:49:33] "GET /static/cmd-city/game.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 13:49:33] "GET /static/cmd-city/core.mjs HTTP/1.1" 200 -
+[... excerpt omitted ...]
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/cmd-city-progression-envir-f0f37--confirmed-reactor-scenario-chromium-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/cmd-city-progression-envir-f0f37--confirmed-reactor-scenario-chromium-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3 failed
+    [chromium-1440] › tests/browser/cmd-city-progression.spec.js:29:1 › government permits govern construction and tutorial controls preserve finances
+    [chromium-1440] › tests/browser/cmd-city-progression.spec.js:60:1 › a request completes from booked months and its one-time claim survives export/import and local save
+    [chromium-1440] › tests/browser/cmd-city-progression.spec.js:91:1 › environment controls expose actual persistent contamination, wind and a confirmed reactor scenario
+
+
+SOURCE: dev_docs/evidence/CMD-02/ui/environment-red.log
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> legit-research-browser-verification@1.0.0 test:browser
+> playwright test tests/browser/cmd-city-progression.spec.js --project=chromium-1440 -g environment controls
+
+[WebServer] WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+[WebServer]  * Running on http://127.0.0.1:5081
+[WebServer] Press CTRL+C to quit
+[WebServer] 127.0.0.1 - - [25/Oct/2026 13:51:09] "GET / HTTP/1.1" 200 -
+
+Running 1 test using 1 worker
+
+(node:33) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 127.0.0.1 - - [25/Oct/2026 13:51:10] "GET /games/cmd-city HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 13:51:10] "GET /static/cmd-city/game.css HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 13:51:10] "GET /static/cmd-city/game.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 13:51:10] "GET /static/cmd-city/core.mjs HTTP/1.1" 200 -
+[... excerpt omitted ...]
+    Error Context: test-results/cmd-city-progression-envir-f0f37--confirmed-reactor-scenario-chromium-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/cmd-city-progression-envir-f0f37--confirmed-reactor-scenario-chromium-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/cmd-city-progression-envir-f0f37--confirmed-reactor-scenario-chromium-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium-1440] › tests/browser/cmd-city-progression.spec.js:91:1 › environment controls expose actual persistent contamination, wind and a confirmed reactor scenario
+
+
+SOURCE: dev_docs/evidence/CMD-02/manager/browser-before-a11y.txt
+  1) [chromium-360] › tests/browser/cmd-city.spec.js:101:1 › responsive controls, overlays, reduced motion and accessible page
+
+    Error: expect(received).toEqual(expected) // deep equality
+
+    - Expected  -  1
+    + Received  + 47
+
+    - Array []
+    + Array [
+    +   Object {
+    +     "description": "Ensure ARIA attributes are not prohibited for an element's role",
+    +     "help": "Elements must only use permitted ARIA attributes",
+    +     "helpUrl": "https://dequeuniversity.com/rules/axe/4.14/aria-prohibited-attr?application=playwright",
+    +     "id": "aria-prohibited-attr",
+    +     "impact": "serious",
+    +     "nodes": Array [
+    +       Object {
+    +         "all": Array [],
+    +         "any": Array [],
+    +         "failureSummary": "Fix all of the following:
+    +   aria-label attribute cannot be used on \"div\" elements with no valid role attribute.",
+    +         "html": "<div id=\"bond-obligations\" class=\"bond-obligations\" aria-label=\"Existing bond obligations\">",
+    +         "impact": "serious",
+    +         "none": Array [
+    +           Object {
+    +             "data": Object {
+    +               "messageKey": "noRoleSingular",
+    +               "nodeName": "div",
+    +               "prohibited": Array [
+    +                 "aria-label",
+    +               ],
+    +               "role": null,
+    +             },
+    +             "id": "aria-prohibited-attr",
+    +             "impact": "serious",
+    +             "message": "aria-label attribute cannot be used on \"div\" elements with no valid role attribute.",
+    +             "relatedNodes": Array [],
+    +           },
+    +         ],
+    +         "target": Array [
+    +           "#bond-obligations",
+    +         ],
+    +       },
+    +     ],
+    +     "tags": Array [
+    +       "cat.aria",
+    +       "wcag2a",
+    +       "wcag412",
+    +       "EN-301-549",
+    +       "EN-9.4.1.2",
+    +       "RGAAv4",
+    +       "RGAA-7.1.1",
+    +     ],
+    +   },
+    + ]
+
+      121 |   ).toBeGreaterThan(260);
+      122 |   const a11y = await new AxeBuilder({ page }).analyze();
+    > 123 |   expect(a11y.violations).toEqual([]);
+          |                           ^
+      124 |   expect(external).toEqual([]);
+      125 |   await page.screenshot({
+      126 |     path: testInfo.outputPath("city-layout.png"),
+        at /workspace/scratch/bf6bfb751ccd/cmduniverse/tests/browser/cmd-city.spec.js:123:27
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cmd-city-responsive-contro-383b2--motion-and-accessible-page-chromium-360/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/cmd-city-responsive-contro-383b2--motion-and-accessible-page-chromium-360/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/cmd-city-responsive-contro-383b2--motion-and-accessible-page-chromium-360/trace.zip
+    Usage:
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  4 failed
+    [chromium-360] › tests/browser/cmd-city.spec.js:101:1 › responsive controls, overlays, reduced motion and accessible page
+    [chromium-390] › tests/browser/cmd-city.spec.js:101:1 › responsive controls, overlays, reduced motion and accessible page
+    [chromium-768] › tests/browser/cmd-city.spec.js:101:1 › responsive controls, overlays, reduced motion and accessible page
+    [chromium-1440] › tests/browser/cmd-city.spec.js:101:1 › responsive controls, overlays, reduced motion and accessible page
+  156 passed (2.9m)
+
+
+SOURCE: dev_docs/evidence/CMD-02/manager/a11y-green.txt
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+[WebServer] WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+[WebServer]  * Running on http://127.0.0.1:5081
+[WebServer] Press CTRL+C to quit
+[WebServer] 127.0.0.1 - - [25/Oct/2026 14:04:10] "GET / HTTP/1.1" 200 -
+
+Running 4 tests using 1 worker
+
+(node:34) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 127.0.0.1 - - [25/Oct/2026 14:04:11] "GET /games/cmd-city HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 14:04:11] "GET /static/cmd-city/game.css HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 14:04:11] "GET /static/cmd-city/game.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 14:04:11] "GET /static/cmd-city/content.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 14:04:11] "GET /static/cmd-city/clock.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 14:04:11] "GET /static/cmd-city/core.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 14:04:11] "GET /static/cmd-city/view.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 14:04:11] "GET /static/cmd-city/save.mjs HTTP/1.1" 200 -
+[... excerpt omitted ...]
+[WebServer] 127.0.0.1 - - [25/Oct/2026 14:04:17] "GET /static/cmd-city/view.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 14:04:17] "GET /static/cmd-city/content.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 14:04:17] "GET /static/cmd-city/clock.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 14:04:17] "GET /static/cmd-city/save.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 14:04:17] "GET /static/cmd-city/region.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 14:04:17] "GET /static/cmd-city/core.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 14:04:17] "GET /static/cmd-city/civic.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 14:04:17] "GET /static/cmd-city/environment.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 14:04:18] "GET /static/cmd-city/transit.mjs HTTP/1.1" 200 -
+  ✓  4 [chromium-1440] › tests/browser/cmd-city.spec.js:101:1 › responsive controls, overlays, reduced motion and accessible page (1.5s)
+
+  4 passed (9.0s)

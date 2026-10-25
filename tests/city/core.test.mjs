@@ -195,8 +195,12 @@ test("pollution is local and parks do not erase industrial emissions", () => {
   utilities(s);
   build(s, "industrial", 10, 15);
   s.tiles[idx(s, 10, 15)].occupancy = 10;
+  // Persistent emissions require actual staffed production and a booked month.
+  build(s, "residential", 9, 15);
+  s.tiles[idx(s, 9, 15)].occupancy = 24;
+  advanceMonth(s);
   const a = measure(s);
-  assert.ok(a.pollution[idx(s, 10, 14)] > a.pollution[idx(s, 35, 5)]);
+  assert.ok(a.pollution[idx(s, 10, 15)] > a.pollution[idx(s, 35, 5)]);
   build(s, "park", 11, 15);
   const b = measure(s);
   assert.equal(a.pollution[idx(s, 10, 14)], b.pollution[idx(s, 10, 14)]);
@@ -259,6 +263,10 @@ test("upgrades charge and expand capacity without inventing occupants", () => {
 });
 test("research spends points, enforces prerequisites and unlocks actual options", () => {
   const s = flat();
+  // This research behavior fixture uses explicit sandbox construction; normal
+  // Education department permission is covered by progression.test.mjs.
+  s.sandbox = true;
+  s.civic.eligible = false;
   s.research.points = 1000;
   assert.equal(
     applyAction(s, { type: "research", topic: "vertical" }).ok,

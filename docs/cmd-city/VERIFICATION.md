@@ -1,5 +1,7 @@
 # CMD City candidate verification
 
+Historical CMD-01 record, retained with its original results. The owner has since confirmed the reference edition; see [CMD-02 verification](VERIFICATION_02.md) for the continued implementation. The numbers below do not certify subsequently changed source.
+
 This is a playable development candidate, **not a feature-equivalent SimCity release**. No production deployment or main-branch merge is established by this record. The working comparison is SimCity (2013) plus Cities of Tomorrow; the edition assumption and detailed reference-game observations remain open.
 
 ## Actual implementation

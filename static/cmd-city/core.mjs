@@ -1,3 +1,16 @@
+import {
+  createEnvironment,
+  advanceEnvironment,
+  environmentReport,
+  environmentAction,
+} from "./environment.mjs";
+import {
+  createCivic,
+  civicReport,
+  civicAction,
+  advanceCivic,
+  buildPermission,
+} from "./civic.mjs";
 import { planTransit, routeTransit } from "./transit.mjs";
 import {
   TOOLS,
@@ -30,6 +43,7 @@ const ADJACENT = Array.from({ length: N }, (_, i) =>
 const neighbors = (i) => ADJACENT[i];
 // Derived caches are external to saved city state and bounded by its road graph.
 const graphCache = new WeakMap();
+const employmentCache = new WeakMap();
 const at = (x, y) =>
   Number.isInteger(x) &&
   Number.isInteger(y) &&
@@ -51,6 +65,19 @@ const log = (s, m) => {
   s.events.push(m);
   if (s.events.length > 24) s.events.shift();
 };
+const RECOVERY = new Set(["road", "avenue", "bridge", "rail", "cleanup"]);
+const PERMITS = new Set([
+  "townHall",
+  "university",
+  "academy",
+  "hospital",
+  "waterFilter",
+  "airport",
+  "casino",
+  "nuclear",
+]);
+const civicMetrics = (m) => ({ ...m, access: m.operationAccess });
+const restricted = (s, i) => (s.environment?.radiation[i] || 0) >= 200;
 const active = (t) => t.enabled !== false && t.fire === 0;
 function roadGraph(s) {
   const signature = s.tiles
@@ -124,13 +151,13 @@ function facilityScale(s, t) {
 function facilityDemand(t) {
   if (!buildings(t) || !active(t) || housing(t) || ZONES.includes(t.type))
     return { power: 0, water: 0 };
-  if (["wind", "coalPlant", "park"].includes(t.type))
+  if (["wind", "coalPlant", "nuclear", "park"].includes(t.type))
     return { power: 0, water: 0 };
   if (["water", "sewage", "landfill", "recycling"].includes(t.type))
     return { power: 20, water: 0 };
   return { power: 10, water: 5 };
 }
-function utilities(s, access) {
+function utilities(s, access, reservedFuel = null) {
   const u = Object.fromEntries(
     ["power", "water", "sewage", "waste"].map((k) => [
       k,
@@ -140,7 +167,9 @@ function utilities(s, access) {
   u.power.supply = s.regionalPower;
   let coalNeeded = 0,
     baseCoalSupply = 0,
-    rawWater = 0;
+    rawWater = 0,
+    nuclearNeeded = 0,
+    nuclearSupply = 0;
   for (let i = 0; i < N; i++) {
     const t = s.tiles[i],
       d = TOOLS[t.type];
@@ -157,13 +186,26 @@ function utilities(s, access) {
     if (t.type === "coalPlant") {
       coalNeeded += 20;
       baseCoalSupply += supply;
+    } else if (t.type === "nuclear") {
+      nuclearNeeded += 2;
+      nuclearSupply += supply;
     } else if (t.type === "wind")
       u.power.supply += Math.floor(
         supply * (s.research.completed.includes("cleanEnergy") ? 1.25 : 1),
       );
     else if (t.type === "water") rawWater += supply;
   }
-  const fuelUsed = Math.min(coalNeeded, s.inventory.coal),
+  const nuclearFuelUsed = Math.min(
+    nuclearNeeded,
+    reservedFuel?.nuclearFuelUsed ?? s.inventory.ore,
+  );
+  u.power.supply += nuclearNeeded
+    ? Math.floor((nuclearSupply * nuclearFuelUsed) / nuclearNeeded)
+    : 0;
+  const fuelUsed = Math.min(
+      coalNeeded,
+      reservedFuel?.fuelUsed ?? s.inventory.coal,
+    ),
     fuelRatio = coalNeeded ? fuelUsed / coalNeeded : 0;
   u.power.supply += Math.floor(baseCoalSupply * fuelRatio);
   u.power.ratio = u.power.demand
@@ -191,7 +233,7 @@ function utilities(s, access) {
   u.waste.demand += s.backlogs.waste;
   for (const k of ["sewage", "waste"])
     u[k].ratio = u[k].demand ? Math.min(1, u[k].supply / u[k].demand) : 1;
-  return { ...u, fuelUsed };
+  return { ...u, fuelUsed, nuclearFuelUsed };
 }
 function routeEmployment(s, graph, u, coverage) {
   const roadLoad = Array(N).fill(0),
@@ -211,14 +253,21 @@ function routeEmployment(s, graph, u, coverage) {
     if (
       (t.type === "commercial" ||
         t.type === "industrial" ||
-        ["factory", "mine", "oilWell", "academy"].includes(t.type)) &&
+        [
+          "factory",
+          "mine",
+          "oilWell",
+          "academy",
+          "waterFilter",
+          "cleanup",
+        ].includes(t.type)) &&
       graph.access[i] &&
       active(t)
     ) {
       const base =
         t.type === "factory" || t.type === "academy"
           ? 12
-          : t.type === "mine" || t.type === "oilWell"
+          : ["mine", "oilWell", "waterFilter", "cleanup"].includes(t.type)
             ? 8
             : t.occupancy;
       const slots = Math.floor(base * Math.min(u.power.ratio, u.water.ratio));
@@ -355,9 +404,44 @@ function routeEmployment(s, graph, u, coverage) {
     busLoad: transit.busLoad,
   };
 }
-export function measure(s) {
-  const graph = roadGraph(s),
-    { fuelUsed, ...u } = utilities(s, graph.access),
+// Routing is unchanged by finance, environmental exposure or rendered reports.
+// Retain only one exact routing-input snapshot per live city; all returned arrays
+// are caller-owned copies so a consumer cannot corrupt this derived cache.
+function cachedEmployment(s, graph, u, coverage) {
+  const signature = [
+    u.power.ratio,
+    u.water.ratio,
+    s.research.completed.includes("transit"),
+    ...s.tiles.map(
+      (t, i) =>
+        `${t.type}:${t.occupancy}:${t.modules}:${t.enabled}:${t.fire}:${graph.access[i] ? 1 : 0}`,
+    ),
+  ].join("|");
+  let cached = employmentCache.get(s);
+  if (!cached || cached.signature !== signature) {
+    cached = { signature, result: routeEmployment(s, graph, u, coverage) };
+    employmentCache.set(s, cached);
+  }
+  const m = cached.result;
+  return {
+    ...m,
+    jobFill: m.jobFill.slice(),
+    roadLoad: m.roadLoad.slice(),
+    railLoad: m.railLoad.slice(),
+    busLoad: m.busLoad.slice(),
+  };
+}
+export function measure(s, options = {}) {
+  const road = roadGraph(s),
+    access = road.access.map(
+      (v, i) => v && (!restricted(s, i) || RECOVERY.has(s.tiles[i].type)),
+    ),
+    graph = { ...road, access },
+    { fuelUsed, nuclearFuelUsed, ...u } = utilities(
+      s,
+      access,
+      options.reservedFuel,
+    ),
     extra = s.research.completed.includes("serviceDrones") ? 2 : 0;
   const coverage = {};
   for (const name of ["park", "school", "clinic", "fire", "police", "bus"])
@@ -372,58 +456,33 @@ export function measure(s) {
       ((s.funding[name] ?? 100) / 100) *
         (name === "park" ? 1 : Math.min(u.power.ratio, u.water.ratio)),
     );
-  const pollution = Array(N).fill(0);
-  for (let i = 0; i < N; i++) {
-    const t = s.tiles[i];
-    if (!active(t)) continue;
-    let emission =
-      t.type === "industrial"
-        ? t.occupancy * 0.8
-        : t.type === "coalPlant" && graph.access[i]
-          ? 70 *
-            (fuelUsed /
-              Math.max(
-                20,
-                s.tiles.filter((q) => q.type === "coalPlant" && active(q))
-                  .length * 20,
-              ))
-          : t.type === "landfill"
-            ? 25
-            : t.type === "oilWell"
-              ? 30
-              : 0;
-    if (!emission) continue;
-    for (
-      let y = Math.max(0, Math.floor(i / W) - 6);
-      y <= Math.min(H - 1, Math.floor(i / W) + 6);
-      y++
-    )
-      for (
-        let x = Math.max(0, (i % W) - 6);
-        x <= Math.min(W - 1, (i % W) + 6);
-        x++
-      ) {
-        const dist = Math.abs(x - (i % W)) + Math.abs(y - Math.floor(i / W));
-        if (dist <= 6)
-          pollution[y * W + x] = clamp(
-            pollution[y * W + x] + emission * (1 - dist / 7),
-            0,
-            100,
-          );
-      }
-  }
+  const employment = cachedEmployment(s, graph, u, coverage);
+  // The operational graph shares cached Maps with the physical graph, but its
+  // primitive signature must also be retained or each measure re-sorts all jobs.
+  road.jobSignature = graph.jobSignature;
+  const environment = environmentReport(s, {
+    ...employment,
+    access,
+    utilities: u,
+    fuelUsed,
+    // During the monthly transaction the ore is already reserved and deducted.
+    // The pure source forecast must not reserve that same physical stock twice.
+    nuclearFuelUsed: options.reservedFuel ? 0 : nuclearFuelUsed,
+  });
+  const pollution = environment.air;
   const landValue = pollution.map((p, i) =>
     clamp(
       45 +
         coverage.park[i] * 0.35 +
         coverage.school[i] * 0.1 +
         coverage.clinic[i] * 0.1 -
-        p * 0.65,
+        p * 0.65 -
+        environment.ground[i] * 0.15 -
+        environment.radiation[i],
       0,
       100,
     ),
   );
-  const employment = routeEmployment(s, graph, u, coverage);
   const homes = s.tiles
     .map((t, i) => (housing(t) && t.occupancy ? i : -1))
     .filter((i) => i >= 0);
@@ -433,7 +492,7 @@ export function measure(s) {
     health = clamp(
       55 +
         avg(coverage.clinic) * 0.45 -
-        avg(pollution) * 0.3 -
+        environment.healthPenalty -
         (1 - u.sewage.ratio) * 30 -
         (1 - u.waste.ratio) * 25,
       0,
@@ -570,9 +629,12 @@ export function measure(s) {
     trade: 0,
     net: income - upkeep - debt,
   };
-  return {
+  const result = {
     ...employment,
     fuelUsed,
+    nuclearFuelUsed,
+    environment,
+    roadAccess: road.access,
     education,
     health,
     crime,
@@ -581,7 +643,8 @@ export function measure(s) {
     utilities: u,
     demand,
     monthly,
-    access: graph.access,
+    access: road.access,
+    operationAccess: access,
     roadLoad: employment.roadLoad,
     pollution,
     landValue,
@@ -589,6 +652,8 @@ export function measure(s) {
     warnings,
     counts: cap,
   };
+  result.civic = civicReport(s, civicMetrics(result));
+  return result;
 }
 export function createCity({
   seed = 2013,
@@ -599,7 +664,7 @@ export function createCity({
   if (!Number.isInteger(seed)) seed = 2013;
   seed = seed >>> 0 || 1;
   const s = {
-    version: 1,
+    version: 2,
     width: W,
     height: H,
     seed,
@@ -627,6 +692,8 @@ export function createCity({
     regionalPower: 0,
     backlogs: { sewage: 0, waste: 0 },
     groundwater: 1000000,
+    environment: createEnvironment(W, H),
+    civic: createCivic({ sandbox: !!sandbox, month: 0 }),
     tiles: [],
   };
   for (let y = 0; y < H; y++) {
@@ -679,6 +746,7 @@ export function createCity({
       ["police", 9],
       ["park", 11],
       ["trade", 12],
+      ["townHall", 13],
     ])
       place(type, x, 15);
     for (let x = 5; x <= 15; x++) {
@@ -702,11 +770,24 @@ export function createCity({
 const success = (message) => ({ ok: true, message }),
   fail = (message) => ({ ok: false, message });
 export function applyAction(s, a) {
-  if (!a || typeof a !== "object") return fail("Invalid action.");
+  if (
+    !a ||
+    typeof a !== "object" ||
+    Array.isArray(a) ||
+    !Object.hasOwn(a, "type") ||
+    ![Object.prototype, null].includes(Object.getPrototypeOf(a))
+  )
+    return fail("Invalid action.");
+  if (a.type === "environment") return environmentAction(s, a.action);
+  if (["department", "request", "tutorial", "redeemBond"].includes(a.type))
+    return civicAction(s, a, civicMetrics(measure(s)));
   const i = at(a.x, a.y),
     t = i >= 0 ? s.tiles[i] : null;
   if (a.type === "build") {
-    const d = Object.hasOwn(TOOLS, a.tool) ? TOOLS[a.tool] : null;
+    const d =
+      typeof a.tool === "string" && Object.hasOwn(TOOLS, a.tool)
+        ? TOOLS[a.tool]
+        : null;
     if (!t || !d) return fail("Choose a valid tool and map tile.");
     if (t.type !== "empty")
       return fail("This tile is occupied. Demolish it before rebuilding.");
@@ -725,6 +806,16 @@ export function applyAction(s, a) {
       return fail("A freight terminal needs waterfront land.");
     if (a.tool === "tower" && !s.research.completed.includes("vertical"))
       return fail("Complete Vertical construction research first.");
+    if (restricted(s, i) && !RECOVERY.has(a.tool))
+      return fail(
+        "Radiation restricts new development here. Build recovery access or cleanup first.",
+      );
+    if (a.tool === "townHall" && !roadGraph(s).access[i])
+      return fail("Town Hall needs a site connected to the regional gateway.");
+    if (PERMITS.has(a.tool)) {
+      const permission = buildPermission(s, a.tool, civicMetrics(measure(s)));
+      if (!permission.ok) return permission;
+    }
     if (s.cash < d.cost)
       return fail("Insufficient treasury for this construction.");
     s.cash -= d.cost;
@@ -764,6 +855,8 @@ export function applyAction(s, a) {
   }
   if (a.type === "upgrade") {
     if (!t || !TOOLS[t.type]) return fail("Select a structure to upgrade.");
+    if (restricted(s, i) && !RECOVERY.has(t.type))
+      return fail("Radiation restricts expansion on this tile.");
     if (roads.has(t.type)) {
       if (t.type !== "road")
         return fail("This road is already at its supported class.");
@@ -813,6 +906,7 @@ export function applyAction(s, a) {
   }
   if (a.type === "funding") {
     if (
+      typeof a.service !== "string" ||
       !Object.hasOwn(s.funding, a.service) ||
       !Number.isInteger(a.value) ||
       a.value < 0 ||
@@ -823,7 +917,11 @@ export function applyAction(s, a) {
     return success("Funding updated; coverage and upkeep respond.");
   }
   if (a.type === "policy") {
-    if (!Object.hasOwn(s.policies, a.name) || typeof a.value !== "boolean")
+    if (
+      typeof a.name !== "string" ||
+      !Object.hasOwn(s.policies, a.name) ||
+      typeof a.value !== "boolean"
+    )
       return fail("Invalid policy.");
     s.policies[a.name] = a.value;
     return success("Policy updated.");
@@ -854,12 +952,17 @@ export function applyAction(s, a) {
     return success("Trade order updated; connected depot required to execute.");
   }
   if (a.type === "research") {
-    const topic = Object.hasOwn(RESEARCH, a.topic) ? RESEARCH[a.topic] : null;
+    const topic =
+      typeof a.topic === "string" && Object.hasOwn(RESEARCH, a.topic)
+        ? RESEARCH[a.topic]
+        : null;
     if (!topic || s.research.completed.includes(a.topic))
       return fail("Choose an unfinished research topic.");
     const m = measure(s);
     if (
-      !s.tiles.some((t, i) => t.type === "academy" && m.access[i] && active(t))
+      !s.tiles.some(
+        (t, i) => t.type === "academy" && m.operationAccess[i] && active(t),
+      )
     )
       return fail("Build a connected Civic Research Institute.");
     if (topic.requires.some((x) => !s.research.completed.includes(x)))
@@ -931,7 +1034,17 @@ export function applyAction(s, a) {
   return fail("Unknown action.");
 }
 function simulateMonth(s) {
-  let m = measure(s);
+  const initial = measure(s);
+  advanceEnvironment(s, { ...initial, access: initial.operationAccess });
+  // Reserve actual fuel before any mine, factory, trade or recycling transaction.
+  const reservedFuel = {
+    fuelUsed: initial.fuelUsed,
+    nuclearFuelUsed: initial.nuclearFuelUsed,
+  };
+  s.inventory.coal -= reservedFuel.fuelUsed;
+  s.inventory.ore -= reservedFuel.nuclearFuelUsed;
+  const monthMeasure = () => measure(s, { reservedFuel });
+  let m = monthMeasure();
   let power = Math.max(0, m.utilities.power.supply - m.utilities.power.demand),
     water = Math.max(0, m.utilities.water.supply - m.utilities.water.demand);
   let total = 0;
@@ -952,14 +1065,15 @@ function simulateMonth(s) {
       }
     }
   }
-  if (incidentChanged) m = measure(s);
+  if (incidentChanged) m = monthMeasure();
   let shrunk = false;
   // Shrink first, then reserve the genuinely freed capacity before allocating growth.
   for (let i = 0; i < N; i++) {
     const t = s.tiles[i];
     if (!consumption(t)) continue;
     const shortage =
-      !m.access[i] ||
+      m.environment.restricted[i] ||
+      !m.operationAccess[i] ||
       !active(t) ||
       Math.min(m.utilities.power.ratio, m.utilities.water.ratio) < 0.98 ||
       m.happiness < 20 ||
@@ -975,14 +1089,14 @@ function simulateMonth(s) {
       shrunk = true;
     }
   }
-  if (shrunk) m = measure(s);
+  if (shrunk) m = monthMeasure();
   power = Math.max(0, m.utilities.power.supply - m.utilities.power.demand);
   water = Math.max(0, m.utilities.water.supply - m.utilities.water.demand);
   const proposals = [];
   for (let i = 0; i < N; i++) {
     const t = s.tiles[i],
       key = housing(t) ? "residential" : t.type;
-    if (!ZONES.includes(key) || !m.access[i] || !active(t)) continue;
+    if (!ZONES.includes(key) || !m.operationAccess[i] || !active(t)) continue;
     t.age++;
     const demand = m.demand[key];
     let want =
@@ -1011,11 +1125,19 @@ function simulateMonth(s) {
       assigned++;
     }
   }
-  for (const p of proposals) s.tiles[p.i].occupancy += p.received;
-  if (assigned > 0) m = measure(s);
+  let populationRoom = Math.max(0, 1000000 - m.population);
+  for (const p of proposals) {
+    const tile = s.tiles[p.i];
+    const received = housing(tile)
+      ? Math.min(populationRoom, p.received)
+      : p.received;
+    tile.occupancy += received;
+    if (housing(tile)) populationRoom -= received;
+  }
+  if (assigned > 0) m = monthMeasure();
   for (let i = 0; i < N; i++) {
     const t = s.tiles[i];
-    if (!m.access[i] || !active(t)) continue;
+    if (!m.operationAccess[i] || !active(t)) continue;
     if (t.type === "mine" || t.type === "oilWell") {
       const amount = Math.min(
         t.reserve,
@@ -1080,7 +1202,7 @@ function simulateMonth(s) {
     (n, t, i) =>
       n +
       ((t.type === "trade" || t.type === "port") &&
-      m.access[i] &&
+      m.operationAccess[i] &&
       active(t) &&
       Math.min(m.utilities.power.ratio, m.utilities.water.ratio) >= 0.9
         ? 1 + t.modules * 0.5
@@ -1106,7 +1228,7 @@ function simulateMonth(s) {
         trade -= buy * PRICES[r];
       }
     }
-  s.inventory.coal = Math.max(0, s.inventory.coal - m.fuelUsed);
+
   const pumped = Math.ceil(
     Math.min(m.utilities.water.supply, m.utilities.water.demand),
   );
@@ -1118,7 +1240,7 @@ function simulateMonth(s) {
   let wasteRemaining = m.utilities.waste.demand;
   for (let i = 0; i < N; i++) {
     const t = s.tiles[i];
-    if (!m.access[i] || !active(t)) continue;
+    if (!m.operationAccess[i] || !active(t)) continue;
     const supply = Math.floor(
       (TOOLS[t.type]?.supply || 0) *
         (1 + t.modules * 0.5) *
@@ -1145,6 +1267,10 @@ function simulateMonth(s) {
   finance.trade = trade;
   finance.net = finance.income - finance.upkeep - finance.debt + trade;
   s.cash += finance.net;
+  if (!Number.isSafeInteger(s.cash) || Math.abs(s.cash) > 1e12)
+    throw Error(
+      "Treasury limit reached. The city was preserved; export it or adjust its budget.",
+    );
   for (const b of s.bonds) {
     const n = Math.min(b.balance, b.payment);
     b.balance -= n;
@@ -1162,6 +1288,8 @@ function simulateMonth(s) {
   if (s.history.length > 24) s.history.shift();
   if (s.policies.disasters && random(s) < 0.02)
     applyAction(s, { type: "disaster", kind: "fire" });
+  const finalMetrics = monthMeasure();
+  advanceCivic(s, civicMetrics(finalMetrics));
   return measure(s);
 }
 export function inspectTile(s, x, y, m = measure(s)) {
@@ -1176,8 +1304,8 @@ export function inspectTile(s, x, y, m = measure(s)) {
     };
   const t = s.tiles[i],
     d = TOOLS[t.type],
-    connected = m.access[i],
-    blockers = [],
+    connected = (m.roadAccess || m.access)[i],
+    blockers = [...(m.environment?.blockers[i] || [])],
     lines = [`Column ${x}, row ${y} · ${t.terrain}`];
   if (t.resource)
     lines.push(`${t.resource}: ${t.reserve.toLocaleString()} units remaining.`);
@@ -1220,12 +1348,23 @@ export function inspectTile(s, x, y, m = measure(s)) {
     );
   if (t.type === "landfill")
     lines.push(`Stored waste: ${t.stored}/30,000 units.`);
+  lines.push(
+    `Air ${m.environment.air[i].toFixed(1)}/100 · Ground ${m.environment.ground[i].toFixed(1)}/100 · Radiation ${m.environment.radiation[i].toFixed(1)}/100`,
+  );
+  if (t.type === "water")
+    lines.push(
+      `Pump contamination ${m.environment.pumpContamination[i].toFixed(1)}/100 · Delivered water contamination ${m.environment.deliveredWaterContamination.toFixed(1)}/100`,
+    );
   const demand = facilityDemand(t),
     threshold = ["factory", "trade", "port", "academy"].includes(t.type)
       ? 0.9
       : 1e-9;
   let operating =
-    connected && active(t) && t.type !== "empty" && t.type !== "ruins";
+    connected &&
+    m.operationAccess[i] &&
+    active(t) &&
+    t.type !== "empty" &&
+    t.type !== "ruins";
   if (demand.power && m.utilities.power.ratio < threshold) {
     operating = false;
     blockers.push("Insufficient supplied power for this facility.");
@@ -1235,7 +1374,14 @@ export function inspectTile(s, x, y, m = measure(s)) {
     blockers.push("Insufficient supplied water for this facility.");
   }
   if (
-    ["mine", "oilWell", "factory", "academy"].includes(t.type) &&
+    [
+      "mine",
+      "oilWell",
+      "factory",
+      "academy",
+      "waterFilter",
+      "cleanup",
+    ].includes(t.type) &&
     !m.jobFill[i]
   ) {
     operating = false;
@@ -1248,6 +1394,12 @@ export function inspectTile(s, x, y, m = measure(s)) {
   if (t.type === "coalPlant" && !s.inventory.coal) {
     operating = false;
     blockers.push("No coal remains for generation.");
+  }
+  if (t.type === "nuclear" && !s.inventory.ore) {
+    operating = false;
+    blockers.push(
+      "No finite ore remains for nuclear generation (2 units per plant per month).",
+    );
   }
   if (t.type === "water" && !s.groundwater) {
     operating = false;
