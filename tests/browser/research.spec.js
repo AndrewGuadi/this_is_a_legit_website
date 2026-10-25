@@ -31,7 +31,7 @@ async function fillForm(page) {
   await page.getByRole('checkbox', { name: /I have read and accept/ }).check();
 }
 
-for (const path of ['/', '/forms', '/games/neon-breaker', '/terms', '/apply/directory', '/apply/partner', '/apply/contact', '/admin/login']) {
+for (const path of ['/', '/forms', '/games/neon-breaker', '/games/infinite-tic-tac-toe', '/terms', '/apply/directory', '/apply/partner', '/apply/contact', '/admin/login']) {
   test(`public page ${path}: semantics, accessibility, layout`, async ({ page }, testInfo) => {
     const errors = [];
     page.on('pageerror', error => errors.push(error.message));
@@ -210,7 +210,7 @@ test('keyboard-only investigator login filter deletion and logout', async ({ pag
 // The arcade shell keeps game status and the secondary research area distinct.
 test('arcade catalog filters and secondary forms remain usable', async ({ page }, testInfo) => {
   await page.goto('/');
-  await expect(page.locator('[data-genre]')).toHaveCount(9);
+  await expect(page.locator('[data-genre]')).toHaveCount(10);
   const filter = page.locator('[data-filter]').nth(1);
   const genre = await filter.getAttribute('data-filter');
   await filter.click();
@@ -221,7 +221,7 @@ test('arcade catalog filters and secondary forms remain usable', async ({ page }
   }
   await noOverflow(page);
   await page.getByRole('button', { name: 'All concepts', exact: true }).click();
-  await expect(page.locator('[data-genre]:visible')).toHaveCount(9);
+  await expect(page.locator('[data-genre]:visible')).toHaveCount(10);
   await page.getByRole('link', { name: 'Form research', exact: true }).click();
   await expect(page).toHaveURL(/\/forms$/);
   await expect(page.getByText('This is a research demonstration.', { exact: true })).toBeVisible();

@@ -200,6 +200,9 @@ def create_app(config=None):
             return render_template('circuit_match.html', game=game)
         if slug == 'blockbound-first-light':
             return render_template('blockbound.html', game=game)
+        if slug == 'infinite-tic-tac-toe':
+            return render_template('infinite_tic_tac_toe.html', game=game)
+
         return render_template('arcade.html', view='game', games=GAMES, game=game)
     @app.get('/terms')
     def terms():

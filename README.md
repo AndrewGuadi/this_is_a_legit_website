@@ -1,6 +1,9 @@
 # Legit Arcade
 
-An arcade with **Neon Breaker**, **Blockbound: First Light**, two playable original review candidates, seven future game concepts, and a secondary form-research area. Neon Breaker is a review candidate; final release requires independent TODD review and physical-device evidence. The homepage is `/`, concepts live at `/games/<slug>`, and the preserved forms are at `/forms` and `/apply/<kind>`. The investigator workspace remains `/admin/login`.
+The catalog includes four playable games: Neon Breaker, Circuit Match, Blockbound: First Light, and Infinite Tic-Tac-Toe. Infinite Tic-Tac-Toe is local two-player play on one device.
+
+
+An arcade with **Neon Breaker**, **Circuit Match**, **Blockbound: First Light**, and **Infinite Tic-Tac-Toe**, four playable original games, six future game concepts, and a secondary form-research area. Neon Breaker is a review candidate; final release requires independent TODD review and physical-device evidence. The homepage is `/`, concepts live at `/games/<slug>`, and the preserved forms are at `/forms` and `/apply/<kind>`. The investigator workspace remains `/admin/login`.
 
 Game status is tracked in `game_catalog.py`; see [game roadmap](docs/GAME_ROADMAP.md) and [first-game brief](docs/FIRST_GAME_BRIEF.md). Catalog visits do not create observation records. Neon Breaker uses native Canvas and local modules, with no game telemetry or third-party requests. Optional best-score storage stays on the device.
 

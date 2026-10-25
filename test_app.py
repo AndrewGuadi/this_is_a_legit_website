@@ -61,13 +61,18 @@ class ObservationTests(unittest.TestCase):
         self.assertEqual(home.status_code,200)
         self.assertIn(b'LEGIT',home.data)
         self.assertIn(b'href="/forms"',home.data)
-        self.assertEqual(len(GAMES),9)
+        self.assertEqual(len(GAMES),10)
         self.assertEqual(GAMES[0]['status'],'playable')
         for game in GAMES:
             route='/games/'+game['slug']
             response=self.client.get(route)
             self.assertEqual(response.status_code,200)
-            if game['status'] == 'playable':
+            if game['slug'] == 'infinite-tic-tac-toe':
+                self.assertIn(b'data-cell="8"',response.data)
+                self.assertIn(b'Two players on one device',response.data)
+                self.assertIn(b'moves are never saved or sent',response.data)
+                self.assertEqual(response.headers['Content-Security-Policy'].count("script-src 'self'"),1)
+            elif game['status'] == 'playable':
                 self.assertIn(b'<canvas',response.data)
                 if game['slug'] in ('neon-breaker', 'circuit-match'):
                     self.assertIn(b'Nothing is sent to a server',response.data)
