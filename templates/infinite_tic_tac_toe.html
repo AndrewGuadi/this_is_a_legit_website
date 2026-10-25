@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="description" content="Play Infinite Tic-Tac-Toe: an endless local two-player duel where you can place a mark or erase an opponent's mark.">
+  <title>Play Infinite Tic-Tac-Toe — Legit Arcade</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230d1320'/%3E%3Cpath d='M8 8l16 16M24 8L8 24' stroke='%23d1f875' stroke-width='4'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="{{ url_for('static',filename='arcade.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static',filename='infinite-tic-tac-toe/game.css') }}">
+  <script type="module" src="{{ url_for('static',filename='infinite-tic-tac-toe/game.mjs') }}"></script>
+</head>
+<body class="infinite-page">
+  <a class="skip" href="#main">Skip to content</a>
+  <header class="shell header">
+    <a class="logo" href="/"><span aria-hidden="true">↗</span> LEGIT<span class="logo-light">ARCADE</span></a>
+    <nav aria-label="Main navigation"><a href="/#games">All games</a><a href="#how-to-play">How to play</a></nav>
+  </header>
+
+  <main id="main" tabindex="-1" class="infinite-shell">
+    <div class="infinite-heading">
+      <div>
+        <p class="eyebrow"><span class="live-dot" aria-hidden="true"></span> ORIGINAL 02 / LOCAL STRATEGY DUEL</p>
+        <h1>INFINITE <span>TIC-TAC-TOE</span></h1>
+      </div>
+      <p class="infinite-tagline">Two players. One screen.<br><strong>No final round.</strong></p>
+    </div>
+
+    <section id="ttt-game" class="ttt-game" aria-label="Infinite Tic-Tac-Toe game" data-state="ready">
+      <div class="match-layout">
+        <aside class="score-rail" aria-label="Match score">
+          <div class="match-label"><span>ENDLESS MATCH</span><strong>ROUND <span id="round-number">1</span></strong></div>
+          <div class="player-score is-current" id="score-x-panel">
+            <span class="player-mark mark-x" aria-hidden="true">X</span>
+            <div><span>PLAYER X</span><strong id="score-x">0</strong></div>
+            <span class="turn-pip" aria-hidden="true"></span>
+          </div>
+          <div class="player-score" id="score-o-panel">
+            <span class="player-mark mark-o" aria-hidden="true">O</span>
+            <div><span>PLAYER O</span><strong id="score-o">0</strong></div>
+            <span class="turn-pip" aria-hidden="true"></span>
+          </div>
+          <div class="loop-watch">
+            <div class="loop-watch-heading"><span>REPEAT WATCH</span><strong><span id="loop-count">0</span> RESETS</strong></div>
+            <p>Each player repeating their exact move three turns in a row clears the board. Scores stay.</p>
+            <div class="repeat-row"><span>X repeats</span><div class="repeat-dots" id="repeat-x" role="meter" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0" aria-label="X repeat count: 0 of 3"><i></i><i></i><i></i></div></div>
+            <div class="repeat-row"><span>O repeats</span><div class="repeat-dots" id="repeat-o" role="meter" aria-valuemin="0" aria-valuemax="3" aria-valuenow="0" aria-label="O repeat count: 0 of 3"><i></i><i></i><i></i></div></div>
+          </div>
+        </aside>
+
+        <div class="board-column">
+          <div class="turn-bar">
+            <div class="turn-copy"><span class="turn-token mark-x" id="turn-token" aria-hidden="true">X</span><div><span class="hud-label">CURRENT TURN</span><strong id="turn-label">Match not started</strong></div></div>
+            <span class="local-badge">LOCAL 1V1</span>
+          </div>
+
+          <div class="action-switch" role="group" aria-label="Choose this turn's action">
+            <button id="place-action" type="button" aria-pressed="true" disabled><span aria-hidden="true">＋</span> Place X</button>
+            <button id="remove-action" type="button" aria-pressed="false" disabled><span aria-hidden="true">−</span> Remove O</button>
+          </div>
+          <p id="action-hint" class="action-hint">Start the match, then choose an action and a cell.</p>
+
+          <div id="board" class="ttt-board" role="group" aria-label="Tic-tac-toe board. Use arrow keys to move between cells and Enter or Space to act.">
+            <button type="button" data-cell="0" aria-disabled="true"><span aria-hidden="true"></span></button>
+            <button type="button" data-cell="1" aria-disabled="true"><span aria-hidden="true"></span></button>
+            <button type="button" data-cell="2" aria-disabled="true"><span aria-hidden="true"></span></button>
+            <button type="button" data-cell="3" aria-disabled="true"><span aria-hidden="true"></span></button>
+            <button type="button" data-cell="4" aria-disabled="true"><span aria-hidden="true"></span></button>
+            <button type="button" data-cell="5" aria-disabled="true"><span aria-hidden="true"></span></button>
+            <button type="button" data-cell="6" aria-disabled="true"><span aria-hidden="true"></span></button>
+            <button type="button" data-cell="7" aria-disabled="true"><span aria-hidden="true"></span></button>
+            <button type="button" data-cell="8" aria-disabled="true"><span aria-hidden="true"></span></button>
+          </div>
+
+          <section id="start-panel" class="round-panel" aria-labelledby="start-title">
+            <div><p class="eyebrow">PASS, PLAY, OUTWIT</p><h2 id="start-title">Ready for one more round?</h2><p>Share this screen. X takes the first turn; the starting player alternates each round.</p></div>
+            <button id="start-match" class="primary-action" type="button">Start match</button>
+          </section>
+          <section id="round-result" class="round-panel" aria-labelledby="result-title" hidden>
+            <div><p class="eyebrow" id="result-kicker">ROUND COMPLETE</p><h2 id="result-title">X takes the line.</h2><p id="result-copy">One point on the board. The match keeps going.</p></div>
+            <button id="next-round" class="primary-action" type="button">Start round 2</button>
+          </section>
+
+          <div class="match-controls">
+            <button id="sound" type="button" aria-pressed="false">Sound off</button>
+            <button id="reset-match" type="button">Reset match</button>
+          </div>
+          <p id="game-status" class="game-status" role="status" aria-live="polite">Press Start match to begin. X starts.</p>
+        </div>
+      </div>
+      <noscript><p class="fallback">JavaScript is required to play. The other site pages remain available.</p></noscript>
+      <div class="game-meta"><span>Endless rounds <span aria-hidden="true">/</span> Two players on one device</span><span>No accounts. No network play.</span></div>
+    </section>
+
+    <section id="how-to-play" class="infinite-guide" aria-labelledby="guide-title">
+      <div><p class="eyebrow">THREE IN A ROW. ONE MORE ROUND.</p><h2 id="guide-title">Build the line.<br>Break theirs.</h2><p>Every turn is a choice: add your own mark to an empty cell, or remove one opposing mark. A completed line earns a point and ends only that round—not the match.</p></div>
+      <div class="guide-rules">
+        <div><span class="guide-number">01</span><div><h3>Place or erase</h3><p>Choose <strong>Place</strong> or <strong>Remove</strong>, then choose a cell. Switching actions is free; only a legal board move passes the turn.</p></div></div>
+        <div><span class="guide-number">02</span><div><h3>Keep the match moving</h3><p>Lines score one point. A full board without a line is a draw. Start the next round to keep playing with the same scores.</p></div></div>
+        <div><span class="guide-number">03</span><div><h3>Break a repeated loop</h3><p>If both players repeat their own exact action on the same cell for three consecutive turns each, the board resets automatically. The match score remains.</p></div></div>
+        <div><span class="guide-number">04</span><div><h3>Keyboard and sound</h3><p>Tab to the board, use arrow keys between cells, and press Enter or Space. Sound is optional and starts off. <span id="audio-note">Audio begins only after your input.</span> <span id="storage-note">Only your sound preference can be stored in this browser; match moves are never saved or sent.</span></p></div></div>
+      </div>
+    </section>
+    <p class="access-note">Accessibility: every cell is a native button with a text label, visible focus, and non-color X/O markers. Round results and loop resets are announced. Reduced-motion preferences are respected.</p>
+  </main>
+
+  <dialog id="reset-dialog" aria-labelledby="reset-title" aria-describedby="reset-copy">
+    <form method="dialog"><p class="eyebrow">BACK TO ZERO?</p><h2 id="reset-title">Reset the whole match?</h2><p id="reset-copy">This clears the board, both scores, the round count, and repeat history. Cancel to keep the current match exactly as it is.</p><div><button value="cancel" autofocus>Keep playing</button><button value="reset" class="primary-action">Reset everything</button></div></form>
+  </dialog>
+
+  <footer class="shell footer">
+    <div class="footer-bottom"><span>© Authentic Dynamics LLC · Original games</span><div><a href="/">Back to the arcade</a><a href="/forms">Form research</a><a href="/terms">Terms &amp; privacy</a></div></div>
+    <p class="research-note">Game play sends no research observations or move data. Our separate form-research area records interaction metadata disclosed on its forms.</p>
+  </footer>
+</body>
+</html>
