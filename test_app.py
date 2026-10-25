@@ -69,7 +69,7 @@ class ObservationTests(unittest.TestCase):
             self.assertEqual(response.status_code,200)
             if game['status'] == 'playable':
                 self.assertIn(b'<canvas',response.data)
-                if game['slug'] == 'neon-breaker':
+                if game['slug'] in ('neon-breaker', 'circuit-match'):
                     self.assertIn(b'Nothing is sent to a server',response.data)
                 else:
                     self.assertIn(b'C core',response.data)
