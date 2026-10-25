@@ -468,25 +468,42 @@ function nextId(s) {
 }
 function syncFleet(city, m, list) {
   const s = city.services,
-    byIndex = new Map(list.map((p) => [p.index, p]));
+    byIndex = new Map(list.map((p) => [p.index, p])),
+    counts = new Map();
+  // Active journeys retain their vehicle and cargo, including closed providers.
+  // Allocate the remaining global slots fairly before retaining idle vehicles;
+  // otherwise an old idle fleet can permanently exclude a new staffed depot.
+  let allocated = 0;
+  for (const v of s.vehicles) {
+    if (v.status === "idle") continue;
+    counts.set(v.home, (counts.get(v.home) || 0) + 1);
+    allocated++;
+  }
+  const quotas = new Map(counts);
+  for (let round = 0; round < 8 && allocated < FLEET_MAX; round++)
+    for (const p of list) {
+      if (allocated >= FLEET_MAX) break;
+      const count = quotas.get(p.index) || 0;
+      if (count > round || count >= p.fleet) continue;
+      quotas.set(p.index, count + 1);
+      allocated++;
+    }
   const kept = [];
   for (const v of s.vehicles) {
-    const p = byIndex.get(v.home),
-      count = kept.filter((x) => x.home === v.home && x.kind === v.kind).length;
-    if (v.status === "idle" && (!p || p.kind !== v.kind || count >= p.fleet))
+    if (v.status !== "idle") {
+      kept.push(v);
       continue;
-    if (v.status === "idle") v.capacity = p.payload;
+    }
+    const p = byIndex.get(v.home), count = counts.get(v.home) || 0;
+    if (!p || p.kind !== v.kind || count >= (quotas.get(v.home) || 0)) continue;
+    v.capacity = p.payload;
+    counts.set(v.home, count + 1);
     kept.push(v);
   }
   s.vehicles = kept;
   for (let round = 0; round < 8 && s.vehicles.length < FLEET_MAX; round++)
     for (const p of list) {
-      if (s.vehicles.length >= FLEET_MAX) break;
-      if (
-        s.vehicles.filter((v) => v.home === p.index && v.kind === p.kind)
-          .length >= p.fleet
-      )
-        continue;
+      if ((counts.get(p.index) || 0) >= (quotas.get(p.index) || 0)) continue;
       const start = frontage(city, p.index)[0];
       s.vehicles.push({
         id: nextId(s),
@@ -501,8 +518,10 @@ function syncFleet(city, m, list) {
         taskId: null,
         destination: null,
       });
+      counts.set(p.index, (counts.get(p.index) || 0) + 1);
     }
 }
+
 function pending(s, city, kind, i) {
   return kind === "garbage"
     ? s.waste[i] + (i === gateway(city) ? s.looseWaste : 0)

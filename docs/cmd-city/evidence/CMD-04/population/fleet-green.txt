@@ -1,0 +1,40 @@
+✔ service migration allocates legacy backlog once and never duplicates stored landfill stock (10.794981ms)
+✔ validator is strict about array sizes quantities IDs references paths and stable clock (8.231909ms)
+✔ reports are pure and opening occupancy generates persistent local bins once per month (32.38641ms)
+✔ fire response requires actual arrival along a road and does not teleport by coverage (28.09512ms)
+✔ disconnected fire incidents remain unserved rather than receiving radius service (19.895146ms)
+✔ garbage pickup creates cargo and storage only changes after a real return arrival (50.230964ms)
+✔ broken return roads retain cargo and restore movement after repair (65.329041ms)
+✔ closed home facility cannot swallow garbage; cargo reroutes to an operational alternative (41.323938ms)
+✔ recycling deliveries conserve cargo and bound ore output at its inventory capacity (31.634948ms)
+✔ medical pickup and bed admission precede finite later treatment (118.149645ms)
+✔ crime pickup respects finite custody and cases resolve only after return and processing (75.002554ms)
+✔ zero funding or absent real drivers prevents dispatch without deleting cases (23.966954ms)
+✔ demolition preserves stored waste admitted patients and custody before clearing source (2.214761ms)
+✔ invalid incidents cannot mutate RNG cash queues or IDs (14.252314ms)
+✔ congestion reduces movement budget and save state retains actual adjacent paths (8.533438ms)
+✔ new emergencies preempt queued garbage tickets when the bounded task queue is full (8.482867ms)
+✔ overflowing a valid near-bound bin leaves the entire standalone city unchanged (4.730515ms)
+✔ finite admitted beds remain full while a closed clinic preserves unmet patients (13.159737ms)
+✔ demolishing an occupied clinic or station returns admitted cases to persistent local queues (11.299284ms)
+✔ polluted homes generate deterministic bounded medical demand while healthy homes do not (5.10174ms)
+✔ high crime pressure and unemployment create bounded deterministic cases without RNG calls (3.867137ms)
+✔ material units survive landfill demolition and recollection without double-counted stock (20.229081ms)
+✔ saved IDs and cross references cannot be aliased or forge completed work (10.513108ms)
+✔ services state remains bounded saveable and conserved over repeated generation and deliveries (231.024887ms)
+✔ near-bound accepted service states request whole-month drafting before preceding model mutations (1.820573ms)
+✔ hospital fleet and throughput require all twelve configured staff rather than treating eight as full (9.895ms)
+✔ shared-start route planning preserves fresh BFS routes and tie order for distinct incidents (6.549931ms)
+✔ routing is recomputed on the next service tick after a road deletion changes the shortest path (6.376374ms)
+✔ extinguishing an actual road invalidates routing within the same service tick (10.202461ms)
+✔ reported fleet arrays are detached and closed destinations do not reuse an earlier route choice (30.8388ms)
+✔ a newly staffed provider receives a fair fleet slot when the global cap is occupied by idle vehicles (14.546166ms)
+✔ redistributing idle fleet slots preserves blocked loaded journeys and their task identities (17.25541ms)
+ℹ tests 32
+ℹ suites 0
+ℹ pass 32
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1119.20935

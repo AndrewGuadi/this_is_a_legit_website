@@ -1,0 +1,246 @@
+{
+  "baseline": "c935bc91988f4882dfce8b858d265dbb6d7a2f5c",
+  "finalPopulation": 4018,
+  "employed": 2318,
+  "shrunkenHomes": [
+    {
+      "index": 1006,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    },
+    {
+      "index": 1010,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    },
+    {
+      "index": 1018,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    },
+    {
+      "index": 1059,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    },
+    {
+      "index": 1061,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    },
+    {
+      "index": 1081,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    },
+    {
+      "index": 1082,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    },
+    {
+      "index": 1085,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    },
+    {
+      "index": 1086,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    },
+    {
+      "index": 1087,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    },
+    {
+      "index": 1093,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    },
+    {
+      "index": 1094,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    },
+    {
+      "index": 1095,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    },
+    {
+      "index": 1097,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    },
+    {
+      "index": 1098,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    },
+    {
+      "index": 1101,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    },
+    {
+      "index": 1162,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    },
+    {
+      "index": 1163,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    },
+    {
+      "index": 1170,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    },
+    {
+      "index": 1171,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    },
+    {
+      "index": 1173,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    },
+    {
+      "index": 1174,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    },
+    {
+      "index": 1175,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    },
+    {
+      "index": 1178,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    },
+    {
+      "index": 1201,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    },
+    {
+      "index": 1209,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    },
+    {
+      "index": 1211,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    },
+    {
+      "index": 1213,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    },
+    {
+      "index": 1215,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    },
+    {
+      "index": 1247,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    },
+    {
+      "index": 1249,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    },
+    {
+      "index": 1251,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    },
+    {
+      "index": 1253,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    },
+    {
+      "index": 1261,
+      "population": 1,
+      "employed": 0,
+      "cash": 0,
+      "wages": 0
+    }
+  ],
+  "note": "Debug copy of unchanged sustained benchmark only added final city/metrics capture. No model or fixture override."
+}

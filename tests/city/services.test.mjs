@@ -614,3 +614,53 @@ test("reported fleet arrays are detached and closed destinations do not reuse an
   assert.equal(city.tiles[a].stored, 0);
   assert.equal(city.tiles[b].stored, 100);
 });
+
+test("a newly staffed provider receives a fair fleet slot when the global cap is occupied by idle vehicles", () => {
+  const { city, metrics } = fixture();
+  for (let x = 1; x <= 16; x++) ready(city, metrics, "clinic", x, 15, { modules: 3 });
+  initialize(city);
+  next(city, metrics);
+  assert.equal(city.services.vehicles.length, 64);
+  assert.ok(city.services.vehicles.every((v) => v.status === "idle"));
+  const depot = ready(city, metrics, "landfill", 30, 15);
+  const target = place(city, "residential", 31, 15, { occupancy: 24 });
+  next(city, metrics);
+  assert.ok(city.services.vehicles.some((v) => v.home === depot), "idle fleets must release a fair slot to a new operational provider");
+  assert.ok(city.services.vehicles.length <= 64);
+  for (let n = 0; n < 4; n++) next(city, metrics);
+  assert.ok(city.tiles[depot].stored > 0, "new provider actually collects and returns local waste");
+  assert.ok(city.services.waste[target] < 24 * 5);
+  assert.equal(serviceReport(city).conservation.waste, true);
+});
+
+test("redistributing idle fleet slots preserves blocked loaded journeys and their task identities", () => {
+  const { city, metrics } = fixture();
+  metrics.roadLoad.fill(240);
+  ready(city, metrics, "landfill", 1, 15);
+  const target = place(city, "residential", 20, 15, { occupancy: 1 });
+  city.backlogs.waste = 200;
+  initialize(city);
+  city.tiles[target].occupancy = 0;
+  for (let n = 0; n < 3; n++) next(city, metrics);
+  const loaded = city.services.vehicles.filter((v) => v.payload > 0).map((v) => ({id: v.id, taskId: v.taskId, payload: v.payload}));
+  assert.ok(loaded.length > 0);
+  city.tiles[index(10, 16)].type = "empty";
+  for (let x = 1; x <= 16; x++) ready(city, metrics, "clinic", x, 17, { modules: 3 });
+  next(city, metrics);
+  assert.equal(city.services.vehicles.length, 64);
+  const police = ready(city, metrics, "police", 30, 17);
+  next(city, metrics);
+  assert.ok(city.services.vehicles.some((v) => v.home === police));
+  assert.equal(city.services.vehicles.length, 64);
+  for (const old of loaded) {
+    const vehicle = city.services.vehicles.find((v) => v.id === old.id);
+    assert.ok(vehicle);
+    assert.equal(vehicle.taskId, old.taskId);
+    assert.equal(vehicle.payload, old.payload);
+    const task = city.services.tasks.find((t) => t.id === old.taskId);
+    assert.equal(task.vehicleId, old.id);
+    assert.equal(task.status, "returning");
+  }
+  assert.equal(serviceReport(city).conservation.waste, true);
+  assert.equal(validateServices(city.services, city), true);
+});

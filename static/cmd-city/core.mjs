@@ -64,6 +64,7 @@ const neighbors = (i) => ADJACENT[i];
 // Derived caches are external to saved city state and bounded by its road graph.
 const graphCache = new WeakMap();
 const employmentCache = new WeakMap();
+const coverageCache = new WeakMap();
 const at = (x, y) =>
   Number.isInteger(x) &&
   Number.isInteger(y) &&
@@ -295,12 +296,20 @@ function routeEmployment(s, graph, u, coverage) {
     graph.jobSignature = jobSignature;
   }
   const busFactor = s.research.completed.includes("transit") ? 1 / 30 : 1 / 20;
+  const homes = [];
   for (let i = 0; i < N; i++) {
-    const home = s.tiles[i];
-    if (!housing(home)) continue;
-    let need = householdWorkers(s, i);
+    if (!housing(s.tiles[i])) continue;
+    const need = householdWorkers(s, i);
     workers += need;
-    if (!need || !graph.access[i] || !active(home)) continue;
+    if (need && graph.access[i] && active(s.tiles[i])) homes.push(i);
+  }
+  // Scarce jobs and shared roads must not permanently exclude the same homes.
+  // Rotate the eligible home list once per month; within each home the existing
+  // nearest-job and road/transit capacity rules remain unchanged.
+  const first = homes.length ? s.month % homes.length : 0;
+  for (let n = 0; n < homes.length; n++) {
+    const i = homes[(first + n) % homes.length];
+    let need = householdWorkers(s, i);
     const start = graph.frontage[i];
     if (
       transit.stations.length < 2 &&
@@ -365,11 +374,14 @@ function routeEmployment(s, graph, u, coverage) {
       }
       const requested = Math.min(need, job.left);
       let roadRoom = Infinity;
-      for (const p of path)
+      for (const p of path) {
         roadRoom = Math.min(
           roadRoom,
           Math.max(0, (TOOLS[s.tiles[p].type]?.capacity || 80) - roadLoad[p]),
         );
+        // A saturated edge is already the exact lower bound for this path.
+        if (roadRoom === 0) break;
+      }
       let moved;
       if (transit.stations.length < 2 && transit.exchanges.length < 2)
         moved = { mode: "none", moved: 0, roadFactor: 1 };
@@ -429,19 +441,61 @@ function routeEmployment(s, graph, u, coverage) {
 // Retain only one exact routing-input snapshot per live city; all returned arrays
 // are caller-owned copies so a consumer cannot corrupt this derived cache.
 function cachedEmployment(s, graph, u, coverage) {
-  const signature = [
-    u.power.ratio,
-    u.water.ratio,
-    s.research.completed.includes("transit"),
-    ...Object.values(s.funding),
-    ...s.tiles.map(
-      (t, i) =>
-        `${t.type}:${t.occupancy}:${t.modules}:${t.enabled}:${t.fire}:${graph.access[i] ? 1 : 0}:${housing(t) ? householdWorkers(s, i) : 0}`,
-    ),
-  ].join("|");
   let cached = employmentCache.get(s);
-  if (!cached || cached.signature !== signature) {
-    cached = { signature, result: routeEmployment(s, graph, u, coverage) };
+  const transit = s.research.completed.includes("transit");
+  const funding = Object.values(s.funding);
+  let changed =
+    !cached ||
+    cached.month !== s.month ||
+    cached.power !== u.power.ratio ||
+    cached.water !== u.water.ratio ||
+    cached.transit !== transit ||
+    funding.length !== cached.funding.length ||
+    funding.some((v, i) => v !== cached.funding[i]);
+  // Compare primitive routing inputs without allocating a large string on every
+  // report. The external snapshot never aliases mutable saved tiles or reports.
+  if (!changed)
+    for (let i = 0; i < N; i++) {
+      const t = s.tiles[i],
+        at = i * 6,
+        values = cached.values;
+      if (
+        cached.types[i] !== t.type ||
+        values[at] !== t.occupancy ||
+        values[at + 1] !== t.modules ||
+        values[at + 2] !== t.enabled ||
+        values[at + 3] !== t.fire ||
+        values[at + 4] !== graph.access[i] ||
+        values[at + 5] !== (housing(t) ? householdWorkers(s, i) : 0)
+      ) {
+        changed = true;
+        break;
+      }
+    }
+  if (changed) {
+    const types = new Array(N),
+      values = new Array(N * 6);
+    for (let i = 0; i < N; i++) {
+      const t = s.tiles[i],
+        at = i * 6;
+      types[i] = t.type;
+      values[at] = t.occupancy;
+      values[at + 1] = t.modules;
+      values[at + 2] = t.enabled;
+      values[at + 3] = t.fire;
+      values[at + 4] = graph.access[i];
+      values[at + 5] = housing(t) ? householdWorkers(s, i) : 0;
+    }
+    cached = {
+      types,
+      values,
+      funding,
+      transit,
+      month: s.month,
+      power: u.power.ratio,
+      water: u.water.ratio,
+      result: routeEmployment(s, graph, u, coverage),
+    };
     employmentCache.set(s, cached);
   }
   const m = cached.result;
@@ -453,6 +507,65 @@ function cachedEmployment(s, graph, u, coverage) {
     railLoad: m.railLoad.slice(),
     busLoad: m.busLoad.slice(),
   };
+}
+const COVERAGE_NAMES = ["park", "school", "clinic", "fire", "police", "bus"];
+function cachedCoverage(s, access, u, extra) {
+  const scales = COVERAGE_NAMES.map(
+    (name) =>
+      ((s.funding[name] ?? 100) / 100) *
+      (name === "park" ? 1 : Math.min(u.power.ratio, u.water.ratio)),
+  );
+  let cached = coverageCache.get(s);
+  let changed =
+    !cached ||
+    cached.extra !== extra ||
+    scales.some((v, i) => v !== cached.scales[i]);
+  if (!changed)
+    for (let i = 0; i < N; i++) {
+      const t = s.tiles[i],
+        old = cached.inputs[i];
+      if (
+        old.type !== t.type ||
+        old.modules !== t.modules ||
+        old.active !== active(t) ||
+        old.access !== access[i]
+      ) {
+        changed = true;
+        break;
+      }
+    }
+  if (changed) {
+    const coverage = {};
+    for (let i = 0; i < COVERAGE_NAMES.length; i++) {
+      const name = COVERAGE_NAMES[i];
+      coverage[name] = field(
+        s,
+        access,
+        (t) =>
+          t.type === name ||
+          (name === "school" && t.type === "university") ||
+          (name === "clinic" && t.type === "hospital"),
+        extra,
+        scales[i],
+      );
+    }
+    cached = {
+      extra,
+      scales,
+      coverage,
+      inputs: s.tiles.map((t, i) => ({
+        type: t.type,
+        modules: t.modules,
+        active: active(t),
+        access: access[i],
+      })),
+    };
+    coverageCache.set(s, cached);
+  }
+  // Report consumers always receive their own arrays, never the cached fields.
+  return Object.fromEntries(
+    COVERAGE_NAMES.map((name) => [name, cached.coverage[name].slice()]),
+  );
 }
 export function measure(s, options = {}) {
   const road = roadGraph(s),
@@ -466,19 +579,7 @@ export function measure(s, options = {}) {
       options.reservedFuel,
     ),
     extra = s.research.completed.includes("serviceDrones") ? 2 : 0;
-  const coverage = {};
-  for (const name of ["park", "school", "clinic", "fire", "police", "bus"])
-    coverage[name] = field(
-      s,
-      graph.access,
-      (t) =>
-        t.type === name ||
-        (name === "school" && t.type === "university") ||
-        (name === "clinic" && t.type === "hospital"),
-      extra,
-      ((s.funding[name] ?? 100) / 100) *
-        (name === "park" ? 1 : Math.min(u.power.ratio, u.water.ratio)),
-    );
+  const coverage = cachedCoverage(s, graph.access, u, extra);
   const employment = cachedEmployment(s, graph, u, coverage);
   // The operational graph shares cached Maps with the physical graph, but its
   // primitive signature must also be retained or each measure re-sorts all jobs.
