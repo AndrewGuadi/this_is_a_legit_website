@@ -11,6 +11,9 @@ const tool = (label, group, cost, upkeep, color, description, extra = {}) =>
   });
 export const FACILITY_JOBS = Object.freeze({
   factory: 12,
+  consortium: 12,
+  fusion: 12,
+  tidal: 8,
   mine: 8,
   oilWell: 8,
   academy: 12,
@@ -361,6 +364,32 @@ const definitions = {
     "#bba0d6",
     "Visitor income with additional crime pressure.",
   ),
+  fusion: tool(
+    "Fusion station",
+    "Future",
+    18000,
+    450,
+    "#8fd5d0",
+    "Twelve actual staff generate up to 3,000 clean power units. Requires advanced research; no fossil fuel or extraction.",
+    { utility: "power", supply: 3000 },
+  ),
+  tidal: tool(
+    "Tidal station",
+    "Future",
+    11000,
+    240,
+    "#95c7df",
+    "Eight actual staff generate 390–600 clean power units with the monthly tidal cycle. Needs shore land beside water and tidal research.",
+    { utility: "power", supply: 600 },
+  ),
+  consortium: tool(
+    "Consortium works",
+    "Future",
+    9000,
+    260,
+    "#da9b76",
+    "Twelve real staff convert two oil and one ore to composite; finite connected business demand buys actual stock, creating revenue and local pollution.",
+  ),
   academy: tool(
     "Civic Research Institute",
     "Future",
@@ -375,7 +404,7 @@ const definitions = {
     8000,
     220,
     "#b4dfd2",
-    "Research-gated vertical housing. Mixed-use floors remain planned.",
+    "Research-gated mixed-use tower. Manage real home, office, shop, utility, school, park and crown floors.",
     { capacity: 180 },
   ),
 };
@@ -405,11 +434,25 @@ export const PRICES = Object.freeze({
   electronics: 2200,
 });
 export const RESEARCH = Object.freeze({
+  fusion: {
+    label: "Fusion power",
+    cost: 260,
+    requires: ["cleanEnergy", "vertical"],
+    description:
+      "Unlock staffed fusion stations. Requires a staffed institute and twelve educated employed middle- or high-wealth adults.",
+  },
+  tidal: {
+    label: "Tidal power",
+    cost: 160,
+    requires: ["cleanEnergy"],
+    description:
+      "Unlock staffed shoreline tidal stations. Requires a staffed institute and twelve educated employed middle- or high-wealth adults.",
+  },
   cleanEnergy: {
     label: "Clean-energy systems",
     cost: 80,
     requires: [],
-    description: "25% more renewable power per generator.",
+    description: "25% more wind power per generator.",
   },
   transit: {
     label: "Transit coordination",

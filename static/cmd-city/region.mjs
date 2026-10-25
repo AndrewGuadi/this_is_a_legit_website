@@ -9,7 +9,7 @@ import {
   measure,
   monthNeedsDraft,
 } from "./core.mjs";
-import { parseCity } from "./save.mjs";
+import { parseCity, cityForExport } from "./save.mjs";
 import { RESOURCES } from "./content.mjs";
 
 const CITY_IDS = ["riverbend", "pinehaven", "stoneport"];
@@ -382,11 +382,24 @@ export function parseRegion(text) {
     )
   )
     invalid();
+  if (
+    new TextEncoder().encode(JSON.stringify(regionForExport(region))).length >
+    MAX_FILE_BYTES
+  )
+    throw Error(
+      "This region would exceed the 3 MiB save/export limit after migration.",
+    );
   return region;
 }
 
+export function regionForExport(region) {
+  return {
+    ...region,
+    cities: region.cities.map((c) => ({ ...c, state: cityForExport(c.state) })),
+  };
+}
 export function serializeRegion(region) {
-  const text = JSON.stringify(region);
+  const text = JSON.stringify(regionForExport(region));
   parseRegion(text);
   return text;
 }

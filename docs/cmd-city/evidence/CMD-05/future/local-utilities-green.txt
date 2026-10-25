@@ -1,0 +1,35 @@
+✔ schema4 strict migration preserves old source fields and creates future state only once (71.443305ms)
+✔ real guarded floor controls create jobs, stock-limited internal purchases and housing capacity (144.979172ms)
+✔ critical staffing and internal generation require actual workers and share road and water limits (76.644022ms)
+✔ corporate output is booked once with resource, treasury and environmental consequences (40.836231ms)
+✔ a self-supplied tower retains local service under outside grid shortage without duplicated supply or groundwater (52.647356ms)
+✔ migration retains canonical tower population and legacy capacity with complete strict state (2.250416ms)
+✔ floor actions charge once, enforce occupied capacity, limits, research and closure (1.014873ms)
+✔ mixed floors have distinct finite capacities and internal utility dependence without report writes (2.173589ms)
+✔ corporate production consumes real finite oil and ore and books bounded product sales once (1.792281ms)
+✔ closed, disconnected or unstaffed corporate facilities cannot produce or conjure demand (1.990934ms)
+✔ research requires actual staffed institute and educated employed middle/high wealth adults (0.446732ms)
+✔ strict validation rejects altered keys, ledgers, indexes, floor counts and non-finite values (1.493594ms)
+✔ reconciliation removes demolished tower floors without losing corporate stock and initializes new towers (0.385037ms)
+✔ removing essential internal power disables dependent tower uses when external supply is absent (1.007458ms)
+✔ stored composite cannot sell through a closed or unstaffed corporate network (0.903809ms)
+✔ strict current state rejects ledgers beyond real stock and canonical floor bounds (0.551417ms)
+✔ invalid research, unknown actions, crowns, maximum floors and insufficient cash are atomic (0.911932ms)
+✔ progression overflow and invalid inventory reject before any mutation (0.955916ms)
+✔ research does not reuse last-month wages or disconnected households as current skilled workers (0.3799ms)
+✔ corporate report site ledger cannot mutate state or hide emitted production (0.498222ms)
+✔ free floor shutdown remains available during a treasury deficit (0.697097ms)
+✔ the single crown remains the top floor when a use is added below it (0.682666ms)
+✔ 240 varied months preserve resource and product identities and exact restored continuation (42.176283ms)
+✔ internal water cannot bypass an exhausted or explicitly unavailable shared water reserve (0.54115ms)
+✔ actual critical staff power their own floor without being diluted by unpowered office vacancies (0.414362ms)
+✔ closing a whole tower suspends its enabled-floor operating upkeep (0.23195ms)
+✔ explicit phase reservations cannot be reassigned into invented critical staffing by a report (0.61712ms)
+ℹ tests 27
+ℹ suites 0
+ℹ pass 27
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 557.501985

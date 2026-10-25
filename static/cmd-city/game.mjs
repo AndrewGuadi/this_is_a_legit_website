@@ -1,3 +1,4 @@
+import { FUTURE_FLOORS, createFuture } from "./future.mjs";
 import { TOOLS, RESEARCH, RESOURCES, money } from "./content.mjs";
 import { createCity, measure, advanceMonth, inspectTile } from "./core.mjs";
 import { parseCity } from "./save.mjs";
@@ -286,7 +287,7 @@ function updateInspector() {
   if (road && tile.enabled === false)
     $("tile-description").textContent =
       `Tile ${selected.x}, ${selected.y} · Road closed · No through access`;
-  $("upgrade-tile").disabled = !TOOLS[tile.type];
+  $("upgrade-tile").disabled = !TOOLS[tile.type] || tile.type === "tower";
   setInput("tile-x", selected.x);
   setInput("tile-y", selected.y);
   $("coordinate-label").textContent =
@@ -307,6 +308,84 @@ function updateInspector() {
   }
   updateEnvironmentSelection();
   updateHouseholdSelection();
+  updateFutureSelection();
+}
+const floorNames = {
+  homes: "Homes",
+  shops: "Shops",
+  offices: "Offices",
+  power: "Power",
+  water: "Water",
+  school: "School",
+  park: "Park",
+  crown: "Crown",
+};
+function updateFutureSelection() {
+  const index = selected.y * city.width + selected.x,
+    tower = metrics.future.towers.find((t) => t.tile === index),
+    panel = $("future-inspector");
+  panel.hidden = !tower;
+  const ledger = city.future.ledger;
+  $("corporate-ledger").textContent =
+    `${whole(city.future.composite)} composite in storage · last month: ${whole(ledger.produced)} produced, ${whole(ledger.oilUsed)} oil + ${whole(ledger.oreUsed)} ore consumed, ${whole(ledger.sold)} sold for ${money(ledger.revenue)}. Ground emissions: ${whole(ledger.pollution)} units.`;
+  if (!tower) return;
+  $("tower-summary").textContent =
+    `${whole(tower.population)} / ${whole(tower.housingCapacity)} residents · ${tower.staffedJobs} / ${tower.physicalJobs} jobs filled · power ${percent(tower.powerRatio * 100)} · water ${percent(tower.waterRatio * 100)} · ${tower.shopBundles} shopping bundles and ${tower.schoolPlaces} school places per month.`;
+  const select = $("tower-floor-use");
+  if (!select.options.length)
+    for (const [use, def] of Object.entries(FUTURE_FLOORS)) {
+      const option = document.createElement("option");
+      option.value = use;
+      option.textContent = `${floorNames[use]} — ${money(def.cost)}, ${money(def.upkeep)}/month`;
+      select.append(option);
+    }
+  $("add-tower-floor").disabled = tower.floors.length >= 12;
+  $("add-tower-floor").onclick = () =>
+    act({
+      type: "future",
+      action: { type: "addFloor", index, use: select.value },
+    });
+  $("tower-floor-list").replaceChildren(
+    ...tower.floors.map((f) => {
+      const row = document.createElement("li"),
+        label = document.createElement("strong"),
+        toggle = document.createElement("button"),
+        remove = document.createElement("button"),
+        locked =
+          f.use === "homes" &&
+          f.enabled &&
+          tower.housingCapacity - 90 < tower.population;
+      label.textContent = `${f.index + 1}. ${floorNames[f.use]} · ${!f.enabled ? "Closed" : f.operating ? "Operating" : "Waiting for service or staff"}${f.use === "homes" ? ` · ${f.residents} residents` : ""}`;
+      toggle.type = remove.type = "button";
+      toggle.textContent = `${f.enabled ? "Close" : "Open"} floor ${f.index + 1}`;
+      toggle.disabled = locked;
+      toggle.onclick = () =>
+        act({
+          type: "future",
+          action: {
+            type: "setFloorEnabled",
+            index,
+            floor: f.index,
+            enabled: !f.enabled,
+          },
+        });
+      remove.textContent = `Remove floor ${f.index + 1}`;
+      remove.disabled = locked || tower.floors.length <= 1;
+      remove.onclick = () =>
+        ask(
+          "Remove tower floor?",
+          `Remove floor ${f.index + 1} (${floorNames[f.use]})? Construction costs are not refunded.`,
+          "Remove floor",
+          () =>
+            act({
+              type: "future",
+              action: { type: "removeFloor", index, floor: f.index },
+            }),
+        );
+      row.append(label, toggle, remove);
+      return row;
+    }),
+  );
 }
 function renderUtilities() {
   const labels = {
@@ -320,7 +399,7 @@ function renderUtilities() {
       const row = document.createElement("div");
       row.className = "utility-line";
       const name = document.createElement("strong");
-      name.textContent = labels[id] || id;
+      name.textContent = `${labels[id] || id}${item.localDelivered ? " grid" : ""}`;
       const total = document.createElement("span");
       total.textContent =
         id === "waste"
@@ -331,6 +410,11 @@ function renderUtilities() {
           ? "Actual waste in bins and service vehicles, awaiting processing"
           : "Monthly demand / connected capacity";
       row.append(name, total);
+      if (item.localDelivered) {
+        const local = document.createElement("small");
+        local.textContent = `${whole(item.localDelivered)} delivered inside towers; grid shows remaining demand and surplus capacity.`;
+        row.append(local);
+      }
       if (id === "waste") {
         const detail = document.createElement("small");
         detail.textContent = `${whole(metrics.services.uncollectedWaste)} in bins · ${whole(metrics.services.carriedWaste)} in vehicles · collection indicator ${whole(item.ratio * 100)}/100`;
@@ -1198,6 +1282,7 @@ function wrapCity(solo) {
     companion.environment.lastMonth = solo.month - 1;
     companion.households = createHouseholds(companion, { month: solo.month });
     companion.services = createServices(companion, { month: solo.month });
+    companion.future = createFuture(companion);
   }
   r.events.push(
     `Single-city import: two fresh towns initialized at calendar month ${solo.month}; their prior months were not simulated.`,

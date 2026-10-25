@@ -286,7 +286,9 @@ function towerReport(city, tower, m) {
     : 0;
   const powerDemand = Math.max(1, tile.occupancy + jobs * 2);
   const powerRatio = isActive
-    ? Math.max(ratio(m, "power"), Math.min(1, powerSupply / powerDemand))
+    ? m.globalUtilities
+      ? (m.utilities?.power?.byTile?.[tower.tile] ?? ratio(m, "power"))
+      : Math.max(ratio(m, "power"), Math.min(1, powerSupply / powerDemand))
     : 0;
   // The core allocates its shared finite groundwater once across all suppliers.
   // A supplied per-tower reservation is authoritative; exhausted reserves never
@@ -310,9 +312,11 @@ function towerReport(city, tower, m) {
         ),
       )
     : 0;
-  const waterDemand = Math.max(1, Math.ceil(tile.occupancy / 2) + jobs);
+  const waterDemand = Math.max(1, tile.occupancy + jobs);
   const waterRatio = isActive
-    ? Math.max(ratio(m, "water"), Math.min(1, waterSupply / waterDemand))
+    ? m.globalUtilities
+      ? (m.utilities?.water?.byTile?.[tower.tile] ?? ratio(m, "water"))
+      : Math.max(ratio(m, "water"), Math.min(1, waterSupply / waterDemand))
     : 0;
   const operation = Math.min(powerRatio, waterRatio);
   const scale = (use) => (operation >= 0.9 ? staffRatio(use) * operation : 0);
@@ -548,4 +552,78 @@ export function advanceFuture(city, m = {}) {
   city.inventory.ore = ore;
   city.future = next;
   return futureReport(city, m);
+}
+// Wire format only: omit canonical default towers and encode at most 12 floor
+// uses/flags per exception. Runtime objects remain complete, ordinary JSON data.
+const FLOOR_CODES = "HSOPWEKC";
+const FLOOR_USES = [
+  "homes",
+  "shops",
+  "offices",
+  "power",
+  "water",
+  "school",
+  "park",
+  "crown",
+];
+const encodeFloors = (floors) =>
+  floors
+    .map((f) => {
+      const code = FLOOR_CODES[FLOOR_USES.indexOf(f.use)];
+      return f.enabled ? code : code.toLowerCase();
+    })
+    .join("");
+export function encodeFuture(city) {
+  validateFuture(city.future, city);
+  const towers = [];
+  for (const t of city.future.towers) {
+    const code = encodeFloors(t.floors);
+    if (code !== encodeFloors(initialTower(city.tiles[t.tile], t.tile).floors))
+      towers.push([t.tile, code]);
+  }
+  return { ...city.future, encoding: "floors-v1", towers };
+}
+export function decodeFuture(city) {
+  const encoded = city.future;
+  if (!encoded || !Object.hasOwn(encoded, "encoding")) return encoded;
+  if (
+    !exact(encoded, [
+      "version",
+      "lastMonth",
+      "towers",
+      "composite",
+      "ledger",
+      "encoding",
+    ]) ||
+    encoded.encoding !== "floors-v1" ||
+    !Array.isArray(encoded.towers) ||
+    encoded.towers.length > context(city)
+  )
+    bad();
+  const complete = createFuture(city),
+    byTile = new Map(complete.towers.map((t) => [t.tile, t]));
+  let previous = -1;
+  for (const pair of encoded.towers) {
+    if (
+      !Array.isArray(pair) ||
+      pair.length !== 2 ||
+      !integer(pair[0], 0, city.tiles.length - 1) ||
+      pair[0] <= previous ||
+      !byTile.has(pair[0]) ||
+      typeof pair[1] !== "string" ||
+      pair[1].length < 1 ||
+      pair[1].length > 12 ||
+      !/^[HSOPWEKChsopwekc]+$/.test(pair[1])
+    )
+      bad();
+    previous = pair[0];
+    byTile.get(pair[0]).floors = Array.from(pair[1], (code) => ({
+      use: FLOOR_USES[FLOOR_CODES.indexOf(code.toUpperCase())],
+      enabled: code === code.toUpperCase(),
+    }));
+  }
+  const { encoding, ...state } = encoded;
+  const decoded = { ...state, towers: complete.towers };
+  validateFuture(decoded, city);
+  return decoded;
 }

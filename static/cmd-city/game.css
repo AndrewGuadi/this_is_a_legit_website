@@ -27,3 +27,5 @@
 .road-actions { display: grid; grid-template-columns: 1fr; gap: .5rem; }
 .road-actions button { min-height: 44px; white-space: normal; }
 #road-plan-status { overflow-wrap: anywhere; }
+
+.tower-floor-list{list-style:none;margin:12px 0;padding:0;max-height:370px;overflow-y:auto}.tower-floor-list li{border-bottom:1px solid var(--line);padding:10px 0}.tower-floor-list strong{display:block;line-height:1.6;margin-bottom:8px}.tower-floor-list button{min-height:44px;margin:3px 4px 3px 0;white-space:normal}#tower-floor-use{width:100%;min-width:0;margin:8px 0;min-height:44px}#tower-summary{line-height:1.7}#add-tower-floor{min-height:44px}

@@ -8,6 +8,7 @@ const model = (file) =>
   import(
     pathToFileURL(path.join(__dirname, "../../static/cmd-city", file)).href
   );
+async function decoded(text){return (await model("region.mjs")).parseRegion(text);}
 const panel = (page, name) =>
   page.getByRole("button", { name, exact: true }).click({ timeout: 7000 });
 const amount = (n) =>
@@ -99,7 +100,7 @@ test("resident cohorts, shopping and private budgets reflect actual booked state
   await selected(page, 5, 9);
   await expect(page.locator("#home-economy")).toContainText("Private cash");
   const text = await exported(page),
-    region = JSON.parse(text),
+    region = await decoded(text),
     city = region.cities[0].state;
   const { measure } = await model("core.mjs");
   const r = measure(city).households,
@@ -193,7 +194,7 @@ test("Finance gates class rates while bulk rates remain available and booked rec
       .press("Tab");
   }
   await month(page);
-  const final = JSON.parse(await exported(page)).cities[0].state;
+  const final = (await decoded(await exported(page))).cities[0].state;
   expect(final.households.wealthTaxes.residential).toEqual([0, 12, 20]);
   let taxes = 0;
   for (const h of final.households.homes)
@@ -251,7 +252,7 @@ test("deliberate medical and crime cases dispatch saved road vehicles and conser
   await expect(page.locator("#service-case-report")).toContainText("6");
   await month(page);
   const text = await exported(page),
-    state = JSON.parse(text).cities[0].state;
+    state = (await decoded(text)).cities[0].state;
   const moving = state.services.vehicles.filter(
     (v) => ["medical", "police"].includes(v.kind) && v.status !== "idle",
   );
@@ -267,7 +268,7 @@ test("deliberate medical and crime cases dispatch saved road vehicles and conser
   expect(state.services.counters.treatedPatients).toBe(0);
   expect(state.services.counters.resolvedCrimes).toBe(0);
   await imported(page, text);
-  const restored = JSON.parse(await exported(page)).cities[0].state;
+  const restored = (await decoded(await exported(page))).cities[0].state;
   expect(restored.services).toEqual(state.services);
   const { measure } = await model("core.mjs");
   expect(
@@ -301,7 +302,7 @@ test("a valid imported closed gateway can be reopened through its road control a
     "data-state",
     "paused",
   );
-  const data = JSON.parse(await exported(page));
+  const data = (await decoded(await exported(page)));
   data.cities[0].state.tiles[16 * 40].enabled = false;
   await imported(page, JSON.stringify(data));
   await selected(page, 0, 16);
@@ -325,6 +326,6 @@ test("a valid imported closed gateway can be reopened through its road control a
   await expect(
     page.getByRole("button", { name: "Close selected road", exact: true }),
   ).toBeEnabled();
-  const restored = JSON.parse(await exported(page)).cities[0].state;
+  const restored = (await decoded(await exported(page))).cities[0].state;
   expect(restored.tiles[16 * 40].enabled).toBe(true);
 });

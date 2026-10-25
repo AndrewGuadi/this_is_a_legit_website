@@ -267,6 +267,7 @@ test("a validated terminal-month save pauses safely and leaves recovery controls
   const region = JSON.parse(await fs.readFile(await file.path(), "utf8"));
   const {createHouseholds} = await import("../../static/cmd-city/households.mjs");
   const {createServices} = await import("../../static/cmd-city/services.mjs");
+  const {createFuture} = await import("../../static/cmd-city/future.mjs");
   region.month = 1000000;
   for (const c of region.cities) {
     c.state.month = 1000000;
@@ -275,6 +276,7 @@ test("a validated terminal-month save pauses safely and leaves recovery controls
     // Terminal-boundary fixture: no historical million-month simulation implied.
     c.state.households = createHouseholds(c.state);
     c.state.services = createServices(c.state);
+    c.state.future = createFuture(c.state);
   }
   await page
     .locator("#import-city")

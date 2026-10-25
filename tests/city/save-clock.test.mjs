@@ -25,7 +25,7 @@ test("malformed, oversize and unknown-version saves fail without changing the cu
   for (const text of [
     "{",
     "x".repeat(1048577),
-    JSON.stringify({ ...s, version: 4 }),
+    JSON.stringify({ ...s, version: 5 }),
     JSON.stringify({ ...s, cash: 1e99 }),
     JSON.stringify({ ...s, tiles: [] }),
     JSON.stringify({

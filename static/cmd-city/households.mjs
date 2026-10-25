@@ -459,9 +459,9 @@ function observation(city, metrics, state) {
   }
 }
 const active = (t) => t.enabled !== false && t.fire === 0;
-function supplied(metrics) {
+function supplied(metrics, i) {
   return ["power", "water"].every(
-    (k) => metrics.utilities[k].supply > 0 && metrics.utilities[k].ratio >= 0.9,
+    (k) => (metrics.utilities[k].byTile?.[i] ?? metrics.utilities[k].ratio) >= 0.9 && (metrics.utilities[k].totalSupply ?? metrics.utilities[k].supply) > 0,
   );
 }
 function operating(city, metrics, i) {
@@ -469,7 +469,7 @@ function operating(city, metrics, i) {
     active(city.tiles[i]) &&
     metrics.access[i] === true &&
     (metrics.operationAccess?.[i] ?? true) &&
-    supplied(metrics)
+    supplied(metrics, i)
   );
 }
 function businessWealth(value) {
@@ -774,7 +774,7 @@ function roadNetwork(city) {
 }
 function routesFrom(city, network, from) {
   const roots = network.frontages[from],
-    key = roots.join(","),
+    key = (city.tiles[from].type === "tower" ? `tower:${from}:` : "") + roots.join(","),
     cached = network.routes.get(key);
   if (cached) {
     network.routes.delete(key);
@@ -830,13 +830,16 @@ function routesFrom(city, network, from) {
       return shopOrder;
     },
     distance(to) {
+      if(to===from && city.tiles[from].type==="tower") return 0;
       const end = endpoint(to);
       return end < 0 ? Infinity : distances[to];
     },
     reachable(to) {
+      if(to===from && city.tiles[from].type==="tower") return true;
       return endpoint(to) >= 0;
     },
     fits(to, remaining) {
+      if(to===from && city.tiles[from].type==="tower") return true;
       const end = endpoint(to);
       if (end < 0) return false;
       const prev = tree().prev;
@@ -845,10 +848,12 @@ function routesFrom(city, network, from) {
       return true;
     },
     walk(to, visit) {
+      if(to===from && city.tiles[from].type==="tower") return;
       const prev = tree().prev;
       for (let j = endpoint(to); j !== -1; j = prev[j]) visit(j);
     },
     path(to) {
+      if(to===from && city.tiles[from].type==="tower") return [];
       const prev = tree().prev,
         path = [];
       for (let j = endpoint(to); j !== -1; j = prev[j]) path.push(j);
@@ -881,6 +886,7 @@ function schooling(city, state, metrics, homeRoutes, order) {
       );
     (university ? universities : schools).push({ i, left: capacity });
   }
+  for(const tower of metrics.future?.towers || []) if(tower.schoolPlaces>0) schools.push({i:tower.tile,left:tower.schoolPlaces});
   const options = (i, facilities) =>
     facilities.filter((s) => s.left > 0 && homeRoutes.get(i).reachable(s.i));
   let remaining = true;
@@ -938,8 +944,8 @@ function updateWealth(h, metrics, i) {
     education = h.adults ? h.educated / h.adults : 1,
     children = h.children ? h.enrolledChildren / h.children : 1,
     utilities = Math.min(
-      metrics.utilities.power.ratio,
-      metrics.utilities.water.ratio,
+      metrics.utilities.power.byTile?.[i] ?? metrics.utilities.power.ratio,
+      metrics.utilities.water.byTile?.[i] ?? metrics.utilities.water.ratio,
       metrics.utilities.sewage.ratio,
       metrics.utilities.waste.ratio,
     ),
@@ -1077,6 +1083,8 @@ export function advanceHouseholds(
         left: Math.floor(metrics.jobFill[i] * 4),
         price: HOUSEHOLD_RULES.shopPrices[businessWealth(metrics.landValue[i])],
       });
+  for(const tower of metrics.future?.towers || []) if(tower.shopBundles>0)
+    shops.push({i:tower.tile,left:tower.shopBundles,price:HOUSEHOLD_RULES.shopPrices[businessWealth(metrics.landValue[tower.tile])]});
   const choices = new Map(),
     shopById = new Map(shops.map((shop) => [shop.i, shop])),
     shopKey = shops.map((shop) => `${shop.i}:${shop.price}`).join("|"),

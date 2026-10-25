@@ -1,0 +1,9 @@
+{
+  "starterAndDense": 240,
+  "mixedTowerWithClosureAndReopening": 120,
+  "fullStateAndReportEqual": true,
+  "referenceWorktree": "/tmp/cmd05-future-integration",
+  "referenceBaseline": "7aa0a1e062e19b92559b7ed5ee230a8dbdeafc29",
+  "referenceDeltaSha256": "c445190a326a223ee3547ce7755b1a07595a55bccd363824ecfb38de1637dfce",
+  "reconciledCommit": "6a5c8c3e70787a5a1a9cf318af48577894c2206d"
+}

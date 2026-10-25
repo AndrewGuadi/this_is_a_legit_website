@@ -1,3 +1,4 @@
+import { createFuture } from "../../static/cmd-city/future.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
 import {
@@ -7,11 +8,18 @@ import {
 } from "../../static/cmd-city/core.mjs";
 import { createHouseholds } from "../../static/cmd-city/households.mjs";
 import { createServices } from "../../static/cmd-city/services.mjs";
-import { parseCity, serializeCity } from "../../static/cmd-city/save.mjs";
+import {
+  parseCity,
+  serializeCity,
+  cityForExport,
+} from "../../static/cmd-city/save.mjs";
 import * as regions from "../../static/cmd-city/region.mjs";
 const CITY_MAX = 1048576,
   REGION_MAX = 3 * CITY_MAX,
-  bytes = (s) => Buffer.byteLength(JSON.stringify(s));
+  bytes = (s) =>
+    Buffer.byteLength(
+      JSON.stringify(s.cities ? regions.regionForExport(s) : cityForExport(s)),
+    );
 function cityNearLimit(headroom = 16, trading = false) {
   const s = createCity({ starter: false });
   s.cash = 900000000000;
@@ -42,6 +50,7 @@ function cityNearLimit(headroom = 16, trading = false) {
       s.environment.radiation[i] = 0;
     }
   s.inventory.ore = 20;
+  s.future = createFuture(s);
   s.households = createHouseholds(s);
   let cash = 0,
     arrears = 0;
@@ -139,7 +148,7 @@ function cityNearLimit(headroom = 16, trading = false) {
   const padding = CITY_MAX - headroom - bytes(s) - 2;
   if (padding >= 0) s.events = ["X".repeat(padding)];
   assert.ok(bytes(s) <= CITY_MAX - headroom);
-  return parseCity(JSON.stringify(s));
+  return parseCity(JSON.stringify(cityForExport(s)));
 }
 function regionNearLimit() {
   const r = regions.createRegion();
@@ -154,7 +163,7 @@ function regionNearLimit() {
   }
   assert.equal(bytes(r), target);
   assert.ok(r.events.length < 24);
-  return regions.parseRegion(JSON.stringify(r));
+  return regions.parseRegion(JSON.stringify(regions.regionForExport(r)));
 }
 function activeCityAction(r, a) {
   // Reproduce the pre-boundary UI flow until the dedicated transaction exists.
@@ -229,4 +238,47 @@ test("region switching and monthly advancement retain exportability or reject th
     assert.deepEqual(r, before);
     assert.match(error.message, /limit|save|accounting/i);
   }
+});
+
+test("legacy migration rejects near-limit states whose exact compact export cannot fit", () => {
+  const old = cityNearLimit(16);
+  old.version = 3;
+  delete old.future;
+  let delta = CITY_MAX - 16 - Buffer.byteLength(JSON.stringify(old));
+  old.events[0] += "X".repeat(Math.max(0, delta));
+  const text = JSON.stringify(old);
+  assert.ok(Buffer.byteLength(text) <= CITY_MAX);
+  assert.throws(() => parseCity(text), /1 MiB/);
+});
+test("a nondefault floor encoding cannot cross the city byte budget through a free floor toggle", () => {
+  const s = cityNearLimit(),
+    before = structuredClone(s);
+  const result = applyAction(s, {
+    type: "future",
+    action: { type: "setFloorEnabled", index: 0, floor: 0, enabled: false },
+  });
+  assert.equal(result.ok, false);
+  assert.match(result.message, /limit|save/i);
+  assert.deepEqual(s, before);
+  assert.deepEqual(parseCity(serializeCity(s)), s);
+});
+
+test("legacy child cities that fit individually cannot exceed the region limit after migration", () => {
+  const old = regionNearLimit();
+  for (const c of old.cities) {
+    c.state.version = 3;
+    delete c.state.future;
+  }
+  let room = REGION_MAX - 16 - Buffer.byteLength(JSON.stringify(old));
+  while (room > 2) {
+    const controls = Math.min(500, Math.floor((room - 3) / 6)),
+      ascii = Math.min(500 - controls, room - 3 - controls * 6);
+    old.events.push("\u0001".repeat(controls) + "X".repeat(ascii));
+    room = REGION_MAX - 16 - Buffer.byteLength(JSON.stringify(old));
+  }
+  assert.ok(old.events.length <= 24);
+  assert.ok(Buffer.byteLength(JSON.stringify(old)) <= REGION_MAX);
+  for (const c of old.cities)
+    assert.doesNotThrow(() => parseCity(JSON.stringify(c.state)));
+  assert.throws(() => regions.parseRegion(JSON.stringify(old)), /3 MiB/);
 });

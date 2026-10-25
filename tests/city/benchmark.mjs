@@ -1,3 +1,4 @@
+import { createFuture } from "../../static/cmd-city/future.mjs";
 import { createHouseholds } from "../../static/cmd-city/households.mjs";
 import { createServices } from "../../static/cmd-city/services.mjs";
 /** Reproducible synthetic stress measurement, not physical-phone evidence. */
@@ -41,6 +42,7 @@ s.tiles[640].type = "road";
 // demographic capital and material baselines once, never reset during the run.
 s.households = createHouseholds(s);
 s.services = createServices(s);
+s.future = createFuture(s);
 const initial = measure(s),
   times = [];
 for (let i = 0; i < 120; i++) {

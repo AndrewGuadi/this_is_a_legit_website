@@ -1,3 +1,4 @@
+import { createFuture } from "../../static/cmd-city/future.mjs";
 import { createHouseholds } from "../../static/cmd-city/households.mjs";
 import { createServices } from "../../static/cmd-city/services.mjs";
 /** Sustained synthetic-load evidence. No per-month state replenishment or model overrides. */
@@ -110,7 +111,8 @@ city.funding = { school: 150, clinic: 150, fire: 100, police: 150 };
 // baselines once, before validation. No demographic/material reset occurs later.
 city.households = createHouseholds(city);
 city.services = createServices(city);
-assert.equal(city.version, 3);
+city.future = createFuture(city);
+assert.equal(city.version, 4);
 assert.equal(city.month, 0);
 assert.equal(city.environment.lastMonth, -1);
 assert.equal(city.civic.lastMonth, 0);

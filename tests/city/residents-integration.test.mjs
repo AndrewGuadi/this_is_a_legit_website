@@ -65,6 +65,7 @@ function legacy(s, version = 2) {
   old.version = version;
   delete old.households;
   delete old.services;
+  delete old.future;
   if (version === 1) {
     delete old.environment;
     delete old.civic;
@@ -87,9 +88,9 @@ function wallet(s, i, value) {
   s.households.ledger.closingCash += delta;
 }
 
-test("city schema3 creates aligned conserved households and finite service state after starter construction", () => {
+test("city schema4 creates aligned conserved households and finite service state after starter construction", () => {
   const s = createCity();
-  assert.equal(s.version, 3);
+  assert.equal(s.version, 4);
   assert.equal(s.households.lastMonth, 0);
   assert.equal(s.services.lastMonth, -1);
   assert.equal(validateHouseholds(s.households, s), true);
@@ -288,7 +289,7 @@ test("legacy1 and legacy2 migration retain old fields and add only declared new 
     const old = legacy(s, version);
     old.taxes.residential = 7;
     const a = parseCity(JSON.stringify(old));
-    assert.equal(a.version, 3);
+    assert.equal(a.version, 4);
     for (const key of Object.keys(old))
       if (key !== "version") assert.deepEqual(a[key], old[key]);
     assert.deepEqual(a.households.wealthTaxes.residential, [7, 7, 7]);
@@ -300,7 +301,7 @@ test("legacy1 and legacy2 migration retain old fields and add only declared new 
     assert.equal(validateServices(a.services, a), true);
   }
 });
-test("schema3 rejects partial new subsystems, malformed cross-tile cohorts, material identities and unsupported versions", () => {
+test("schema4 rejects partial new subsystems, malformed cross-tile cohorts, material identities and unsupported versions", () => {
   const s = createCity();
   for (const change of [
     (a) => delete a.households,
@@ -309,7 +310,7 @@ test("schema3 rejects partial new subsystems, malformed cross-tile cohorts, mate
     (a) => a.services.lastMonth--,
     (a) => a.households.homes.find(Boolean).adults++,
     (a) => a.services.waste[0]++,
-    (a) => (a.version = 4),
+    (a) => (a.version = 5),
     (a) => {
       a.version = 2;
       delete a.services;
@@ -334,7 +335,7 @@ test("new state roundtrip preserves deterministic future and every city in legac
   const old = structuredClone(r),
     region = parseRegion(JSON.stringify(r));
   for (let n = 0; n < 3; n++) {
-    assert.equal(region.cities[n].state.version, 3);
+    assert.equal(region.cities[n].state.version, 4);
     assert.deepEqual(
       region.cities[n].state.inventory,
       old.cities[n].state.inventory,
@@ -373,7 +374,7 @@ test("near-bound service failure preserves the entire city and whole region incl
   assert.deepEqual(r, original);
 });
 
-test("demolition immediately updates bounded legacy waste summary and schema3 rejects a forged summary", () => {
+test("demolition immediately updates bounded legacy waste summary and schema4 rejects a forged summary", () => {
   const s = flat();
   put(s, "landfill", 7, 15, { stored: 80 });
   initialize(s);

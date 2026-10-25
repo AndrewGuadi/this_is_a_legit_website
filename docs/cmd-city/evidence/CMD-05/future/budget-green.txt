@@ -1,0 +1,18 @@
+✔ an accepted near-limit city rejects an ASCII or escaped rename without losing exportability (1250.2953ms)
+✔ ordinary byte-safe actions preserve city identity and remain exactly exportable (30.757632ms)
+✔ a city month either remains exportable or rejects with every source field preserved (597.147967ms)
+✔ a city action cannot cross the region wrapper budget even when its individual city still fits (4630.761413ms)
+✔ near-limit regional shipment preserves stock cash shipments project and events on rejection (3504.192673ms)
+✔ near-limit regional contribute preserves stock cash shipments project and events on rejection (2931.208663ms)
+✔ region switching and monthly advancement retain exportability or reject the whole region atomically (3599.423198ms)
+✔ legacy migration rejects near-limit states whose exact compact export cannot fit (449.472104ms)
+✔ a nondefault floor encoding cannot cross the city byte budget through a free floor toggle (998.873571ms)
+✔ legacy child cities that fit individually cannot exceed the region limit after migration (3522.451899ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 21696.98515

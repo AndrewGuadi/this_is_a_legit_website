@@ -1,3 +1,10 @@
+import {
+  createFuture,
+  validateFuture,
+  futureTowerCapacity,
+  encodeFuture,
+  decodeFuture,
+} from "./future.mjs";
 import { createHouseholds, validateHouseholds } from "./households.mjs";
 import { createServices, validateServices } from "./services.mjs";
 import { createEnvironment, validateEnvironment } from "./environment.mjs";
@@ -6,7 +13,7 @@ import { TOOLS, RESOURCES, RESEARCH, capacity } from "./content.mjs";
 export const MAX_CITY_SAVE_BYTES = 1048576;
 const MAX = MAX_CITY_SAVE_BYTES;
 const bad = () => {
-  throw Error("This file is not a valid CMD City version 1, 2 or 3 save.");
+  throw Error("This file is not a valid CMD City version 1, 2, 3 or 4 save.");
 };
 const integer = (n, a, b) => Number.isSafeInteger(n) && n >= a && n <= b;
 const object = (v) => v && typeof v === "object" && !Array.isArray(v);
@@ -31,8 +38,9 @@ export function parseCity(text) {
   } catch {
     bad();
   }
-  if (!object(s) || ![1, 2, 3].includes(s.version)) bad();
+  if (!object(s) || ![1, 2, 3, 4].includes(s.version)) bad();
   const version = s.version;
+  if (version === 4 && s.future?.encoding) s.future = decodeFuture(s);
   keys(s, [
     "version",
     "width",
@@ -57,10 +65,11 @@ export function parseCity(text) {
     "regionalPower",
     "tiles",
     ...(version >= 2 ? ["environment", "civic"] : []),
-    ...(version === 3 ? ["households", "services"] : []),
+    ...(version >= 3 ? ["households", "services"] : []),
+    ...(version === 4 ? ["future"] : []),
   ]);
   if (
-    ![1, 2, 3].includes(s.version) ||
+    ![1, 2, 3, 4].includes(s.version) ||
     s.width !== 40 ||
     s.height !== 32 ||
     !integer(s.seed, 1, 4294967295) ||
@@ -89,6 +98,28 @@ export function parseCity(text) {
     new Set(s.research.completed).size !== s.research.completed.length ||
     s.research.completed.some(
       (v) => typeof v !== "string" || !Object.hasOwn(RESEARCH, v),
+    )
+  )
+    bad();
+  if (
+    version < 3 &&
+    s.research.completed.some(
+      (name) =>
+        !["cleanEnergy", "transit", "vertical", "serviceDrones"].includes(name),
+    )
+  )
+    bad();
+  if (
+    version < 4 &&
+    s.research.completed.some(
+      (name) =>
+        ![
+          "cleanEnergy",
+          "transit",
+          "vertical",
+          "serviceDrones",
+          "maglev",
+        ].includes(name),
     )
   )
     bad();
@@ -129,7 +160,13 @@ export function parseCity(text) {
       !integer(t.age, 0, s.month) ||
       !integer(t.stored, 0, 30000) ||
       typeof t.enabled !== "boolean" ||
-      !integer(t.occupancy, 0, capacity(t))
+      !integer(
+        t.occupancy,
+        0,
+        version === 4 && t.type === "tower"
+          ? futureTowerCapacity(s, i)
+          : capacity(t),
+      )
     )
       bad();
     if (
@@ -149,6 +186,8 @@ export function parseCity(text) {
       bad();
     if (["streetcarTrack", "maglevTrack"].includes(t.type) && t.modules !== 0)
       bad();
+    if (version < 4 && ["consortium", "fusion", "tidal"].includes(t.type))
+      bad();
     if (
       version < 3 &&
       [
@@ -161,6 +200,18 @@ export function parseCity(text) {
     )
       bad();
     if (t.type === "tower" && !s.research.completed.includes("vertical")) bad();
+    if (
+      ["fusion", "tidal"].includes(t.type) &&
+      !s.research.completed.includes(t.type)
+    )
+      bad();
+    if (
+      t.type === "tidal" &&
+      ![i % 40 ? i - 1 : -1, i % 40 < 39 ? i + 1 : -1, i - 40, i + 40].some(
+        (j) => s.tiles[j]?.terrain === "water",
+      )
+    )
+      bad();
     if (t.type === "tower" || t.type === "residential")
       population += t.occupancy;
   }
@@ -201,14 +252,14 @@ export function parseCity(text) {
       !integer(h.population, 0, 1000000) ||
       !integer(h.happiness, 0, 100) ||
       !integer(h.cash, -1e12, 1e12) ||
-      !integer(h.income, 0, version === 3 ? 2e12 : 1e10) ||
+      !integer(h.income, 0, version >= 3 ? 2e12 : 1e10) ||
       !integer(h.upkeep, 0, 1e10) ||
       !integer(h.debt, 0, 1e10) ||
       !integer(h.trade, -1e10, 1e10) ||
       !integer(
         h.net,
-        version === 3 ? -2e12 : -1e10,
-        version === 3 ? 2e12 : 1e10,
+        version >= 3 ? -2e12 : -1e10,
+        version >= 3 ? 2e12 : 1e10,
       ) ||
       h.net !== h.income - h.upkeep - h.debt + h.trade
     )
@@ -253,11 +304,18 @@ export function parseCity(text) {
       0,
     );
   if (s.backlogs.waste !== Math.min(1000000, pendingWaste)) bad();
+  if (version < 4) {
+    s.future = createFuture(s);
+    s.version = 4;
+  }
+  validateFuture(s.future, s);
+  if (s.future.lastMonth !== s.month) bad();
+  assertCitySaveBudget(s);
   return s;
 }
 /** Exact post-transaction byte bound; never guesses from entity counts. */
 export function assertCitySaveBudget(city) {
-  const text = JSON.stringify(city);
+  const text = JSON.stringify(cityForExport(city));
   // A UTF-16 code unit needs at most three UTF-8 bytes (a surrogate pair
   // needs four total). Small strings and ASCII strings therefore have a proven
   // byte bound without allocating a second full encoded buffer. Borderline
@@ -276,4 +334,8 @@ export function serializeCity(s) {
   const text = assertCitySaveBudget(s);
   parseCity(text);
   return text;
+}
+
+export function cityForExport(city) {
+  return city.version === 4 ? { ...city, future: encodeFuture(city) } : city;
 }

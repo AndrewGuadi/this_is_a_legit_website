@@ -20,3 +20,13 @@ The existing Flask/PythonAnywhere hosting target is retained. No domain-specific
 ## Evidence
 
 Worker/manager evidence will be retained under `docs/cmd-city/evidence/CMD-05/`, with current source hashes, real test results and explicit failed/unverified items. Unchanged historical evidence is identified as historical, not silently presented as current. Primary-document capabilities can support documented comparison; licensed-game execution is not claimed unless actually observed.
+
+## CMD-05 integration continuation
+
+Published intermediate checkpoint `a0ab98882cdafedc5f904dc2636cbca4f46f52ea` has exact local source tree `3ad1c6cbbc014af4f3bd9f0dfbbbaf3c7aa7c598`; PR6 remains draft. Main implementation checkout is `/tmp/cmd-city-work`. Reconciled future source is local `6a5c8c3e70787a5a1a9cf318af48577894c2206d` in `/tmp/cmd05-reconcile`; evidence checkpoint `a836e38` follows it. Manager game regression passed385/385. Frozen isolated future source passed96 city browser checks across360/390/768/1440;360 full-state/report month comparisons preserve results after routing reconciliation. These are intermediate evidence, not final release approval.
+
+A bounded Wasm BFS experiment passed behavioral and fallback checks but failed to improve whole-game performance. Production kernel/CSP/dependency edits are being reverted; experiment evidence remains. The under20ms p95 target remains unmet. Next optimization uses immutable owned report snapshots, retaining fresh public validation, mutation invalidation and exact rollback budgets.
+
+Current isolated work: commerce schema5 integration at `/tmp/cmd05-commerce-integration`; tower keyboard focus/layout correction then aerial services at `/tmp/cmd06-aerial`; performance at main; independent TODD review of future/schema/UI. Fourth narrow implementation worker added for online foundation in `/tmp/cmd06-online` after remeasuring9 CPUs/affinity9, load1.28 and8.93GiB available memory. This worker owns new backend/adaptor/tests only, with no shared model/UI edits before a contract handoff. Sequential quiet performance measurement remains mandatory; no recursive delegation.
+
+Online foundation must use original identity and explicit region authorization, authoritative model actions, bounded storage, conflict/idempotency rules and permission-filtered activity. It must preserve form/admin privacy boundaries. A fixed Node subprocess adapter can reuse the actual JavaScript model, but PythonAnywhere Node availability/configuration remains unverified and must be checked before deployment readiness. No game accounts, database migration or production configuration have been created on the deployed site.

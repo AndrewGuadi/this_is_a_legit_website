@@ -1,0 +1,60 @@
+✔ schema4 strict migration preserves old source fields and creates future state only once (70.669613ms)
+✔ real guarded floor controls create jobs, stock-limited internal purchases and housing capacity (147.334416ms)
+✔ critical staffing and internal generation require actual workers and share road and water limits (86.005909ms)
+✔ corporate output is booked once with resource, treasury and environmental consequences (51.837408ms)
+✔ a self-supplied tower retains local service under outside grid shortage without duplicated supply or groundwater (107.850319ms)
+✔ compact future exports are lossless, bounded and strict against expansion abuse (147.711765ms)
+✖ advanced clean-power research needs current skilled employed residents and a staffed institute, then actual plant staff generate power (8.308016ms)
+✖ tidal generation is shoreline constrained, finite, staffed and tied to the current tidal cycle (3.320421ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 6
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 805.470864
+
+✖ failing tests:
+
+test at tests/city/future-integration.test.mjs:15:1
+✖ advanced clean-power research needs current skilled employed residents and a staffed institute, then actual plant staff generate power (8.308016ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///tmp/cmd05-future-integration/tests/city/future-integration.test.mjs:15:395)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/city/future-integration.test.mjs:16:1
+✖ tidal generation is shoreline constrained, finite, staffed and tied to the current tidal cycle (3.320421ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///tmp/cmd05-future-integration/tests/city/future-integration.test.mjs:16:225)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

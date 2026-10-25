@@ -8,6 +8,7 @@ for (const version of [1, 2])
     city.version = version;
     delete city.households;
     delete city.services;
+    delete city.future;
     if (version === 1) {
       delete city.environment;
       delete city.civic;
@@ -16,7 +17,7 @@ for (const version of [1, 2])
           Object.assign(t, { type: "empty", occupancy: 0 });
     }
     city.research.completed = ["cleanEnergy", "transit"];
-    assert.equal(parseCity(JSON.stringify(city)).version, 3);
+    assert.equal(parseCity(JSON.stringify(city)).version, 4);
     city.research.completed.push("maglev");
     assert.throws(() => parseCity(JSON.stringify(city)));
   });

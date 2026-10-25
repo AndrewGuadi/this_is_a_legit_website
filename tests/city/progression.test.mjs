@@ -1,3 +1,4 @@
+import { createFuture } from "../../static/cmd-city/future.mjs";
 import { reconcileHouseholds } from "../../static/cmd-city/households.mjs";
 import test from "node:test";
 import assert from "node:assert/strict";
@@ -54,6 +55,7 @@ function legacy(s) {
   delete v.civic;
   delete v.households;
   delete v.services;
+  delete v.future;
   for (const t of v.tiles)
     if (["townHall", "waterFilter", "cleanup", "nuclear"].includes(t.type))
       Object.assign(t, { type: "empty", occupancy: 0 });
@@ -65,9 +67,9 @@ function reject(s, a) {
   assert.deepEqual(s, b);
 }
 
-test("schema3 cities have persistent environment, civic state and a connected prebuilt starter hall", () => {
+test("schema4 cities have persistent environment, civic state and a connected prebuilt starter hall", () => {
   const s = createCity();
-  assert.equal(s.version, 3);
+  assert.equal(s.version, 4);
   assert.equal(s.environment.air.length, 1280);
   assert.equal(s.environment.lastMonth, -1);
   assert.equal(s.civic.lastMonth, 0);
@@ -281,11 +283,11 @@ test("bond redemption pays actual outstanding obligation once and respects funds
   s.cash = 0;
   reject(s, { type: "redeemBond", index: 0 });
 });
-test("schema3 round trip preserves environment, civic progress and exact deterministic future", () => {
+test("schema4 round trip preserves environment, civic progress and exact deterministic future", () => {
   const s = createCity();
   advanceMonth(s);
   const restored = parseCity(serializeCity(s));
-  assert.equal(restored.version, 3);
+  assert.equal(restored.version, 4);
   assert.deepEqual(restored, s);
   advanceMonth(s);
   advanceMonth(restored);
@@ -296,7 +298,7 @@ test("strict legacy migration preserves inventories cash RNG all tiles history a
   advanceMonth(s);
   const old = legacy(s),
     a = parseCity(JSON.stringify(old));
-  assert.equal(a.version, 3);
+  assert.equal(a.version, 4);
   assert.deepEqual(a.inventory, old.inventory);
   assert.deepEqual(a.tiles, old.tiles);
   assert.deepEqual(a.history, old.history);
@@ -343,7 +345,7 @@ test("legacy region wrapper remains version1 while all three cities migrate inde
     a = parseRegion(JSON.stringify(r));
   assert.equal(a.version, 1);
   for (let n = 0; n < 3; n++) {
-    assert.equal(a.cities[n].state.version, 3);
+    assert.equal(a.cities[n].state.version, 4);
     assert.deepEqual(a.cities[n].state.inventory, b.cities[n].state.inventory);
     assert.equal(a.cities[n].state.rng, b.cities[n].state.rng);
     assert.equal(a.cities[n].state.cash, b.cities[n].state.cash);
@@ -412,7 +414,7 @@ test("within-month environmental forecasts cannot reserve already deducted nucle
   );
 });
 
-test("completed schema3 saves reject stale subsystem processing markers", () => {
+test("completed schema4 saves reject stale subsystem processing markers", () => {
   const s = createCity();
   advanceMonth(s);
   for (const subsystem of ["environment", "civic"]) {
@@ -452,7 +454,8 @@ test("a near-limit accepted population remains supported after a simulated month
     remaining -= occupied;
   }
   reconcileHouseholds(s);
-  const restored = parseCity(JSON.stringify(s));
+  s.future = createFuture(s);
+  const restored = parseCity(serializeCity(s));
   advanceMonth(restored);
   assert.ok(measure(restored).population <= 1000000);
   assert.doesNotThrow(() => serializeCity(restored));

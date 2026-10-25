@@ -374,7 +374,7 @@ export function createView(canvas) {
             : d.color;
     let h =
       t.type === "tower"
-        ? 36 + (t.level - 1) * 8
+        ? 24 + (state.future?.towers.find(v=>v.tile===index)?.floors.length || 2)*3
         : t.type === "residential" || t.type === "commercial"
           ? [6, 15, 28][t.level - 1]
           : 8 + t.modules * 3;
@@ -396,7 +396,7 @@ export function createView(canvas) {
       ctx.fill();
     }
     if (
-      ["industrial", "coalPlant", "factory", "mine", "oilWell"].includes(t.type)
+      ["industrial", "coalPlant", "factory", "mine", "oilWell", "consortium"].includes(t.type)
     ) {
       cube(px + 6, py + 6, 3, 3, 13, "#8a8a75");
       if (t.type === "coalPlant") cube(px + 15, py + 7, 4, 4, 17, "#a4a591");

@@ -32,6 +32,8 @@ test("scarce jobs rotate between equal eligible homes instead of starving the sa
     totals = [0, 0];
   for (let month = 0; month < 4; month++) {
     s.month = month;
+    s.future.lastMonth = month;
+    s.future.ledger.month = month;
     s.households.lastMonth = month;
     s.households.ledger.month = month;
     s.services.lastMonth = month - 1;
@@ -63,6 +65,8 @@ test("inactive homes do not take turns ahead of eligible commuters", () => {
   s.tiles[idx(3, 15)].enabled = false;
   for (let month = 0; month < 4; month++) {
     s.month = month;
+    s.future.lastMonth = month;
+    s.future.ledger.month = month;
     s.households.lastMonth = month;
     s.households.ledger.month = month;
     s.services.lastMonth = month - 1;
