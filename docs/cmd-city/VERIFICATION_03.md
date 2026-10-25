@@ -57,4 +57,6 @@ Direct Codex implementation remains authorized. Independent TODD/parity sessions
 
 Selected actual logs, source inventory and browser-test images are retained under `evidence/CMD-03/`; complete development logs remain under ignored `dev_docs/evidence/CMD-03/`. Scaffold RED, corrective RED, failed benchmark targets and passing regressions are distinguished. A formatter filename error was corrected and is not behavioral TDD evidence.
 
-The complete feature target, exact reference comparisons, the dense performance gate and the sustained fixture criterion remain unresolved. Publish only the development branch and evidence; do not claim acceptance or production release. The forthcoming independent CMD-TODD-03 report must identify the exact source candidate and current hashes.
+The complete feature target, exact reference comparisons, the dense performance gate and the sustained fixture criterion remain unresolved. Publish only the development branch and evidence; do not claim acceptance or production release.
+
+[Independent CMD-TODD-03 review](TODD_REVIEW_03.md) returned **REVISE, 85.1/100**. It verifies the exact local source and 44-file inventory, and records native source candidate `f13ea1b208c1747f9b64facd4094308d21006be7`, whose tree `e92bf9c214b281373343cefa7ca3ed8e7aeb63aa` exactly matches the reviewed local commit. Its independently executed 274 game, 33 application and eight focused browser checks passed. Both workload gates failed independently. The later report-only publication does not change the reviewed product source.

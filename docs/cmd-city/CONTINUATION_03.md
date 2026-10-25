@@ -13,7 +13,7 @@ Baseline: `5cebb4748ec1ad1c69c79aef924b46238f02fe6b`, branch `october2026/cmd-ci
 | CMD-03-REFERENCE | `/root/parity_research` | Primary-reference checks and honest acceptance boundaries | HANDOFF_READY |
 | CMD-03-INTEGRATE | `/root/city_design_review` | Core/content and strict schema migration; actual booked private taxes, waste/case conservation and bounded route caches | HANDOFF_READY |
 | CMD-03-UI | `/root/city_interface` | Meaningful household/service reports, controls and vehicle rendering with actual browser tests | HANDOFF_READY |
-| CMD-03-TODD | Separate `/root/todd_city` | Candidate-bound ten-criterion independent review | QUEUED |
+| CMD-03-TODD | Separate `/root/todd_city` | Candidate-bound ten-criterion independent review | REVISE — 85.1/100 |
 
 Initial implementation concurrency is two, with disjoint ownership. Actual tests-first snapshots and logs remain under ignored `dev_docs/evidence/CMD-03/`; selected evidence will be published with the candidate. Worker platform is direct Codex, not an unexecuted OpenCode inference claim. The manager owns documentation, scope/contract decisions, narrow integration corrections and publishing; implementation workers own substantive product changes.
 
@@ -35,4 +35,6 @@ Household groups are not named individual citizens. Shared finite enrollment is 
 
 Final formatted functional source passed 274 game checks (251 city), 176 full browser checks, 33 application, 27 orchestration, five runtime and 33 operations checks; the synthetic research runner matched all nine issued tasks. Actual schema 1/2 regions migrated preserving prior fields, projects and shipments. Independent closed-road and accepted-save rename defects were reproduced, corrected and rechecked. The UI now uses the guarded regionCityAction entry point. Manager reporting-copy changes distinguish educated adults and actual pending waste from radius coverage/capacity forecasts.
 
-Final dense performance: median 16.99 ms, p95 47.01 ms; target 20 ms NOT met. Sustained fixture: 4,800→minimum 4,018 (83.7%), below 90% retention; its script exited 1. No target was weakened and no in-run population/resource refresh occurred. Full feature-equivalence and source-bound independent acceptance remain incomplete. No merge or deployment is claimed.
+Final dense performance: median 16.99 ms, p95 47.01 ms; target 20 ms NOT met. Sustained fixture: 4,800→minimum 4,018 (83.7%), below 90% retention; its script exited 1. No target was weakened and no in-run population/resource refresh occurred. Full feature-equivalence and independent acceptance remain incomplete. No merge or deployment is claimed.
+
+[CMD-TODD-03](TODD_REVIEW_03.md) independently verified the frozen source and returned **REVISE, 85.1/100**, with all ten equal-weight scores recorded. It reran 274 game, 33 application and eight focused browser checks, real legacy migrations and the original corrective probes. Both workload gates failed again. Native source `f13ea1b208c1747f9b64facd4094308d21006be7` has exactly the locally reviewed tree `e92bf9c214b281373343cefa7ca3ed8e7aeb63aa`; the later report-only commit preserves this source identity.
