@@ -235,7 +235,9 @@ field.addEventListener("keydown", (event) => {
   sync();
   renderer.draw(game);
 });
-field.addEventListener("blur", () => {
+field.addEventListener("blur", (event) => {
+  // The primary button owns its pause/resume transition after receiving focus.
+  if (event.relatedTarget === action) return;
   if (game.mode === "playing") stop("Field lost focus. Resume when you're ready.");
 });
 function cellFromEvent(event) {
