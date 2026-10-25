@@ -193,6 +193,8 @@ def create_app(config=None):
         if game is None: abort(404)
         if slug == 'neon-breaker':
             return render_template('neon_breaker.html', game=game)
+        if slug == 'infinite-tic-tac-toe':
+            return render_template('infinite_tic_tac_toe.html', game=game)
         return render_template('arcade.html', view='game', games=GAMES, game=game)
     @app.get('/terms')
     def terms():
