@@ -47,7 +47,7 @@ GAMES = [
         "description": "Swap circuit tiles, build matching lines, and solve compact boards within a move budget.",
         "controls": "Keyboard: arrows to focus tiles; Enter to select and swap. Touch: tap two adjacent tiles.",
         "session": "2–5 minutes",
-        "status": "planned",
+        "status": "playable",
         "phase": 5,
     },
     {
