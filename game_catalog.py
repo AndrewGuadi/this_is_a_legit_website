@@ -1,4 +1,4 @@
-"""Arcade catalog source of truth. Neon Breaker is playable; seven future concepts remain planned."""
+"""Arcade catalog source of truth. Two original games are playable; seven future concepts remain planned."""
 GAMES = [
     {
         "slug": "neon-breaker",
@@ -79,5 +79,15 @@ GAMES = [
         "session": "2–5 minutes",
         "status": "planned",
         "phase": 8,
+    },
+    {
+        "slug": "blockbound-first-light",
+        "title": "Blockbound: First Light",
+        "genre": "Blocky 3D adventure",
+        "description": "Explore an original C-built harbor city, meet its residents, and return three light shards to the beacon.",
+        "controls": "Keyboard: WASD to move, arrows to move/turn, E or Space to interact, P to pause. Touch: movement, look, and interaction buttons.",
+        "session": "4–7 minutes",
+        "status": "playable",
+        "phase": 9,
     },
 ]
