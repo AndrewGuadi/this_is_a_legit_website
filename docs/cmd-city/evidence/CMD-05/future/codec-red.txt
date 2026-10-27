@@ -1,0 +1,39 @@
+✔ schema4 strict migration preserves old source fields and creates future state only once (85.751138ms)
+✔ real guarded floor controls create jobs, stock-limited internal purchases and housing capacity (157.665825ms)
+✔ critical staffing and internal generation require actual workers and share road and water limits (101.96157ms)
+✔ corporate output is booked once with resource, treasury and environmental consequences (72.553798ms)
+✔ a self-supplied tower retains local service under outside grid shortage without duplicated supply or groundwater (57.746492ms)
+✖ compact future exports are lossless, bounded and strict against expansion abuse (51.130741ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 5
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 782.236712
+
+✖ failing tests:
+
+test at tests/city/future-integration.test.mjs:14:1
+✖ compact future exports are lossless, bounded and strict against expansion abuse (51.130741ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + undefined
+  - 'floors-v1'
+  
+      at TestContext.<anonymous> (file:///tmp/cmd05-future-integration/tests/city/future-integration.test.mjs:14:390)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: 'floors-v1',
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

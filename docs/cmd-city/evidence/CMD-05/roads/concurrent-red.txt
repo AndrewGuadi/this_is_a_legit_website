@@ -1,0 +1,39 @@
+✔ straight plans a bounded connected grid road and commits exact cost without mutating source (997.789774ms)
+✔ curve plans a bounded connected grid road and commits exact cost without mutating source (797.905129ms)
+✔ circle plans a bounded connected grid road and commits exact cost without mutating source (2209.246683ms)
+✔ block plans a bounded connected grid road and commits exact cost without mutating source (1026.560776ms)
+✔ occupied buildings or insufficient funds reject complete plans without partial mutations (76.250622ms)
+✔ water crossings price and construct bridges while existing roads are preserved and free (159.840345ms)
+✔ invalid geometry, out-of-map circles and unsupported road types reject without mutation (1.95277ms)
+✔ a stale preview is revalidated against current funds and occupied tiles at commit (43.143101ms)
+✔ invalid regional identity rejects the complete plan without mutating any source fields (86.209997ms)
+✔ responsive road commits yield to the UI, preserve source state and match synchronous construction (1022.769378ms)
+✔ canceling a responsive plan after candidate construction discards every candidate change (146.811835ms)
+✖ responsive commit refuses a concurrent nested change in the same source region object (302.367771ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 11
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 7156.522822
+
+✖ failing tests:
+
+test at tests/city/roads.test.mjs:176:1
+✖ responsive commit refuses a concurrent nested change in the same source region object (302.367771ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/roads.test.mjs:180:9)
+      at async Test.run (node:internal/test_runner/test:1409:7)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

@@ -1,9 +1,13 @@
 # Legit Arcade
 
-The catalog includes four playable games: Neon Breaker, Circuit Match, Blockbound: First Light, and Infinite Tic-Tac-Toe. Infinite Tic-Tac-Toe is local two-player play on one device.
+The catalog includes **Neon Breaker**, **Circuit Match**, **Blockbound: First Light**, **Infinite Tic-Tac-Toe**, and the **CMD City alpha**, alongside six planned concepts. Infinite Tic-Tac-Toe is local two-player play on one device. Forms remain at `/forms` and `/apply/<kind>`; the investigator workspace is `/admin/login`.
 
+CMD City runs locally in the browser with connected infrastructure, zoning, employment, transport, finite resources, finances and three-city cooperation. It is not yet feature-equivalent to SimCity (2013) plus Cities of Tomorrow. The first-release readiness work defers parity additions; see [parity target](docs/cmd-city/PARITY_TARGET.md) and [current readiness evidence](docs/cmd-city/evidence/READINESS-02/ROUND.md). Performance and review gates still block production release.
 
-An arcade with **Neon Breaker**, **Circuit Match**, **Blockbound: First Light**, and **Infinite Tic-Tac-Toe**, four playable original games, six future game concepts, and a secondary form-research area. Neon Breaker is a review candidate; final release requires independent TODD review and physical-device evidence. The homepage is `/`, concepts live at `/games/<slug>`, and the preserved forms are at `/forms` and `/apply/<kind>`. The investigator workspace remains `/admin/login`.
+Open `/games/cmd-city` after starting the Flask app. Cities begin paused. Inspect, build, then resume; save/export includes all three regional cities. All gameplay stays on-device. Direct Codex implementation was explicitly approved by Andrew for CMD City; independent review and normal release gates remain. This source branch does not itself establish a production deployment.
+
+Run `npm run test:game` for the game suites, `npm run test:browser` for browser checks, and `node tests/city/benchmark.mjs` for the synthetic dense-map measurement. A repository-local `.venv` with requirements is sufficient for Flask. For static visual QA, `python tests/city/build_preview.py` renders the actual templates into ignored `dev_docs/city-preview`; never deploy the synthetic preview fixture. Production continues to use the existing Flask/PythonAnywhere entrypoint.
+
 
 Game status is tracked in `game_catalog.py`; see [game roadmap](docs/GAME_ROADMAP.md) and [first-game brief](docs/FIRST_GAME_BRIEF.md). Catalog visits do not create observation records. Neon Breaker uses native Canvas and local modules, with no game telemetry or third-party requests. Optional best-score storage stays on the device.
 

@@ -1,0 +1,17 @@
+
+Running 12 tests using 1 worker
+
+  ✓   1 [chromium-360] › tests/browser/cmd-city-transit.spec.js:18:37 › streetcar construction connects assigned commuters, exports and recovers after terminal closure (3.3s)
+  ✓   2 [chromium-360] › tests/browser/cmd-city-transit.spec.js:18:37 › ferry construction connects assigned commuters, exports and recovers after terminal closure (2.8s)
+  ✓   3 [chromium-360] › tests/browser/cmd-city-transit.spec.js:18:37 › maglev construction connects assigned commuters, exports and recovers after terminal closure (2.6s)
+  ✓   4 [chromium-390] › tests/browser/cmd-city-transit.spec.js:18:37 › streetcar construction connects assigned commuters, exports and recovers after terminal closure (4.1s)
+  ✓   5 [chromium-390] › tests/browser/cmd-city-transit.spec.js:18:37 › ferry construction connects assigned commuters, exports and recovers after terminal closure (2.6s)
+  ✓   6 [chromium-390] › tests/browser/cmd-city-transit.spec.js:18:37 › maglev construction connects assigned commuters, exports and recovers after terminal closure (3.0s)
+  ✓   7 [chromium-768] › tests/browser/cmd-city-transit.spec.js:18:37 › streetcar construction connects assigned commuters, exports and recovers after terminal closure (4.3s)
+  ✓   8 [chromium-768] › tests/browser/cmd-city-transit.spec.js:18:37 › ferry construction connects assigned commuters, exports and recovers after terminal closure (3.4s)
+  ✓   9 [chromium-768] › tests/browser/cmd-city-transit.spec.js:18:37 › maglev construction connects assigned commuters, exports and recovers after terminal closure (2.6s)
+  ✓  10 [chromium-1440] › tests/browser/cmd-city-transit.spec.js:18:37 › streetcar construction connects assigned commuters, exports and recovers after terminal closure (3.8s)
+  ✓  11 [chromium-1440] › tests/browser/cmd-city-transit.spec.js:18:37 › ferry construction connects assigned commuters, exports and recovers after terminal closure (2.9s)
+  ✓  12 [chromium-1440] › tests/browser/cmd-city-transit.spec.js:18:37 › maglev construction connects assigned commuters, exports and recovers after terminal closure (3.5s)
+
+  12 passed (42.4s)

@@ -1,0 +1,18 @@
+✔ service snapshots own their data, retain historical stock, and use current population penalties (35.540839ms)
+✔ environment snapshots isolate captured fields while public reports validate current fields (78.608873ms)
+✔ month-end cached phase reports equal fresh reports through real fire decay and facility destruction (283.37174ms)
+✔ shared lazy frontiers preserve single/multiple root order, discovery ties and exact predecessor paths (5.036464ms)
+✔ topology invalidation handles closures, reopening and fires while retaining disconnected road islands (0.500841ms)
+✔ frontier memory remains capped after more roots than the LRU capacity (22.05182ms)
+✔ environment omitted presentation report preserves identical simulation and financial state (114.705993ms)
+✔ services omitted presentation report preserves identical simulation and financial state (58.877903ms)
+✔ households omitted presentation report preserves identical simulation and financial state (66.627246ms)
+✔ omitting reports does not bypass any service or household input validation (33.982594ms)
+ℹ tests 10
+ℹ suites 0
+ℹ pass 10
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 620.720111

@@ -194,6 +194,8 @@ def create_app(config=None):
     def game_concept(slug):
         game = next((item for item in GAMES if item['slug'] == slug), None)
         if game is None: abort(404)
+        if slug == 'cmd-city':
+            return render_template('cmd_city.html', game=game)
         if slug == 'neon-breaker':
             return render_template('neon_breaker.html', game=game)
         if slug == 'circuit-match':

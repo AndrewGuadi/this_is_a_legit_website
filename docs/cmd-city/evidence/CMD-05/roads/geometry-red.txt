@@ -1,0 +1,142 @@
+✖ straight plans a bounded connected grid road and commits exact cost without mutating source (52.776608ms)
+✖ curve plans a bounded connected grid road and commits exact cost without mutating source (29.675726ms)
+✖ circle plans a bounded connected grid road and commits exact cost without mutating source (26.001123ms)
+✖ block plans a bounded connected grid road and commits exact cost without mutating source (23.184067ms)
+✔ occupied buildings or insufficient funds reject complete plans without partial mutations (82.460345ms)
+✖ water crossings price and construct bridges while existing roads are preserved and free (2.380951ms)
+✔ invalid geometry, out-of-map circles and unsupported road types reject without mutation (1.335558ms)
+✖ a stale preview is revalidated against current funds and occupied tiles at commit (1.626615ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 2
+ℹ fail 6
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 412.314054
+
+✖ failing tests:
+
+test at tests/city/roads.test.mjs:10:58
+✖ straight plans a bounded connected grid road and commits exact cost without mutating source (52.776608ms)
+  AssertionError [ERR_ASSERTION]: Road planning not implemented.
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/roads.test.mjs:12:40)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.start (node:internal/test_runner/test:1262:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/city/roads.test.mjs:10:58
+✖ curve plans a bounded connected grid road and commits exact cost without mutating source (29.675726ms)
+  AssertionError [ERR_ASSERTION]: Road planning not implemented.
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/roads.test.mjs:12:40)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async startSubtestAfterBootstrap (node:internal/test_runner/harness:387:3) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/city/roads.test.mjs:10:58
+✖ circle plans a bounded connected grid road and commits exact cost without mutating source (26.001123ms)
+  AssertionError [ERR_ASSERTION]: Road planning not implemented.
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/roads.test.mjs:12:40)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/city/roads.test.mjs:10:58
+✖ block plans a bounded connected grid road and commits exact cost without mutating source (23.184067ms)
+  AssertionError [ERR_ASSERTION]: Road planning not implemented.
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/roads.test.mjs:12:40)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/city/roads.test.mjs:20:1
+✖ water crossings price and construct bridges while existing roads are preserved and free (2.380951ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/roads.test.mjs:21:209)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/city/roads.test.mjs:26:1
+✖ a stale preview is revalidated against current funds and occupied tiles at commit (1.626615ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/roads.test.mjs:27:104)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

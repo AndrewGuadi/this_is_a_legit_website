@@ -1,0 +1,89 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+[WebServer] WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+[WebServer]  * Running on http://127.0.0.1:5081
+[WebServer] Press CTRL+C to quit
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:39:40] "GET / HTTP/1.1" 200 -
+
+Running 3 tests using 1 worker
+
+(node:34) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  1 [chromium-1440] › tests/browser/cmd-city-readiness.spec.js:42:1 › tower toggle retains keyboard focus through refresh (2ms)
+(node:46) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  2 [chromium-1440] › tests/browser/cmd-city-readiness.spec.js:54:1 › reselecting a home respects a closed household inspector (2ms)
+(node:58) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+  ✘  3 [chromium-1440] › tests/browser/cmd-city-readiness.spec.js:62:1 › long inspector stays bounded and keyboard scrollable (2ms)
+
+
+  1) [chromium-1440] › tests/browser/cmd-city-readiness.spec.js:42:1 › tower toggle retains keyboard focus through refresh 
+
+    Error: browserType.launch: Executable doesn't exist at /root/.cache/ms-playwright/chromium_headless_shell-1248/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/cmd-city-readiness-tower-t-ea387-board-focus-through-refresh-chromium-1440/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/cmd-city-readiness-tower-t-ea387-board-focus-through-refresh-chromium-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/cmd-city-readiness-tower-t-ea387-board-focus-through-refresh-chromium-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium-1440] › tests/browser/cmd-city-readiness.spec.js:54:1 › reselecting a home respects a closed household inspector 
+
+    Error: browserType.launch: Executable doesn't exist at /root/.cache/ms-playwright/chromium_headless_shell-1248/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/cmd-city-readiness-reselec-19b16--closed-household-inspector-chromium-1440/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/cmd-city-readiness-reselec-19b16--closed-household-inspector-chromium-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/cmd-city-readiness-reselec-19b16--closed-household-inspector-chromium-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium-1440] › tests/browser/cmd-city-readiness.spec.js:62:1 › long inspector stays bounded and keyboard scrollable 
+
+    Error: browserType.launch: Executable doesn't exist at /root/.cache/ms-playwright/chromium_headless_shell-1248/chrome-headless-shell-linux64/chrome-headless-shell
+    ╔════════════════════════════════════════════════════════════╗
+    ║ Looks like Playwright was just installed or updated.       ║
+    ║ Please run the following command to download new browsers: ║
+    ║                                                            ║
+    ║     npx playwright install                                 ║
+    ║                                                            ║
+    ║ <3 Playwright Team                                         ║
+    ╚════════════════════════════════════════════════════════════╝
+
+    Error Context: test-results/cmd-city-readiness-long-in-1f1e8-ded-and-keyboard-scrollable-chromium-1440/error-context.md
+
+    attachment #2: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/cmd-city-readiness-long-in-1f1e8-ded-and-keyboard-scrollable-chromium-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/cmd-city-readiness-long-in-1f1e8-ded-and-keyboard-scrollable-chromium-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3 failed
+    [chromium-1440] › tests/browser/cmd-city-readiness.spec.js:42:1 › tower toggle retains keyboard focus through refresh 
+    [chromium-1440] › tests/browser/cmd-city-readiness.spec.js:54:1 › reselecting a home respects a closed household inspector 
+    [chromium-1440] › tests/browser/cmd-city-readiness.spec.js:62:1 › long inspector stays bounded and keyboard scrollable 

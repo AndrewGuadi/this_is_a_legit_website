@@ -1,0 +1,46 @@
+✔ creation preserves warehouse ownership without duplicating stock or inventing opening deliveries (11.714027ms)
+✔ actual staffed industrial production enters producer stock once; repeated hook is inert (19.952552ms)
+✔ closed, burning, unstaffed, unserved and unpowered producers generate no goods (13.640097ms)
+✔ warehouse cargo travels a real bounded path before a shop receives inventory (5.949454ms)
+✔ shared shop unloading is finite and goods remain aboard during partial deliveries (5.491885ms)
+✔ purchases consume only physically delivered shop stock and do not debit warehouse again (6.509966ms)
+✔ blocked roads hold real cargo and repairs restore its delivery (9.002014ms)
+✔ closing a destination returns its cargo over roads instead of teleporting or losing it (2.952408ms)
+✔ freight shares remaining road capacity with commuters and other freight (2.302482ms)
+✔ zero utilities or a closed gateway cannot dispatch warehouse freight (2.163628ms)
+✔ external warehouse transfer records only actual bounded stock and preserves money (1.176749ms)
+✔ demolition conserves producer and retail stock into explicit recovered goods (1.16661ms)
+✔ recall retains cargo and rejects malformed or missing vehicle actions without state changes (15.323538ms)
+✔ a tower shop uses explicitly supplied staffed monthly retail throughput (6.573859ms)
+✔ reporting is pure and returns defensive paths and stock/load arrays (5.544855ms)
+✔ strict validation rejects malformed keys, clocks, stocks, quantities and broken conservation (2.663188ms)
+✔ strict validation rejects malformed in-flight route/cursor/id/payload relationships (6.978322ms)
+✔ counter overflow refuses monthly production atomically (3.948027ms)
+✖ destroying the road under a loaded recalled truck preserves its position and cargo until repair (3.758342ms)
+✔ rotating shop admission eventually serves every shop under a finite shared fleet (164.01554ms)
+✔ producer stock bounds preserve actual accepted production without wrapping or losing prior goods (0.841044ms)
+✔ a demolished producer and full warehouse recover returned cargo into explicit loose goods (7.326499ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 21
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 471.624709
+
+✖ failing tests:
+
+test at tests/city/commerce.test.mjs:76:1
+✖ destroying the road under a loaded recalled truck preserves its position and cargo until repair (3.758342ms)
+  Error: Invalid CMD City commerce state.
+      at invalid (file:///tmp/cmd-city-work/static/cmd-city/commerce.mjs:12:26)
+      at validateCommerce (file:///tmp/cmd-city-work/static/cmd-city/commerce.mjs:34:51)
+      at advanceCommerce (file:///tmp/cmd-city-work/static/cmd-city/commerce.mjs:112:418)
+      at month (file:///tmp/cmd-city-work/tests/city/commerce.test.mjs:14:38)
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/commerce.test.mjs:78:2)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)

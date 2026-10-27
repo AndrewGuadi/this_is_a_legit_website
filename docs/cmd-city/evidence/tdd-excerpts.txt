@@ -1,0 +1,290 @@
+
+=== core-red.txt — actual execution excerpt ===
+✖ seeded maps reproduce exactly, include river and protected gateway (16.143861ms)
+✖ successful placement charges once; rejected actions do not mutate any state (3.380124ms)
+✖ disconnected road island does not grant access; completing the path does (0.371767ms)
+✖ only bridges build on water and a continuous crossing joins road banks (0.460638ms)
+✖ isolated utility cannot supply the city (0.356765ms)
+✖ new zones remain empty without supply, then grow with all utilities (0.3396ms)
+✖ growth reserves shared capacity across proposals (0.365908ms)
+✖ employment is bounded by residents and operating jobs and puts real load on roads (0.539614ms)
+✖ removing a connecting road disables downstream jobs and supply (1.410777ms)
+✖ monthly ledger exactly reconciles treasury and bounded history (0.560194ms)
+✔ measure and inspection never mutate authoritative state (3.408297ms)
+✖ deficit blocks construction but allows decommissioning to reduce upkeep (0.340902ms)
+✖ bonds give principal once and repay a bounded fixed obligation (0.446707ms)
+✖ pollution is local and parks do not erase industrial emissions (0.342254ms)
+✖ resource extraction is finite and site constrained (0.396173ms)
+✖ trade mode changes create actual inventory and treasury transactions (0.684397ms)
+✖ service funding changes operational coverage (0.46192ms)
+✖ upgrades charge and expand capacity without inventing occupants (0.467228ms)
+✖ research spends points, enforces prerequisites and unlocks actual options (0.513706ms)
+✖ disasters damage actual structures rather than only displaying text (1.917482ms)
+✔ invalid action values preserve city exactly (6.285781ms)
+✖ long simulation stays finite and capacities remain internally bounded (8.130281ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 2
+ℹ fail 20
+ℹ cancelled 0
+
+=== save-clock-red.txt — actual execution excerpt ===
+✔ save round trip restores authoritative state and deterministic future (111.929553ms)
+✖ malformed, oversize and unknown-version saves fail without changing the current city (5.359359ms)
+✖ all scalar and tile invariants are checked; unknown object keys are rejected (2.898611ms)
+✔ import strings are data and bounded, never interpreted as code (1.434239ms)
+✖ paused clock never accumulates and lifecycle reset requires explicit resume (0.453427ms)
+✖ equal simulated duration produces equal months at all speeds (0.291289ms)
+✖ stalled render is bounded; invalid elapsed does not corrupt future ticks (0.262426ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 2
+ℹ fail 5
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 210.541746
+
+✖ failing tests:
+
+test at tests/city/save-clock.test.mjs:6:1
+✖ malformed, oversize and unknown-version saves fail without changing the current city (5.359359ms)
+  AssertionError [ERR_ASSERTION]: Missing expected exception.
+      at TestContext.<anonymous> (file:///workspace/scratch/bf6bfb751ccd/cmduniverse/tests/city/save-clock.test.mjs:6:367)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+
+=== todd-defects-red.txt — actual execution excerpt ===
+✔ seeded maps reproduce exactly, include river and protected gateway (5.26812ms)
+✔ successful placement charges once; rejected actions do not mutate any state (7.163535ms)
+✔ disconnected road island does not grant access; completing the path does (6.784949ms)
+✔ only bridges build on water and a continuous crossing joins road banks (3.773475ms)
+✔ isolated utility cannot supply the city (3.765072ms)
+✔ new zones remain empty without supply, then grow with all utilities (52.2922ms)
+✔ growth reserves shared capacity across proposals (31.047086ms)
+✔ employment is bounded by residents and operating jobs and puts real load on roads (3.54594ms)
+✔ removing a connecting road disables downstream jobs and supply (3.919288ms)
+✔ monthly ledger exactly reconciles treasury and bounded history (123.306466ms)
+✔ measure and inspection never mutate authoritative state (23.823222ms)
+✔ deficit blocks construction but allows decommissioning to reduce upkeep (1.10255ms)
+✔ bonds give principal once and repay a bounded fixed obligation (53.530269ms)
+✔ pollution is local and parks do not erase industrial emissions (1.18377ms)
+✔ resource extraction is finite and site constrained (17.647488ms)
+✔ trade mode changes create actual inventory and treasury transactions (4.625906ms)
+✔ service funding changes operational coverage (2.25291ms)
+✔ upgrades charge and expand capacity without inventing occupants (0.388341ms)
+✔ research spends points, enforces prerequisites and unlocks actual options (2.413346ms)
+✔ disasters damage actual structures rather than only displaying text (3.434306ms)
+✔ invalid action values preserve city exactly (9.58292ms)
+✔ long simulation stays finite and capacities remain internally bounded (454.958933ms)
+✖ prototype names cannot enter tool or research lookup tables (2.594071ms)
+✖ generators reserve fuel globally and pumps cannot promise more than the aquifer (2.063252ms)
+✖ productive facilities need actual power and water even when city has no occupied zones (7.387584ms)
+✖ disabled recycling contributes no waste supply, then enabling operates it (4.633558ms)
+ℹ tests 26
+
+=== todd-economy-red.txt — actual execution excerpt ===
+✔ seeded maps reproduce exactly, include river and protected gateway (5.749238ms)
+✔ successful placement charges once; rejected actions do not mutate any state (7.273276ms)
+✔ disconnected road island does not grant access; completing the path does (7.087954ms)
+✔ only bridges build on water and a continuous crossing joins road banks (4.615301ms)
+✔ isolated utility cannot supply the city (2.806383ms)
+✔ new zones remain empty without supply, then grow with all utilities (58.383472ms)
+✔ growth reserves shared capacity across proposals (32.558107ms)
+✔ employment is bounded by residents and operating jobs and puts real load on roads (4.52653ms)
+✔ removing a connecting road disables downstream jobs and supply (5.477007ms)
+✔ monthly ledger exactly reconciles treasury and bounded history (132.549773ms)
+✔ measure and inspection never mutate authoritative state (20.103408ms)
+✔ deficit blocks construction but allows decommissioning to reduce upkeep (1.173885ms)
+✔ bonds give principal once and repay a bounded fixed obligation (55.118655ms)
+✔ pollution is local and parks do not erase industrial emissions (1.406016ms)
+✔ resource extraction is finite and site constrained (18.208574ms)
+✔ trade mode changes create actual inventory and treasury transactions (4.367728ms)
+✔ service funding changes operational coverage (2.118422ms)
+✔ upgrades charge and expand capacity without inventing occupants (0.389883ms)
+✔ research spends points, enforces prerequisites and unlocks actual options (2.14403ms)
+✔ disasters damage actual structures rather than only displaying text (3.448878ms)
+✔ invalid action values preserve city exactly (9.756064ms)
+✔ long simulation stays finite and capacities remain internally bounded (463.704435ms)
+✖ prototype names cannot enter tool or research lookup tables (2.773822ms)
+✖ generators reserve fuel globally and pumps cannot promise more than the aquifer (2.136676ms)
+✖ productive facilities need actual power and water even when city has no occupied zones (5.061509ms)
+✖ disabled recycling contributes no waste supply, then enabling operates it (1.814033ms)
+✖ imports cannot overflow bounded inventories or break saveability (6.43067ms)
+
+=== region-red.txt — actual execution excerpt ===
+✖ region creates three distinct deterministic independently seeded cities (5.661751ms)
+✖ switching retains independent city state and invalid switches are transactional (2.874629ms)
+✖ shipment reserves stock and freight exactly once without immediate receiver gain (0.56391ms)
+✖ next region month delivers stock once and advances all cities once (0.29914ms)
+✖ stock in source, receiver and transit is conserved (0.369533ms)
+✖ receiver headroom is reserved across every pending shipment (0.635455ms)
+✔ shipment rejects invalid quantities, stock, money, destinations and lookup names unchanged (28.57986ms)
+✖ both endpoints need connected, open and supplied trade infrastructure (8.729295ms)
+✖ pending shipment cap is enforced transactionally (0.34722ms)
+✖ project reserves actual goods/alloy, completes exactly once and grants fixed regional power (0.356094ms)
+✔ project rejects over-contribution, wrong resources, missing stock and unavailable depots unchanged (15.276426ms)
+✖ region save round-trip preserves pending deliveries and deterministic next state (0.527586ms)
+✖ region parser rejects malformed, oversized, unknown or impossible envelopes (5.099774ms)
+✖ parser rejects tampered freight, delivery month, stock reservations and shipment destinations (2.619124ms)
+✔ region event history and simulation state remain bounded and saveable (69.975509ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 3
+ℹ fail 12
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 267.76728
+
+✖ failing tests:
+
+test at tests/city/region.test.mjs:17:1
+
+=== transit-red.txt — actual execution excerpt ===
+✔ planning creates bounded zeroed derived loads and never mutates the authoritative city (5.554503ms)
+✖ a connected rail path with two distinct accessible stations carries actual passengers (2.397718ms)
+✔ disconnected rail segments, one station and tracks without stations serve nobody (0.784154ms)
+✔ disabled, burning or road-disconnected stations are ineligible (1.060281ms)
+✔ catchments are bounded and one shared station cannot pretend to be a route (0.369073ms)
+✖ rail capacity is reserved across repeated callers sharing the same track (0.350216ms)
+✖ buses need two exchanges and a genuine connected road path, reducing car equivalents (0.769292ms)
+✖ bus capacity is shared across overlapping trips without inventing passengers (0.315284ms)
+✔ bus path cannot jump over missing tiles, diagonals or disconnected roads (0.679991ms)
+✔ invalid requests and invalid endpoint indices leave every derived load unchanged (1.681114ms)
+✖ planning snapshots network eligibility rather than retaining writable source references (0.303416ms)
+✖ rail is preferred when both a valid bus and rail route serve a journey (0.533054ms)
+ℹ tests 12
+ℹ suites 0
+ℹ pass 6
+ℹ fail 6
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 101.7756
+
+✖ failing tests:
+
+test at tests/city/transit.test.mjs:14:1
+✖ a connected rail path with two distinct accessible stations carries actual passengers (2.397718ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:
+  + actual - expected
+
+=== region-ui-red.txt — actual execution excerpt ===
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+[WebServer] WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+[WebServer]  * Running on http://127.0.0.1:5081
+[WebServer] Press CTRL+C to quit
+[WebServer] 127.0.0.1 - - [25/Oct/2026 12:11:26] "GET / HTTP/1.1" 200 -
+
+Running 1 test using 1 worker
+
+(node:34) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 127.0.0.1 - - [25/Oct/2026 12:11:27] "GET /games/cmd-city HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 12:11:27] "GET /static/cmd-city/game.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 12:11:27] "GET /static/cmd-city/game.css HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 12:11:27] "GET /static/cmd-city/core.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 12:11:27] "GET /static/cmd-city/save.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 12:11:27] "GET /static/cmd-city/clock.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 12:11:27] "GET /static/cmd-city/content.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 12:11:27] "GET /static/cmd-city/view.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 12:11:27] "GET /static/cmd-city/transit.mjs HTTP/1.1" 200 -
+  ✘  1 [chromium-390] › tests/browser/cmd-city.spec.js:83:1 › regional cities preserve their identities and dispatch real next-month shipments (30.2s)
+
+
+  1) [chromium-390] › tests/browser/cmd-city.spec.js:83:1 › regional cities preserve their identities and dispatch real next-month shipments
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+
+=== fire-recovery-red.txt — actual execution excerpt ===
+✔ seeded maps reproduce exactly, include river and protected gateway (4.992429ms)
+✔ successful placement charges once; rejected actions do not mutate any state (6.915546ms)
+✔ disconnected road island does not grant access; completing the path does (6.021392ms)
+✔ only bridges build on water and a continuous crossing joins road banks (3.796351ms)
+✔ isolated utility cannot supply the city (2.329835ms)
+✔ new zones remain empty without supply, then grow with all utilities (53.916918ms)
+✔ growth reserves shared capacity across proposals (36.82763ms)
+✔ employment is bounded by residents and operating jobs and puts real load on roads (4.335393ms)
+✔ removing a connecting road disables downstream jobs and supply (4.919251ms)
+✔ monthly ledger exactly reconciles treasury and bounded history (143.255641ms)
+✔ measure and inspection never mutate authoritative state (26.29758ms)
+✔ deficit blocks construction but allows decommissioning to reduce upkeep (1.910799ms)
+✔ bonds give principal once and repay a bounded fixed obligation (63.055668ms)
+✔ pollution is local and parks do not erase industrial emissions (1.812435ms)
+✔ resource extraction is finite and site constrained (14.52218ms)
+✔ trade mode changes create actual inventory and treasury transactions (2.556448ms)
+✔ service funding changes operational coverage (1.487697ms)
+✔ upgrades charge and expand capacity without inventing occupants (0.395141ms)
+✔ research spends points, enforces prerequisites and unlocks actual options (1.558722ms)
+✔ disasters damage actual structures rather than only displaying text (2.087429ms)
+✔ invalid action values preserve city exactly (5.806537ms)
+✔ long simulation stays finite and capacities remain internally bounded (455.107939ms)
+✔ prototype names cannot enter tool or research lookup tables (4.848808ms)
+✔ generators reserve fuel globally and pumps cannot promise more than the aquifer (5.184833ms)
+✔ productive facilities need actual power and water even when city has no occupied zones (5.276217ms)
+✔ disabled recycling contributes no waste supply, then enabling operates it (1.415771ms)
+✔ imports cannot overflow bounded inventories or break saveability (3.242937ms)
+
+=== cash-bound-red.txt — actual execution excerpt ===
+✔ seeded maps reproduce exactly, include river and protected gateway (5.779902ms)
+✔ successful placement charges once; rejected actions do not mutate any state (8.065414ms)
+✔ disconnected road island does not grant access; completing the path does (9.82383ms)
+✔ only bridges build on water and a continuous crossing joins road banks (4.605625ms)
+✔ isolated utility cannot supply the city (2.790775ms)
+✔ new zones remain empty without supply, then grow with all utilities (69.997884ms)
+✔ growth reserves shared capacity across proposals (43.36694ms)
+✔ employment is bounded by residents and operating jobs and puts real load on roads (4.612335ms)
+✔ removing a connecting road disables downstream jobs and supply (7.303373ms)
+✔ monthly ledger exactly reconciles treasury and bounded history (73.249197ms)
+✔ measure and inspection never mutate authoritative state (18.108436ms)
+✔ deficit blocks construction but allows decommissioning to reduce upkeep (1.492275ms)
+✔ bonds give principal once and repay a bounded fixed obligation (35.962249ms)
+✔ pollution is local and parks do not erase industrial emissions (1.490693ms)
+✔ resource extraction is finite and site constrained (8.236716ms)
+✔ trade mode changes create actual inventory and treasury transactions (1.69936ms)
+✔ service funding changes operational coverage (1.512224ms)
+✔ upgrades charge and expand capacity without inventing occupants (0.23145ms)
+✔ research spends points, enforces prerequisites and unlocks actual options (2.78739ms)
+✔ disasters damage actual structures rather than only displaying text (1.8361ms)
+✔ invalid action values preserve city exactly (5.677201ms)
+✔ long simulation stays finite and capacities remain internally bounded (264.799692ms)
+✔ prototype names cannot enter tool or research lookup tables (4.625804ms)
+✔ generators reserve fuel globally and pumps cannot promise more than the aquifer (3.330018ms)
+✔ productive facilities need actual power and water even when city has no occupied zones (3.252905ms)
+✔ disabled recycling contributes no waste supply, then enabling operates it (1.473277ms)
+✔ imports cannot overflow bounded inventories or break saveability (1.790133ms)
+
+=== inspector-red.txt — actual execution excerpt ===
+✔ seeded maps reproduce exactly, include river and protected gateway (7.448831ms)
+✔ successful placement charges once; rejected actions do not mutate any state (9.49338ms)
+✔ disconnected road island does not grant access; completing the path does (7.380099ms)
+✔ only bridges build on water and a continuous crossing joins road banks (4.693906ms)
+✔ isolated utility cannot supply the city (2.382646ms)
+✔ new zones remain empty without supply, then grow with all utilities (45.801085ms)
+✔ growth reserves shared capacity across proposals (31.504829ms)
+✔ employment is bounded by residents and operating jobs and puts real load on roads (3.50021ms)
+✔ removing a connecting road disables downstream jobs and supply (4.364822ms)
+✔ monthly ledger exactly reconciles treasury and bounded history (72.344779ms)
+✔ measure and inspection never mutate authoritative state (18.845067ms)
+✔ deficit blocks construction but allows decommissioning to reduce upkeep (1.807921ms)
+✔ bonds give principal once and repay a bounded fixed obligation (30.71975ms)
+✔ pollution is local and parks do not erase industrial emissions (1.578783ms)
+✔ resource extraction is finite and site constrained (9.418028ms)
+✔ trade mode changes create actual inventory and treasury transactions (1.673202ms)
+✔ service funding changes operational coverage (1.50869ms)
+✔ upgrades charge and expand capacity without inventing occupants (0.226513ms)
+✔ research spends points, enforces prerequisites and unlocks actual options (1.775132ms)
+✔ disasters damage actual structures rather than only displaying text (2.178325ms)
+✔ invalid action values preserve city exactly (6.119924ms)
+✔ long simulation stays finite and capacities remain internally bounded (226.804792ms)
+✔ prototype names cannot enter tool or research lookup tables (4.511939ms)
+✔ generators reserve fuel globally and pumps cannot promise more than the aquifer (3.336259ms)
+✔ productive facilities need actual power and water even when city has no occupied zones (3.910413ms)
+✔ disabled recycling contributes no waste supply, then enabling operates it (1.341233ms)
+✔ imports cannot overflow bounded inventories or break saveability (1.823373ms)

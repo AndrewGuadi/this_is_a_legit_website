@@ -1,0 +1,46 @@
+✔ migration retains canonical tower population and legacy capacity with complete strict state (2.334018ms)
+✔ floor actions charge once, enforce occupied capacity, limits, research and closure (0.867918ms)
+✔ mixed floors have distinct finite capacities and internal utility dependence without report writes (1.530089ms)
+✔ corporate production consumes real finite oil and ore and books bounded product sales once (1.429053ms)
+✔ closed, disconnected or unstaffed corporate facilities cannot produce or conjure demand (1.935172ms)
+✔ research requires actual staffed institute and educated employed middle/high wealth adults (0.408787ms)
+✔ strict validation rejects altered keys, ledgers, indexes, floor counts and non-finite values (0.806849ms)
+✔ reconciliation removes demolished tower floors without losing corporate stock and initializes new towers (0.393365ms)
+✔ removing essential internal power disables dependent tower uses when external supply is absent (0.685504ms)
+✔ stored composite cannot sell through a closed or unstaffed corporate network (0.695165ms)
+✔ strict current state rejects ledgers beyond real stock and canonical floor bounds (0.590215ms)
+✔ invalid research, unknown actions, crowns, maximum floors and insufficient cash are atomic (0.747692ms)
+✔ progression overflow and invalid inventory reject before any mutation (1.23326ms)
+✖ research does not reuse last-month wages or disconnected households as current skilled workers (1.403855ms)
+✔ corporate report site ledger cannot mutate state or hide emitted production (0.511198ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 14
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 188.207055
+
+✖ failing tests:
+
+test at tests/city/future.test.mjs:93:1
+✖ research does not reuse last-month wages or disconnected households as current skilled workers (1.403855ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  true !== false
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/future.test.mjs:94:62)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

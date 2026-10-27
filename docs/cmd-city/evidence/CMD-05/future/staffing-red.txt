@@ -1,0 +1,73 @@
+✔ migration retains canonical tower population and legacy capacity with complete strict state (4.300381ms)
+✔ floor actions charge once, enforce occupied capacity, limits, research and closure (3.373548ms)
+✔ mixed floors have distinct finite capacities and internal utility dependence without report writes (3.83378ms)
+✔ corporate production consumes real finite oil and ore and books bounded product sales once (4.489876ms)
+✔ closed, disconnected or unstaffed corporate facilities cannot produce or conjure demand (7.516604ms)
+✔ research requires actual staffed institute and educated employed middle/high wealth adults (0.926353ms)
+✔ strict validation rejects altered keys, ledgers, indexes, floor counts and non-finite values (1.05303ms)
+✔ reconciliation removes demolished tower floors without losing corporate stock and initializes new towers (0.58588ms)
+✔ removing essential internal power disables dependent tower uses when external supply is absent (1.709179ms)
+✔ stored composite cannot sell through a closed or unstaffed corporate network (1.191278ms)
+✔ strict current state rejects ledgers beyond real stock and canonical floor bounds (1.611681ms)
+✔ invalid research, unknown actions, crowns, maximum floors and insufficient cash are atomic (1.367396ms)
+✔ progression overflow and invalid inventory reject before any mutation (0.7973ms)
+✔ research does not reuse last-month wages or disconnected households as current skilled workers (0.514714ms)
+✔ corporate report site ledger cannot mutate state or hide emitted production (0.676435ms)
+✔ free floor shutdown remains available during a treasury deficit (0.549436ms)
+✔ the single crown remains the top floor when a use is added below it (0.775611ms)
+✔ 240 varied months preserve resource and product identities and exact restored continuation (96.761375ms)
+✔ internal water cannot bypass an exhausted or explicitly unavailable shared water reserve (0.54137ms)
+✖ actual critical staff power their own floor without being diluted by unpowered office vacancies (2.163205ms)
+✖ closing a whole tower suspends its enabled-floor operating upkeep (1.18824ms)
+ℹ tests 21
+ℹ suites 0
+ℹ pass 19
+ℹ fail 2
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 351.275968
+
+✖ failing tests:
+
+test at tests/city/future.test.mjs:476:1
+✖ actual critical staff power their own floor without being diluted by unpowered office vacancies (2.163205ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  47 !== 400
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/future.test.mjs:480:46)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 47,
+    expected: 400,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+test at tests/city/future.test.mjs:482:1
+✖ closing a whole tower suspends its enabled-floor operating upkeep (1.18824ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  8000 !== 0
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/future.test.mjs:483:103)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 8000,
+    expected: 0,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

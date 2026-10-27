@@ -1,0 +1,111 @@
+
+Running 3 tests using 1 worker
+
+  ✘  1 [chromium-1440] › tests/browser/cmd-city-roads.spec.js:21:1 › road shape previews cancel without spending and a confirmed straight plan builds exactly once (30.2s)
+  ✘  2 [chromium-1440] › tests/browser/cmd-city-roads.spec.js:37:1 › road preview rejects insufficient treasury and Escape cancels without building (30.2s)
+  ✘  3 [chromium-1440] › tests/browser/cmd-city-roads.spec.js:41:1 › touch endpoint selection previews a road and canceled touch cannot commit (30.1s)
+
+
+  1) [chromium-1440] › tests/browser/cmd-city-roads.spec.js:21:1 › road shape previews cancel without spending and a confirmed straight plan builds exactly once 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByText('Road planner', { exact: true })
+
+
+      10 |  await page.getByRole('dialog').getByRole('button',{name:'Import city',exact:true}).click();
+      11 |  await expect(page.locator('#city-message')).toContainText('Imported city');
+    > 12 |  await page.getByText('Road planner',{exact:true}).click();
+         |                                                    ^
+      13 | }
+      14 | async function config(page,shape='straight'){
+      15 |  await page.getByLabel('Road shape').selectOption(shape);
+        at setup (/tmp/cmd-city-work/tests/browser/cmd-city-roads.spec.js:12:52)
+        at /tmp/cmd-city-work/tests/browser/cmd-city-roads.spec.js:22:2
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cmd-city-roads-road-shape--27672-ht-plan-builds-exactly-once-chromium-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/cmd-city-roads-road-shape--27672-ht-plan-builds-exactly-once-chromium-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/cmd-city-roads-road-shape--27672-ht-plan-builds-exactly-once-chromium-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/cmd-city-roads-road-shape--27672-ht-plan-builds-exactly-once-chromium-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium-1440] › tests/browser/cmd-city-roads.spec.js:37:1 › road preview rejects insufficient treasury and Escape cancels without building 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test timeout of 30000ms exceeded.
+    Call log:
+      - waiting for getByText('Road planner', { exact: true })
+
+
+      10 |  await page.getByRole('dialog').getByRole('button',{name:'Import city',exact:true}).click();
+      11 |  await expect(page.locator('#city-message')).toContainText('Imported city');
+    > 12 |  await page.getByText('Road planner',{exact:true}).click();
+         |                                                    ^
+      13 | }
+      14 | async function config(page,shape='straight'){
+      15 |  await page.getByLabel('Road shape').selectOption(shape);
+        at setup (/tmp/cmd-city-work/tests/browser/cmd-city-roads.spec.js:12:52)
+        at /tmp/cmd-city-work/tests/browser/cmd-city-roads.spec.js:38:2
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cmd-city-roads-road-previe-0fbd8-pe-cancels-without-building-chromium-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/cmd-city-roads-road-previe-0fbd8-pe-cancels-without-building-chromium-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/cmd-city-roads-road-previe-0fbd8-pe-cancels-without-building-chromium-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/cmd-city-roads-road-previe-0fbd8-pe-cancels-without-building-chromium-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium-1440] › tests/browser/cmd-city-roads.spec.js:41:1 › touch endpoint selection previews a road and canceled touch cannot commit 
+
+    Test timeout of 30000ms exceeded.
+
+    Error: locator.click: Test ended.
+    Call log:
+      - waiting for getByText('Road planner', { exact: true })
+
+
+      10 |  await page.getByRole('dialog').getByRole('button',{name:'Import city',exact:true}).click();
+      11 |  await expect(page.locator('#city-message')).toContainText('Imported city');
+    > 12 |  await page.getByText('Road planner',{exact:true}).click();
+         |                                                    ^
+      13 | }
+      14 | async function config(page,shape='straight'){
+      15 |  await page.getByLabel('Road shape').selectOption(shape);
+        at setup (/tmp/cmd-city-work/tests/browser/cmd-city-roads.spec.js:12:52)
+        at /tmp/cmd-city-work/tests/browser/cmd-city-roads.spec.js:42:162
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cmd-city-roads-touch-endpo-ae18f-anceled-touch-cannot-commit-chromium-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/cmd-city-roads-touch-endpo-ae18f-anceled-touch-cannot-commit-chromium-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/cmd-city-roads-touch-endpo-ae18f-anceled-touch-cannot-commit-chromium-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/cmd-city-roads-touch-endpo-ae18f-anceled-touch-cannot-commit-chromium-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3 failed
+    [chromium-1440] › tests/browser/cmd-city-roads.spec.js:21:1 › road shape previews cancel without spending and a confirmed straight plan builds exactly once 
+    [chromium-1440] › tests/browser/cmd-city-roads.spec.js:37:1 › road preview rejects insufficient treasury and Escape cancels without building 
+    [chromium-1440] › tests/browser/cmd-city-roads.spec.js:41:1 › touch endpoint selection previews a road and canceled touch cannot commit 

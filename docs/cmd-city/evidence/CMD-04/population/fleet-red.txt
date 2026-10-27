@@ -1,0 +1,59 @@
+✔ service migration allocates legacy backlog once and never duplicates stored landfill stock (15.522448ms)
+✔ validator is strict about array sizes quantities IDs references paths and stable clock (7.658562ms)
+✔ reports are pure and opening occupancy generates persistent local bins once per month (40.107355ms)
+✔ fire response requires actual arrival along a road and does not teleport by coverage (41.759274ms)
+✔ disconnected fire incidents remain unserved rather than receiving radius service (17.132548ms)
+✔ garbage pickup creates cargo and storage only changes after a real return arrival (37.663957ms)
+✔ broken return roads retain cargo and restore movement after repair (50.774454ms)
+✔ closed home facility cannot swallow garbage; cargo reroutes to an operational alternative (30.128679ms)
+✔ recycling deliveries conserve cargo and bound ore output at its inventory capacity (24.887912ms)
+✔ medical pickup and bed admission precede finite later treatment (139.448994ms)
+✔ crime pickup respects finite custody and cases resolve only after return and processing (127.800191ms)
+✔ zero funding or absent real drivers prevents dispatch without deleting cases (83.773126ms)
+✔ demolition preserves stored waste admitted patients and custody before clearing source (4.6019ms)
+✔ invalid incidents cannot mutate RNG cash queues or IDs (28.910161ms)
+✔ congestion reduces movement budget and save state retains actual adjacent paths (13.915299ms)
+✔ new emergencies preempt queued garbage tickets when the bounded task queue is full (9.97703ms)
+✔ overflowing a valid near-bound bin leaves the entire standalone city unchanged (4.234077ms)
+✔ finite admitted beds remain full while a closed clinic preserves unmet patients (15.808768ms)
+✔ demolishing an occupied clinic or station returns admitted cases to persistent local queues (11.831918ms)
+✔ polluted homes generate deterministic bounded medical demand while healthy homes do not (6.916779ms)
+✔ high crime pressure and unemployment create bounded deterministic cases without RNG calls (4.5218ms)
+✔ material units survive landfill demolition and recollection without double-counted stock (24.925766ms)
+✔ saved IDs and cross references cannot be aliased or forge completed work (7.514335ms)
+✔ services state remains bounded saveable and conserved over repeated generation and deliveries (291.147949ms)
+✔ near-bound accepted service states request whole-month drafting before preceding model mutations (2.010727ms)
+✔ hospital fleet and throughput require all twelve configured staff rather than treating eight as full (13.138928ms)
+✔ shared-start route planning preserves fresh BFS routes and tie order for distinct incidents (11.335607ms)
+✔ routing is recomputed on the next service tick after a road deletion changes the shortest path (8.009583ms)
+✔ extinguishing an actual road invalidates routing within the same service tick (16.94368ms)
+✔ reported fleet arrays are detached and closed destinations do not reuse an earlier route choice (45.934176ms)
+✖ a newly staffed provider receives a fair fleet slot when the global cap is occupied by idle vehicles (8.225239ms)
+ℹ tests 31
+ℹ suites 0
+ℹ pass 30
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1379.249872
+
+✖ failing tests:
+
+test at tests/city/services.test.mjs:618:1
+✖ a newly staffed provider receives a fair fleet slot when the global cap is occupied by idle vehicles (8.225239ms)
+  AssertionError [ERR_ASSERTION]: idle fleets must release a fair slot to a new operational provider
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/services.test.mjs:628:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }

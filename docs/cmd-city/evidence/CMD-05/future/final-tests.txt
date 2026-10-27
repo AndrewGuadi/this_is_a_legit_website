@@ -1,0 +1,30 @@
+✔ migration retains canonical tower population and legacy capacity with complete strict state (2.481587ms)
+✔ floor actions charge once, enforce occupied capacity, limits, research and closure (0.827011ms)
+✔ mixed floors have distinct finite capacities and internal utility dependence without report writes (2.090547ms)
+✔ corporate production consumes real finite oil and ore and books bounded product sales once (1.511929ms)
+✔ closed, disconnected or unstaffed corporate facilities cannot produce or conjure demand (2.399897ms)
+✔ research requires actual staffed institute and educated employed middle/high wealth adults (0.619723ms)
+✔ strict validation rejects altered keys, ledgers, indexes, floor counts and non-finite values (0.962854ms)
+✔ reconciliation removes demolished tower floors without losing corporate stock and initializes new towers (0.461165ms)
+✔ removing essential internal power disables dependent tower uses when external supply is absent (1.065803ms)
+✔ stored composite cannot sell through a closed or unstaffed corporate network (0.720769ms)
+✔ strict current state rejects ledgers beyond real stock and canonical floor bounds (0.497866ms)
+✔ invalid research, unknown actions, crowns, maximum floors and insufficient cash are atomic (1.08731ms)
+✔ progression overflow and invalid inventory reject before any mutation (0.756957ms)
+✔ research does not reuse last-month wages or disconnected households as current skilled workers (0.179038ms)
+✔ corporate report site ledger cannot mutate state or hide emitted production (0.492882ms)
+✔ free floor shutdown remains available during a treasury deficit (0.247902ms)
+✔ the single crown remains the top floor when a use is added below it (0.300415ms)
+✔ 240 varied months preserve resource and product identities and exact restored continuation (37.306609ms)
+✔ internal water cannot bypass an exhausted or explicitly unavailable shared water reserve (0.501791ms)
+✔ actual critical staff power their own floor without being diluted by unpowered office vacancies (0.485526ms)
+✔ closing a whole tower suspends its enabled-floor operating upkeep (0.163203ms)
+✔ explicit phase reservations cannot be reassigned into invented critical staffing by a report (0.381258ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 22
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 198.813857

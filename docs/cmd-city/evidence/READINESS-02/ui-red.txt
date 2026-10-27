@@ -1,0 +1,182 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+[WebServer] WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+[WebServer]  * Running on http://127.0.0.1:5081
+[WebServer] Press CTRL+C to quit
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:12] "GET / HTTP/1.1" 200 -
+
+Running 3 tests using 1 worker
+
+(node:48) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:13] "GET /games/cmd-city HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:13] "GET /static/cmd-city/game.css HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:13] "GET /static/cmd-city/game.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:13] "GET /static/cmd-city/future.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:13] "GET /static/cmd-city/save.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:13] "GET /static/cmd-city/core.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:13] "GET /static/cmd-city/content.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:13] "GET /static/cmd-city/region.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:13] "GET /static/cmd-city/civic.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:13] "GET /static/cmd-city/roads.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:13] "GET /static/cmd-city/view.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:13] "GET /static/cmd-city/households.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:13] "GET /static/cmd-city/clock.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:13] "GET /static/cmd-city/services.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:13] "GET /static/cmd-city/environment.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:13] "GET /static/cmd-city/road-network.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:13] "GET /static/cmd-city/transit.mjs HTTP/1.1" 200 -
+  ✘  1 [chromium-1440] › tests/browser/cmd-city-readiness.spec.js:42:1 › tower toggle retains keyboard focus through refresh (9.1s)
+(node:142) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:23] "GET /games/cmd-city HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:23] "GET /static/cmd-city/game.css HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:23] "GET /static/cmd-city/game.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:23] "GET /static/cmd-city/future.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:23] "GET /static/cmd-city/region.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:23] "GET /static/cmd-city/clock.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:23] "GET /static/cmd-city/core.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:23] "GET /static/cmd-city/save.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:23] "GET /static/cmd-city/content.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:23] "GET /static/cmd-city/view.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:23] "GET /static/cmd-city/civic.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:23] "GET /static/cmd-city/roads.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:23] "GET /static/cmd-city/households.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:23] "GET /static/cmd-city/services.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:23] "GET /static/cmd-city/road-network.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:23] "GET /static/cmd-city/environment.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:23] "GET /static/cmd-city/transit.mjs HTTP/1.1" 200 -
+  ✘  2 [chromium-1440] › tests/browser/cmd-city-readiness.spec.js:54:1 › reselecting a home respects a closed household inspector (8.6s)
+(node:235) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:32] "GET /games/cmd-city HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:32] "GET /static/cmd-city/game.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:32] "GET /static/cmd-city/game.css HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:32] "GET /static/cmd-city/core.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:32] "GET /static/cmd-city/content.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:32] "GET /static/cmd-city/region.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:32] "GET /static/cmd-city/save.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:32] "GET /static/cmd-city/future.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:32] "GET /static/cmd-city/clock.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:32] "GET /static/cmd-city/view.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:32] "GET /static/cmd-city/roads.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:32] "GET /static/cmd-city/civic.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:32] "GET /static/cmd-city/services.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:32] "GET /static/cmd-city/households.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:32] "GET /static/cmd-city/environment.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:32] "GET /static/cmd-city/road-network.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [27/Oct/2026 06:41:32] "GET /static/cmd-city/transit.mjs HTTP/1.1" 200 -
+  ✘  3 [chromium-1440] › tests/browser/cmd-city-readiness.spec.js:62:1 › long inspector stays bounded and keyboard scrollable (2.2s)
+
+
+  1) [chromium-1440] › tests/browser/cmd-city-readiness.spec.js:42:1 › tower toggle retains keyboard focus through refresh 
+
+    Error: expect(locator).toBeFocused() failed
+
+    Locator:  getByRole('button', { name: 'Open floor 3', exact: true })
+    Expected: focused
+    Received: inactive
+    Timeout:  7000ms
+
+    Call log:
+      - Expect "toBeFocused" getByRole('button', { name: 'Open floor 3', exact: true }) with timeout 7000ms
+      - waiting for getByRole('button', { name: 'Open floor 3', exact: true })
+        18 × locator resolved to <button type="button">Open floor 3</button>
+           - unexpected value "inactive"
+
+
+      47 |   await close.focus();
+      48 |   await page.keyboard.press('Enter');
+    > 49 |   await expect(page.getByRole('button', {name:'Open floor 3', exact:true})).toBeFocused();
+         |                                                                             ^
+      50 |   await page.keyboard.press('Enter');
+      51 |   await expect(page.getByRole('button', {name:'Close floor 3', exact:true})).toBeFocused();
+      52 | });
+        at /workspace/scratch/bf6bfb751ccd/cmd-city/tests/browser/cmd-city-readiness.spec.js:49:77
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cmd-city-readiness-tower-t-ea387-board-focus-through-refresh-chromium-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/cmd-city-readiness-tower-t-ea387-board-focus-through-refresh-chromium-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/cmd-city-readiness-tower-t-ea387-board-focus-through-refresh-chromium-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/cmd-city-readiness-tower-t-ea387-board-focus-through-refresh-chromium-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2) [chromium-1440] › tests/browser/cmd-city-readiness.spec.js:54:1 › reselecting a home respects a closed household inspector 
+
+    Error: expect(locator).not.toHaveAttribute() failed
+
+    Locator:  locator('#home-inspector')
+    Expected: not have attribute
+    Received: have attribute
+    Timeout:  7000ms
+
+    Call log:
+      - Expect "not toHaveAttribute" locator('#home-inspector') with timeout 7000ms
+      - waiting for locator('#home-inspector')
+        18 × locator resolved to <details open="" id="home-inspector" class="home-inspector">…</details>
+           - unexpected value "attribute present"
+
+
+      57 |   await expect(page.locator('#home-inspector')).not.toHaveAttribute('open');
+      58 |   await page.getByRole('button', {name:'Inspect tile', exact:true}).click();
+    > 59 |   await expect(page.locator('#home-inspector')).not.toHaveAttribute('open');
+         |                                                     ^
+      60 | });
+      61 |
+      62 | test('long inspector stays bounded and keyboard scrollable', async ({page}, info) => {
+        at /workspace/scratch/bf6bfb751ccd/cmd-city/tests/browser/cmd-city-readiness.spec.js:59:53
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cmd-city-readiness-reselec-19b16--closed-household-inspector-chromium-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/cmd-city-readiness-reselec-19b16--closed-household-inspector-chromium-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/cmd-city-readiness-reselec-19b16--closed-household-inspector-chromium-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/cmd-city-readiness-reselec-19b16--closed-household-inspector-chromium-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3) [chromium-1440] › tests/browser/cmd-city-readiness.spec.js:62:1 › long inspector stays bounded and keyboard scrollable 
+
+    Error: expect(received).toBeLessThanOrEqual(expected)
+
+    Expected: <= 802
+    Received:    2566.484375
+
+      64 |   for (let i=0; i<6; i++) await page.getByRole('button', {name:'Add tower floor', exact:true}).click();
+      65 |   const inspector=page.locator('aside.inspector');
+    > 66 |   expect((await inspector.boundingBox()).height).toBeLessThanOrEqual(802);
+         |                                                  ^
+      67 |   await inspector.focus();
+      68 |   await page.keyboard.press('End');
+      69 |   await expect.poll(() => inspector.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
+        at /workspace/scratch/bf6bfb751ccd/cmd-city/tests/browser/cmd-city-readiness.spec.js:66:50
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cmd-city-readiness-long-in-1f1e8-ded-and-keyboard-scrollable-chromium-1440/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/cmd-city-readiness-long-in-1f1e8-ded-and-keyboard-scrollable-chromium-1440/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/cmd-city-readiness-long-in-1f1e8-ded-and-keyboard-scrollable-chromium-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/cmd-city-readiness-long-in-1f1e8-ded-and-keyboard-scrollable-chromium-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3 failed
+    [chromium-1440] › tests/browser/cmd-city-readiness.spec.js:42:1 › tower toggle retains keyboard focus through refresh 
+    [chromium-1440] › tests/browser/cmd-city-readiness.spec.js:54:1 › reselecting a home respects a closed household inspector 
+    [chromium-1440] › tests/browser/cmd-city-readiness.spec.js:62:1 › long inspector stays bounded and keyboard scrollable 

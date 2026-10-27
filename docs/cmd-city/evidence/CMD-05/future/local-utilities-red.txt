@@ -1,0 +1,38 @@
+✔ schema4 strict migration preserves old source fields and creates future state only once (60.256806ms)
+✔ real guarded floor controls create jobs, stock-limited internal purchases and housing capacity (164.261405ms)
+✔ critical staffing and internal generation require actual workers and share road and water limits (82.450236ms)
+✔ corporate output is booked once with resource, treasury and environmental consequences (50.101674ms)
+✖ a self-supplied tower retains local service under outside grid shortage without duplicated supply or groundwater (51.067638ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 4
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 647.25909
+
+✖ failing tests:
+
+test at tests/city/future-integration.test.mjs:13:1
+✖ a self-supplied tower retains local service under outside grid shortage without duplicated supply or groundwater (51.067638ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  + actual - expected
+  
+  + 0.38095238095238093
+  - 1
+  
+      at TestContext.<anonymous> (file:///tmp/cmd05-future-integration/tests/city/future-integration.test.mjs:13:553)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 0.38095238095238093,
+    expected: 1,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

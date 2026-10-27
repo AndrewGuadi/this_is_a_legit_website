@@ -1,0 +1,14 @@
+{
+  "node": "v24.19.0",
+  "cpu": "AMD EPYC 9V74 80-Core Processor",
+  "platform": "linux x64",
+  "tiles": 1280,
+  "initialPopulation": 43200,
+  "months": 120,
+  "medianMs": 5.547194999999988,
+  "p95Ms": 19.754965,
+  "maxMs": 39.254125999999985,
+  "targetP95Ms": 20,
+  "targetMet": true,
+  "finalPopulation": 0
+}

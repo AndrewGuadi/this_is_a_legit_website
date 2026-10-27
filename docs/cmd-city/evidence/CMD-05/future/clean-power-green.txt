@@ -1,0 +1,16 @@
+✔ schema4 strict migration preserves old source fields and creates future state only once (52.759553ms)
+✔ real guarded floor controls create jobs, stock-limited internal purchases and housing capacity (134.983474ms)
+✔ critical staffing and internal generation require actual workers and share road and water limits (70.720022ms)
+✔ corporate output is booked once with resource, treasury and environmental consequences (43.365841ms)
+✔ a self-supplied tower retains local service under outside grid shortage without duplicated supply or groundwater (62.838511ms)
+✔ compact future exports are lossless, bounded and strict against expansion abuse (81.204259ms)
+✔ advanced clean-power research needs current skilled employed residents and a staffed institute, then actual plant staff generate power (53.69245ms)
+✔ tidal generation is shoreline constrained, finite, staffed and tied to the current tidal cycle (76.909356ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 751.087985

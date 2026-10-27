@@ -1,0 +1,34 @@
+✔ planning creates bounded zeroed derived loads and never mutates the authoritative city (11.727465ms)
+✔ a connected rail path with two distinct accessible stations carries actual passengers (5.516801ms)
+✔ disconnected rail segments, one station and tracks without stations serve nobody (6.565625ms)
+✔ disabled, burning or road-disconnected stations are ineligible (3.627063ms)
+✔ catchments are bounded and one shared station cannot pretend to be a route (3.997389ms)
+✔ rail capacity is reserved across repeated callers sharing the same track (0.977173ms)
+✔ buses need two exchanges and a genuine connected road path, reducing car equivalents (3.743701ms)
+✔ bus capacity is shared across overlapping trips without inventing passengers (1.046141ms)
+✔ bus path cannot jump over missing tiles, diagonals or disconnected roads (3.504148ms)
+✔ invalid requests and invalid endpoint indices leave every derived load unchanged (5.872464ms)
+✔ planning snapshots network eligibility rather than retaining writable source references (0.858766ms)
+✔ rail is preferred when both a valid bus and rail route serve a journey (0.569585ms)
+✔ station modules increase aggregate throughput across different rail branches without raising edge capacity (2.425991ms)
+✔ saturated rail edges do not hide an available alternate track path (0.976021ms)
+✔ a disabled or burning bus exchange cannot provide service (1.076141ms)
+✔ streetcar assigns real demand on its connected network with finite shared segments and endpoints (3.351523ms)
+✔ streetcar rejects disconnected or demolished paths and inaccessible/closed/burning endpoints (4.057274ms)
+✔ streetcar module capacity never raises a shared segment's capacity (1.043677ms)
+✔ ferry assigns real demand on its connected network with finite shared segments and endpoints (3.389293ms)
+✔ ferry rejects disconnected or demolished paths and inaccessible/closed/burning endpoints (3.408692ms)
+✔ ferry module capacity never raises a shared segment's capacity (3.427397ms)
+✔ maglev assigns real demand on its connected network with finite shared segments and endpoints (2.038728ms)
+✔ maglev rejects disconnected or demolished paths and inaccessible/closed/burning endpoints (3.920608ms)
+✔ maglev module capacity never raises a shared segment's capacity (0.686028ms)
+✔ ferry terminals cannot teleport across land and a water bridge preserves navigation (2.456576ms)
+✔ future movement requires completed maglev research, even for imported infrastructure (1.972336ms)
+ℹ tests 26
+ℹ suites 0
+ℹ pass 26
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 275.220062

@@ -1,0 +1,48 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+[WebServer] WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+[WebServer]  * Running on http://127.0.0.1:5081
+[WebServer] Press CTRL+C to quit
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:36:15] "GET / HTTP/1.1" 200 -
+
+Running 2 tests using 1 worker
+
+(node:34) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:36:17] "GET /games/cmd-city HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:36:17] "GET /static/cmd-city/game.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:36:17] "GET /static/cmd-city/game.css HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:36:17] "GET /static/cmd-city/future.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:36:17] "GET /static/cmd-city/content.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:36:17] "GET /static/cmd-city/region.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:36:17] "GET /static/cmd-city/core.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:36:17] "GET /static/cmd-city/save.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:36:17] "GET /static/cmd-city/view.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:36:17] "GET /static/cmd-city/clock.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:36:17] "GET /static/cmd-city/civic.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:36:17] "GET /static/cmd-city/households.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:36:17] "GET /static/cmd-city/services.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:36:17] "GET /static/cmd-city/roads.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:36:17] "GET /static/cmd-city/environment.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:36:17] "GET /static/cmd-city/transit.mjs HTTP/1.1" 200 -
+  ✓  1 [chromium-390] › tests/browser/cmd-city-future.spec.js:6:1 › mixed tower floors change real capacity and survive export; occupied homes cannot be removed (3.7s)
+(node:144) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:36:21] "GET /games/cmd-city HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:36:21] "GET /static/cmd-city/game.css HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:36:21] "GET /static/cmd-city/game.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:36:21] "GET /static/cmd-city/future.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:36:21] "GET /static/cmd-city/region.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:36:21] "GET /static/cmd-city/clock.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:36:21] "GET /static/cmd-city/content.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:36:21] "GET /static/cmd-city/save.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:36:21] "GET /static/cmd-city/core.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:36:21] "GET /static/cmd-city/view.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:36:21] "GET /static/cmd-city/roads.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:36:21] "GET /static/cmd-city/services.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:36:21] "GET /static/cmd-city/civic.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:36:21] "GET /static/cmd-city/households.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:36:21] "GET /static/cmd-city/transit.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:36:21] "GET /static/cmd-city/environment.mjs HTTP/1.1" 200 -
+  ✓  2 [chromium-1440] › tests/browser/cmd-city-future.spec.js:6:1 › mixed tower floors change real capacity and survive export; occupied homes cannot be removed (3.8s)
+
+  2 passed (9.7s)

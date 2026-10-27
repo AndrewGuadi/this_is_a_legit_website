@@ -1,0 +1,19 @@
+✔ straight plans a bounded connected grid road and commits exact cost without mutating source (1181.781608ms)
+✔ curve plans a bounded connected grid road and commits exact cost without mutating source (682.596585ms)
+✔ circle plans a bounded connected grid road and commits exact cost without mutating source (1589.870618ms)
+✔ block plans a bounded connected grid road and commits exact cost without mutating source (1274.782545ms)
+✔ occupied buildings or insufficient funds reject complete plans without partial mutations (82.953351ms)
+✔ water crossings price and construct bridges while existing roads are preserved and free (253.000513ms)
+✔ invalid geometry, out-of-map circles and unsupported road types reject without mutation (2.829836ms)
+✔ a stale preview is revalidated against current funds and occupied tiles at commit (58.679133ms)
+✔ invalid regional identity rejects the complete plan without mutating any source fields (94.134344ms)
+✔ responsive road commits yield to the UI, preserve source state and match synchronous construction (997.636579ms)
+✔ canceling a responsive plan after candidate construction discards every candidate change (127.123411ms)
+ℹ tests 11
+ℹ suites 0
+ℹ pass 11
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6575.970492

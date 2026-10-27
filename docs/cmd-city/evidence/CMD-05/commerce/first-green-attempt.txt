@@ -1,0 +1,26 @@
+✔ creation preserves warehouse ownership without duplicating stock or inventing opening deliveries (12.112161ms)
+✔ actual staffed industrial production enters producer stock once; repeated hook is inert (10.059594ms)
+✔ closed, burning, unstaffed, unserved and unpowered producers generate no goods (10.320102ms)
+✔ warehouse cargo travels a real bounded path before a shop receives inventory (4.963651ms)
+✔ shared shop unloading is finite and goods remain aboard during partial deliveries (5.037114ms)
+✔ purchases consume only physically delivered shop stock and do not debit warehouse again (7.621425ms)
+✔ blocked roads hold real cargo and repairs restore its delivery (11.469155ms)
+✔ closing a destination returns its cargo over roads instead of teleporting or losing it (2.930157ms)
+✔ freight shares remaining road capacity with commuters and other freight (2.610453ms)
+✔ zero utilities or a closed gateway cannot dispatch warehouse freight (2.092599ms)
+✔ external warehouse transfer records only actual bounded stock and preserves money (1.032065ms)
+✔ demolition conserves producer and retail stock into explicit recovered goods (0.935733ms)
+✔ recall retains cargo and rejects malformed or missing vehicle actions without state changes (9.667588ms)
+✔ a tower shop uses explicitly supplied staffed monthly retail throughput (5.339606ms)
+✔ reporting is pure and returns defensive paths and stock/load arrays (5.259058ms)
+✔ strict validation rejects malformed keys, clocks, stocks, quantities and broken conservation (2.268194ms)
+✔ strict validation rejects malformed in-flight route/cursor/id/payload relationships (5.779743ms)
+✔ counter overflow refuses monthly production atomically (9.352428ms)
+ℹ tests 18
+ℹ suites 0
+ℹ pass 18
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 267.950536

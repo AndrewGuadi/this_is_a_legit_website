@@ -1,0 +1,12 @@
+✔ scarce jobs rotate between equal eligible homes instead of starving the same home forever (113.420038ms)
+✔ inactive homes do not take turns ahead of eligible commuters (20.986734ms)
+✔ repeated reports remain identical to fresh-city reports after routing and coverage changes (467.620101ms)
+✔ mutating a returned report cannot corrupt future coverage or commute reports (15.664259ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 638.308973

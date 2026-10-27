@@ -1,0 +1,1032 @@
+--- a/static/cmd-city/core.mjs
++++ b/static/cmd-city/core.mjs
+@@ -4,6 +4,7 @@
+   validateHouseholds,
+   reconcileHouseholds,
+   householdReport,
++  householdSimulationReport,
+   advanceHouseholds,
+   householdWorkers,
+   householdAction,
+@@ -11,6 +12,7 @@
+ } from "./households.mjs";
+ import {
+   createServices,
++  createServiceReportSnapshot,
+   serviceReport,
+   advanceServices,
+   serviceAction,
+@@ -19,6 +21,7 @@
+ } from "./services.mjs";
+ import {
+   createEnvironment,
++  createEnvironmentReportSnapshot,
+   advanceEnvironment,
+   environmentReport,
+   environmentAction,
+@@ -187,6 +190,7 @@
+       { supply: 0, demand: 0, ratio: 1 },
+     ]),
+   );
++  const utilityValues = Object.values(u);
+   u.power.supply = access[GATE] ? s.regionalPower : 0;
+   let coalNeeded = 0,
+     baseCoalSupply = 0,
+@@ -198,7 +202,7 @@
+       d = TOOLS[t.type];
+     if (!access[i]) continue;
+     const occupied = consumption(t);
+-    for (const v of Object.values(u)) v.demand += occupied;
++    for (const v of utilityValues) v.demand += occupied;
+     if (active(t)) {
+       const demand = facilityDemand(t);
+       u.power.demand += demand.power;
+@@ -262,7 +266,8 @@
+   const roadLoad = Array(N).fill(0),
+     homeEmployment = Array(N).fill(0),
+     jobFill = Array(N).fill(0),
+-    jobs = [];
++    jobs = [],
++    potentialJobs = [];
+   const ready = Math.min(u.power.ratio, u.water.ratio) >= 0.9;
+   const transit = planTransit(
+     s,
+@@ -274,6 +279,9 @@
+   for (let i = 0; i < N; i++) {
+     const t = s.tiles[i];
+     if (housing(t)) population += t.occupancy;
++    if (graph.frontage[i] >= 0 && (t.type === "commercial" ||
++      t.type === "industrial" || Object.hasOwn(FACILITY_JOBS, t.type)))
++      potentialJobs.push({ i, road: graph.frontage[i] });
+     if (
+       (t.type === "commercial" ||
+         t.type === "industrial" ||
+@@ -289,8 +297,9 @@
+     }
+   }
+   const totalJobs = jobs.reduce((a, j) => a + j.left, 0);
+-  const jobByTile = new Map(jobs.map((j) => [j.i, j])),
+-    jobSignature = jobs.map((j) => j.i).join(",");
++  const jobByTile = new Array(N),
++    jobSignature = potentialJobs.map((j) => j.i).join(",");
++  for (const job of jobs) jobByTile[job.i] = job;
+   if (graph.jobSignature !== jobSignature) {
+     graph.orders.clear();
+     graph.jobSignature = jobSignature;
+@@ -307,7 +316,8 @@
+   // Rotate the eligible home list once per month; within each home the existing
+   // nearest-job and road/transit capacity rules remain unchanged.
+   const first = homes.length ? s.month % homes.length : 0;
+-  for (let n = 0; n < homes.length; n++) {
++  let remainingJobs = totalJobs;
++  for (let n = 0; n < homes.length && remainingJobs > 0; n++) {
+     const i = homes[(first + n) % homes.length];
+     let need = householdWorkers(s, i);
+     const start = graph.frontage[i];
+@@ -336,15 +346,16 @@
+     const { prev, distance } = tree;
+     let order = graph.orders.get(start);
+     if (!order) {
+-      order = jobs
+-        .filter((j) => Number.isFinite(distance[j.road]))
+-        .sort((a, b) => distance[a.road] - distance[b.road] || a.i - b.i)
+-        .map((j) => j.i);
++      const keys = new Uint32Array(potentialJobs.length);
++      let count = 0;
++      for (const job of potentialJobs) if (Number.isFinite(distance[job.road]))
++        keys[count++] = distance[job.road] * N + job.i;
++      order = Array.from(keys.subarray(0, count).sort(), key => key % N);
+       graph.orders.set(start, order);
+     }
+     for (const id of order) {
+       if (!need) break;
+-      const job = jobByTile.get(id);
++      const job = jobByTile[id];
+       if (!job || job.left <= 0) continue;
+       if (transit.stations.length < 2) {
+         const minimum = transit.exchanges.length >= 2 ? busFactor : 1;
+@@ -358,6 +369,30 @@
+           minimum - 1e-8
+         )
+           continue;
++      }
++      // Without transit, route assignment only needs the predecessor chain.
++      // Walk it directly: materializing/caching thousands of temporary path
++      // arrays adds no simulation information and causes cache thrash.
++      if (transit.stations.length < 2 && transit.exchanges.length < 2) {
++        let room = Infinity;
++        for (let p = job.road; p !== -1; p = prev[p]) {
++          room = Math.min(room, Math.max(0,
++            (TOOLS[s.tiles[p].type]?.capacity || 80) - roadLoad[p]));
++          if (room === 0 || p === start) break;
++        }
++        const take = Math.min(need, job.left, Math.max(0, Math.floor(room + 1e-8)));
++        if (!take) continue;
++        for (let p = job.road; p !== -1; p = prev[p]) {
++          roadLoad[p] += take;
++          if (p === start) break;
++        }
++        need -= take;
++        job.left -= take;
++      remainingJobs -= take;
++        jobFill[job.i] += take;
++        homeEmployment[i] += take;
++        employed += take;
++        continue;
+       }
+       const pathKey = start * N + job.road;
+       let path = graph.routePaths.get(pathKey);
+@@ -413,6 +448,7 @@
+         roadLoad[p] += carTake + moved.moved * moved.roadFactor;
+       need -= take;
+       job.left -= take;
++      remainingJobs -= take;
+       jobFill[job.i] += take;
+       homeEmployment[i] += take;
+       employed += take;
+@@ -568,6 +604,9 @@
+   );
+ }
+ export function measure(s, options = {}) {
++  return measureDerived(s, options);
++}
++function measureDerived(s, options = {}, context = null) {
+   const road = roadGraph(s),
+     access = road.access.map(
+       (v, i) => v && (!restricted(s, i) || RECOVERY.has(s.tiles[i].type)),
+@@ -584,7 +623,9 @@
+   // The operational graph shares cached Maps with the physical graph, but its
+   // primitive signature must also be retained or each measure re-sorts all jobs.
+   road.jobSignature = graph.jobSignature;
+-  const services = serviceReport(s, { population: employment.population });
++  const services = context
++    ? (context.services ||= createServiceReportSnapshot(s))({ population: employment.population })
++    : serviceReport(s, { population: employment.population });
+   const monthlyWaste = s.tiles.reduce((n, t) => n + t.occupancy, 0);
+   u.waste.processingRatio = u.waste.ratio;
+   u.waste.collectionRatio = services.pendingWaste
+@@ -592,7 +633,7 @@
+     : 1;
+   u.waste.ratio = u.waste.collectionRatio;
+   u.waste.pending = services.pendingWaste;
+-  const environment = environmentReport(s, {
++  const environmentMetrics = {
+     ...employment,
+     access,
+     utilities: u,
+@@ -600,7 +641,11 @@
+     // During the monthly transaction the ore is already reserved and deducted.
+     // The pure source forecast must not reserve that same physical stock twice.
+     nuclearFuelUsed: options.reservedFuel ? 0 : nuclearFuelUsed,
+-  });
++  };
++  const environment = context
++    ? (context.environment ||= createEnvironmentReportSnapshot(s))(environmentMetrics, { presentation: context.presentation !== false })
++    : environmentReport(s, environmentMetrics);
++
+   const pollution = environment.air;
+   const landValue = pollution.map((p, i) =>
+     clamp(
+@@ -620,7 +665,7 @@
+     .filter((i) => i >= 0);
+   const avg = (a) =>
+     homes.length ? homes.reduce((n, i) => n + a[i], 0) / homes.length : 0;
+-  const households = householdReport(s, {
++  const households = (context?.presentation === false ? householdSimulationReport : householdReport)(s, {
+     ...employment,
+     access: road.access,
+     operationAccess: access,
+@@ -818,7 +863,7 @@
+       n ? (100 * n) / (TOOLS[s.tiles[i].type]?.capacity || 80) : 0,
+     ),
+   );
+-  result.civic = civicReport(s, civicMetrics(result));
++  if (context?.presentation !== false) result.civic = civicReport(s, civicMetrics(result));
+   return result;
+ }
+ export function createCity({
+@@ -1287,8 +1332,8 @@
+ }
+ function simulateMonth(s) {
+   reconcileHouseholds(s);
+-  const initial = measure(s);
+-  advanceEnvironment(s, { ...initial, access: initial.operationAccess });
++  const initial = measureDerived(s, {}, { services: null, environment: null, presentation: false });
++  advanceEnvironment(s, { ...initial, access: initial.operationAccess }, { report: false });
+   // Reserve actual fuel before any mine, factory, trade or recycling transaction.
+   const reservedFuel = {
+     fuelUsed: initial.fuelUsed,
+@@ -1296,8 +1341,9 @@
+   };
+   s.inventory.coal -= reservedFuel.fuelUsed;
+   s.inventory.ore -= reservedFuel.nuclearFuelUsed;
+-  const monthMeasure = () => measure(s, { reservedFuel });
+-  advanceServices(s, { ...initial, roadLoad: initial.roadLoad });
++  const context = { services: null, environment: null, presentation: false };
++  const monthMeasure = () => measureDerived(s, { reservedFuel }, context);
++  advanceServices(s, { ...initial, roadLoad: initial.roadLoad }, { report: false });
+   let m = monthMeasure();
+   let power = Math.max(0, m.utilities.power.supply - m.utilities.power.demand),
+     water = Math.max(0, m.utilities.water.supply - m.utilities.water.demand);
+@@ -1321,7 +1367,7 @@
+     }
+   }
+   if (incidentChanged) reconcileHouseholds(s);
+-  if (incidentChanged) m = monthMeasure();
++  if (incidentChanged) { context.services = null; m = monthMeasure(); }
+   let shrunk = false;
+   // Shrink first, then reserve the genuinely freed capacity before allocating growth.
+   for (let i = 0; i < N; i++) {
+@@ -1519,7 +1565,7 @@
+   const householdResult = advanceHouseholds(s, {
+     ...m,
+     roadLoad: m.commuterRoadLoad,
+-  });
++  }, { report: false });
+   const finance = {
+     ...m.monthly,
+     income: m.visitorIncome + householdResult.bookedTaxes.total,
+@@ -1546,11 +1592,20 @@
+     ...finance,
+   });
+   if (s.history.length > 24) s.history.shift();
+-  if (s.policies.disasters && random(s) < 0.02)
++  if (s.policies.disasters && random(s) < 0.02) {
+     performAction(s, { type: "disaster", kind: "fire" });
++    // Actual disaster mutation invalidates captured service/environment fields.
++    context.services = null;
++    context.environment = null;
++  }
++  context.presentation = true;
+   const finalMetrics = monthMeasure();
+-  advanceCivic(s, civicMetrics(finalMetrics));
+-  return measure(s);
++  const civic = advanceCivic(s, civicMetrics(finalMetrics));
++  if (!s.tiles.some(t => t.type === "coalPlant" || t.type === "nuclear")) {
++    finalMetrics.civic = civic;
++    return finalMetrics;
++  }
++  return measureDerived(s, {}, context);
+ }
+ export function inspectTile(s, x, y, m = measure(s)) {
+   const i = at(x, y);
+--- a/static/cmd-city/environment.mjs
++++ b/static/cmd-city/environment.mjs
+@@ -131,7 +131,7 @@
+   return 1 + 0.5 * (integer(tile.modules, 0, 3) ? tile.modules : 0);
+ }
+ function sourceReport(city, metrics) {
+-  const size = city.width * city.height;
++  const size = city.width * city.height, r = ratios(metrics);
+   const air = Array(size).fill(0),
+     ground = Array(size).fill(0),
+     sources = [];
+@@ -175,8 +175,7 @@
+   };
+   for (let i = 0; i < size; i++) {
+     const tile = city.tiles[i],
+-      filled = workers(metrics, i),
+-      r = ratios(metrics);
++      filled = workers(metrics, i);
+     if (active(tile) && connected(metrics, i)) {
+       if (tile.type === "coalPlant")
+         add(
+@@ -308,9 +307,24 @@
+   return weight ? total / weight : 0;
+ }
+ export function environmentReport(city, metrics = {}) {
+-  const environment = environmentOf(city),
+-    size = city.width * city.height,
+-    emissions = sourceReport(city, metrics);
++  return environmentReportWith(city, metrics, environmentOf(city));
++}
++/** Validated, independent environmental fields for one read-only simulation phase.
++ * Live staffing, stocks, occupancy, buildings and utilities are still recomputed.
++ */
++export function createEnvironmentReportSnapshot(city, { presentation = true } = {}) {
++  const source = environmentOf(city), width = city.width, height = city.height;
++  const environment = { ...source, air: source.air.slice(),
++    ground: source.ground.slice(), radiation: source.radiation.slice() };
++  return (metrics = {}, options = {}) => {
++    if (city.width !== width || city.height !== height)
++      throw Error("Environmental snapshot dimensions changed.");
++    return environmentReportWith(city, metrics, environment, options.presentation ?? presentation);
++  };
++}
++function environmentReportWith(city, metrics, environment, presentation = true) {
++  const size = city.width * city.height,
++    emissions = presentation ? sourceReport(city, metrics) : null;
+   let pumpCapacity = 0,
+     weightedContamination = 0,
+     filterCapacity = 0;
+@@ -365,7 +379,7 @@
+     airExposure = 0,
+     radiationExposure = 0;
+   const restricted = environment.radiation.map((v) => v >= 200),
+-    blockers = Array.from({ length: size }, () => []);
++    blockers = presentation ? Array.from({ length: size }, () => []) : null;
+   for (let i = 0; i < size; i++) {
+     const tile = city.tiles[i];
+     if (
+@@ -377,19 +391,19 @@
+       airExposure += (environment.air[i] / 10) * population;
+       radiationExposure += (environment.radiation[i] / 10) * population;
+     }
+-    if (restricted[i])
++    if (presentation && restricted[i])
+       blockers[i].push(
+         "Radiation restricts new occupation and normal development on this land. Recovery access and cleanup may remain available.",
+       );
+-    if (environment.ground[i] >= 500)
++    if (presentation && environment.ground[i] >= 500)
+       blockers[i].push(
+         "Persistent ground contamination is high; removing the emitter does not clean existing soil.",
+       );
+-    if (tile.type === "water" && pumpContamination[i] > 20)
++    if (presentation && tile.type === "water" && pumpContamination[i] > 20)
+       blockers[i].push(
+         "This pump draws contaminated water. Connected, supplied and staffed filtration treats only its available throughput.",
+       );
+-    if (tile.type === "landfill" && amount(tile.stored))
++    if (presentation && tile.type === "landfill" && amount(tile.stored))
+       blockers[i].push(
+         "Stored landfill waste remains a local contamination source, including after closure.",
+       );
+@@ -403,11 +417,11 @@
+     ground: environment.ground.map((v) => v / 10),
+     radiation: environment.radiation.map((v) => v / 10),
+     restricted,
+-    blockers,
+-    sources: emissions.sources,
+-    emissions: emissions.totals,
+-    emissionBasis: "opening-month activity forecast",
+-    pumpContamination: pumpContamination.map(display),
++    ...(presentation ? {
++      blockers, sources: emissions.sources, emissions: emissions.totals,
++      emissionBasis: "opening-month activity forecast",
++      pumpContamination: pumpContamination.map(display),
++    } : {}),
+     pumpWeightedRawContamination: display(rawContamination),
+     deliveredWaterContamination: display(deliveredWaterContamination),
+     waterFilterCapacity: filterCapacity,
+@@ -459,11 +473,11 @@
+   }
+   return { groundRemoved, radiationRemoved };
+ }
+-export function advanceEnvironment(city, metrics = {}) {
++export function advanceEnvironment(city, metrics = {}, { report = true } = {}) {
+   const before = environmentOf(city);
+   if (before.lastMonth >= city.month)
+     return {
+-      ...environmentReport(city, metrics),
++      ...(report ? environmentReport(city, metrics) : {}),
+       changed: false,
+       massBalance: null,
+     };
+@@ -523,7 +537,7 @@
+   validateEnvironment(next, city.width, city.height, city.month);
+   city.environment = next;
+   return {
+-    ...environmentReport(city, metrics),
++    ...(report ? environmentReport(city, metrics) : {}),
+     changed: true,
+     massBalance: balance,
+   };
+--- a/static/cmd-city/households.mjs
++++ b/static/cmd-city/households.mjs
+@@ -81,13 +81,14 @@
+ const bad = () => {
+   throw Error("Invalid CMD City household version 1 state.");
+ };
++const keySets = new WeakMap();
+ function keys(o, names) {
+-  if (
+-    !plain(o) ||
+-    Object.keys(o).length !== names.length ||
+-    Object.keys(o).some((k) => !names.includes(k))
+-  )
+-    bad();
++  if (!plain(o)) bad();
++  const actual = Object.keys(o);
++  if (actual.length !== names.length) bad();
++  let allowed = keySets.get(names);
++  if (!allowed) { allowed = new Set(names); keySets.set(names, allowed); }
++  for (const key of actual) if (!allowed.has(key)) bad();
+ }
+ function context(city) {
+   if (
+@@ -205,7 +206,7 @@
+     integer(h.adults, 0, 1000000) &&
+     integer(h.seniors, 0, 1000000) &&
+     pop(h) > 0
+-    ? demographics(count, h).adults
++    ? count === pop(h) ? h.adults : demographics(count, h).adults
+     : demographics(count).adults;
+ }
+ export function validateHouseholds(value, city, { stable = true } = {}) {
+@@ -387,8 +388,13 @@
+     ledger: { ...source.ledger },
+   };
+ }
+-function virtualState(city) {
++function virtualState(city, writable = false) {
+   validateHouseholds(city.households, city, { stable: false });
++  // Reports only need a draft when occupancy reconciliation would alter records.
++  // Mutating transactions always request their own validated copy.
++  if (!writable && city.households.homes.every((h, i) =>
++    isHome(city.tiles[i]) ? h !== null && pop(h) === city.tiles[i].occupancy : h === null))
++    return city.households;
+   const state = cloneState(city.households);
+   reconcileInto(state, city);
+   return state;
+@@ -536,14 +542,14 @@
+   observation(city, metrics, state);
+   return effective(state, city, sector, metrics);
+ }
+-function reportWith(state, city, metrics) {
+-  const classes = [0, 1, 2].map((wealth) => ({
++function reportWith(state, city, metrics, presentation = true) {
++  const classes = presentation ? [0, 1, 2].map((wealth) => ({
+     wealth,
+     label: ["Low wealth", "Middle wealth", "High wealth"][wealth],
+     people: 0,
+     homes: 0,
+     cash: 0,
+-  }));
++  })) : null;
+   const demographics = {
+     children: 0,
+     adults: 0,
+@@ -557,13 +563,19 @@
+     const count = pop(h);
+     population += count;
+     satisfaction += h.satisfaction * count;
+-    classes[h.wealth].people += count;
+-    classes[h.wealth].homes++;
+-    classes[h.wealth].cash += h.cash;
++    if (presentation) {
++      classes[h.wealth].people += count;
++      classes[h.wealth].homes++;
++      classes[h.wealth].cash += h.cash;
++    }
+     demographics.children += h.children;
+     demographics.adults += h.adults;
+     demographics.seniors += h.seniors;
+     demographics.educatedAdults += h.educated;
++    if (!presentation) return {
++      satisfaction: h.satisfaction, badMonths: h.badMonths, unmet: h.unmet,
++      shoppingWanted: h.shoppingWanted, taxRate: state.wealthTaxes.residential[h.wealth],
++    };
+     return {
+       ...h,
+       population: count,
+@@ -571,7 +583,7 @@
+       employmentRate: h.adults ? h.employed / h.adults : 0,
+     };
+   });
+-  const sum = totals(state.homes),
++  const sum = presentation ? totals(state.homes) : null,
+     l = state.ledger,
+     booked = {
+       residential: l.residentialTaxes,
+@@ -583,7 +595,7 @@
+     population,
+     classes,
+     demographics,
+-    budgets: { ...l, currentCash: sum.cash, arrears: sum.arrears },
++    ...(presentation ? { budgets: { ...l, currentCash: sum.cash, arrears: sum.arrears } } : {}),
+     shopping: {
+       wanted: l.shoppingWanted,
+       bought: l.shoppingBought,
+@@ -619,6 +631,12 @@
+   observation(city, metrics, state);
+   return reportWith(state, city, metrics);
+ }
++/** Read-only projection for internal growth/finance calculations; public reports stay complete. */
++export function householdSimulationReport(city, metrics) {
++  const state = virtualState(city);
++  observation(city, metrics, state);
++  return reportWith(state, city, metrics, false);
++}
+ export function setSectorTaxes(city, sector, value) {
+   if (
+     typeof sector !== "string" ||
+@@ -683,11 +701,12 @@
+     i < n - w ? i + w : -1,
+   ].filter((j) => j >= 0);
+ }
+-// Retain topology only: no household balances, staff, supplies, prices or capacity decisions.
+-// Per city: at most 256 BFS pairs of Int16Array(N), bounded to 1.25 MiB at N=1280.
++// Retain derived topology and exact-keyed nearest-shop orders, never balances or capacity decisions.
++// At most 512 routes with three Int16Array(N) buffers: <=3.75 MiB at N=1280.
++// Each route retains only the latest shop-ID order (<=N entries), not historical months.
+ // Actual path arrays are materialized only for the at-most-128 returned trip samples.
+ const networkCache = new WeakMap();
+-const MAX_ROUTES = 256;
++const MAX_ROUTES = 512;
+ function roadNetwork(city) {
+   const n = city.tiles.length,
+     signature =
+@@ -740,6 +759,7 @@
+   const n = city.tiles.length,
+     dist = new Int16Array(n).fill(-1),
+     prev = new Int16Array(n).fill(-1),
++    endpoints = new Int16Array(n).fill(-2),
+     queue = network.queue;
+   let head = 0,
+     tail = 0;
+@@ -757,6 +777,7 @@
+       }
+   }
+   const endpoint = (to) => {
++    if (endpoints[to] !== -2) return endpoints[to];
+     let best = -1,
+       bestDistance = Infinity;
+     for (const j of network.frontages[to])
+@@ -767,9 +788,27 @@
+         best = j;
+         bestDistance = dist[j];
+       }
++    endpoints[to] = best;
+     return best;
+   };
++  let shopKey = null, shopOrder = [];
+   const route = {
++    orderedShops(shops, key) {
++      if (shopKey !== key) {
++        // Pack the exact distance/price/tile tie order into bounded integer keys.
++        // Native numeric sort avoids one temporary object per home-shop pair.
++        const keys = new Uint32Array(shops.length);
++        let count = 0;
++        for (const shop of shops) {
++          const distance = this.distance(shop.i);
++          if (Number.isFinite(distance)) keys[count++] =
++            (distance * 3 + HOUSEHOLD_RULES.shopPrices.indexOf(shop.price)) * NMAX + shop.i;
++        }
++        shopOrder = Array.from(keys.subarray(0, count).sort(), key => key % NMAX);
++        shopKey = key;
++      }
++      return shopOrder;
++    },
+     distance(to) {
+       const end = endpoint(to);
+       return end < 0 ? Infinity : dist[end] + 1;
+@@ -923,8 +962,8 @@
+     h.goodMonths = 0;
+   }
+ }
+-export function advanceHouseholds(city, metrics) {
+-  const state = virtualState(city);
++export function advanceHouseholds(city, metrics, { report: includeReport = true } = {}) {
++  const state = virtualState(city, true);
+   observation(city, metrics, state);
+   if (city.households.lastMonth === city.month + 1) {
+     const report = reportWith(state, city, metrics);
+@@ -1012,32 +1051,20 @@
+         price: HOUSEHOLD_RULES.shopPrices[businessWealth(metrics.landValue[i])],
+       });
+   const choices = new Map(),
+-    minimumShopPrice = shops.reduce(
+-      (minimum, shop) => Math.min(minimum, shop.price),
+-      Infinity,
+-    );
++    shopById = new Map(shops.map(shop => [shop.i, shop])),
++    shopKey = shops.map(shop => `${shop.i}:${shop.price}`).join("|"),
++    minimumShopPrice = shops.reduce((minimum, shop) => Math.min(minimum, shop.price), Infinity);
+   function choicesFor(i) {
+     let result = choices.get(i);
+     if (!result) {
+-      result = shops.length
+-        ? shops
+-            .map((shop) => ({
+-              shop,
+-              distance: homeRoutes.get(i).distance(shop.i),
+-            }))
+-            .filter((x) => Number.isFinite(x.distance))
+-            .sort(
+-              (a, b) =>
+-                a.distance - b.distance ||
+-                a.shop.price - b.shop.price ||
+-                a.shop.i - b.shop.i,
+-            )
+-        : [];
++      result = shops.length ? homeRoutes.get(i).orderedShops(shops, shopKey)
++        .map(id => ({ shop: shopById.get(id) })) : [];
+       choices.set(i, result);
+     }
+     return result;
+   }
+   let goods = city.inventory.goods,
++    remainingShopCapacity = shops.reduce((n, shop) => n + shop.left, 0),
+     served = true,
+     tripsTruncated = false;
+   const shoppingLoad = Array(city.tiles.length).fill(0),
+@@ -1045,15 +1072,16 @@
+       (t, i) => (TOOLS[t.type]?.capacity ?? 0) - (metrics.roadLoad?.[i] ?? 0),
+     ),
+     trips = [],
+-    tripIndex = new Map();
+-  while (goods > 0 && served) {
++    tripIndex = new Map(),
++    blockedHomes = new Uint8Array(city.tiles.length);
++  while (goods > 0 && served && remainingShopCapacity > 0) {
+     served = false;
+     for (const i of order) {
+       const h = state.homes[i];
+-      if (h.shoppingBought >= h.shoppingWanted || h.cash < minimumShopPrice)
++      if (blockedHomes[i] || h.shoppingBought >= h.shoppingWanted || h.cash < minimumShopPrice)
+         continue;
+       const availableChoices = choicesFor(i);
+-      if (!availableChoices.length) continue;
++      if (!availableChoices.length) { blockedHomes[i] = 1; continue; }
+       const route = homeRoutes.get(i),
+         choice = availableChoices.find(
+           (x) =>
+@@ -1061,9 +1089,12 @@
+             h.cash >= x.shop.price &&
+             route.fits(x.shop.i, remainingRoad),
+         );
+-      if (!choice) continue;
++      // Wallets, shop stock and road room only decrease inside this shopping
++      // round. An unavailable home cannot acquire a route later in the loop.
++      if (!choice) { blockedHomes[i] = 1; continue; }
+       const { shop } = choice;
+       shop.left--;
++      remainingShopCapacity--;
+       goods--;
+       h.cash -= shop.price;
+       h.spending += shop.price;
+@@ -1076,6 +1107,7 @@
+           (metrics.roadLoad?.[p] ?? 0) -
+           shoppingLoad[p];
+       });
++      if (!includeReport) { if (goods <= 0) break; continue; }
+       const key = `${i}:${shop.i}`;
+       if (tripIndex.has(key)) {
+         const trip = trips[tripIndex.get(key)];
+@@ -1119,10 +1151,13 @@
+   // Commit only after all bounded financial/cohort calculations validate.
+   city.households = state;
+   city.inventory.goods = goods;
+-  const report = reportWith(state, city, metrics);
++  const report = includeReport ? reportWith(state, city, metrics) : null;
+   return {
+     report,
+-    bookedTaxes: report.taxes.booked,
++    bookedTaxes: report ? report.taxes.booked : {
++      residential: ledger.residentialTaxes, commercial: ledger.commercialTaxes,
++      industrial: ledger.industrialTaxes,
++      total: ledger.residentialTaxes + ledger.commercialTaxes + ledger.industrialTaxes },
+     shoppingLoad,
+     trips,
+     tripsTruncated,
+--- a/static/cmd-city/services.mjs
++++ b/static/cmd-city/services.mjs
+@@ -47,13 +47,17 @@
+   throw Error("Invalid CMD City road services state.");
+ };
+ const active = (t) => t && t.enabled !== false && !t.fire && t.type !== "ruins";
+-const exact = (v, keys) =>
+-  v &&
+-  typeof v === "object" &&
+-  !Array.isArray(v) &&
+-  [Object.prototype, null].includes(Object.getPrototypeOf(v)) &&
+-  Object.keys(v).length === keys.length &&
+-  Object.keys(v).every((k) => keys.includes(k));
++const keySets = new WeakMap();
++function exact(v, keys) {
++  if (!v || typeof v !== "object" || Array.isArray(v) ||
++    ![Object.prototype, null].includes(Object.getPrototypeOf(v))) return false;
++  const actual = Object.keys(v);
++  if (actual.length !== keys.length) return false;
++  let allowed = keySets.get(keys);
++  if (!allowed) { allowed = new Set(keys); keySets.set(keys, allowed); }
++  for (const key of actual) if (!allowed.has(key)) return false;
++  return true;
++}
+ function dimensions(city) {
+   const n = city.width * city.height;
+   if (
+@@ -96,28 +100,28 @@
+ function cargo(s, kind) {
+   return s.vehicles.reduce((n, v) => n + (v.kind === kind ? v.payload : 0), 0);
+ }
+-function conservation(s, city) {
++function conservation(s, totals) {
+   return {
+     waste:
+       s.counters.generatedWaste +
+         s.counters.legacyWaste +
+         s.counters.initialStoredWaste ===
+-      sum(s.waste) +
++      totals.waste +
+         s.looseWaste +
+-        cargo(s, "garbage") +
+-        totalStored(city) +
++        totals.garbage +
++        totals.stored +
+         s.counters.processedWaste,
+     patients:
+       s.counters.createdPatients ===
+-      sum(s.patients) +
+-        sum(s.beds) +
+-        cargo(s, "medical") +
++      totals.patients +
++        totals.beds +
++        totals.medical +
+         s.counters.treatedPatients,
+     crimes:
+       s.counters.createdCrimes ===
+-      sum(s.crimes) +
+-        sum(s.custody) +
+-        cargo(s, "police") +
++      totals.crimes +
++        totals.custody +
++        totals.police +
+         s.counters.resolvedCrimes,
+   };
+ }
+@@ -160,7 +164,7 @@
+   s.counters.initialStoredWaste = totalStored(city);
+   return s;
+ }
+-export function validateServices(s, city, { stable = true } = {}) {
++function inspectServices(s, city, { stable = true } = {}) {
+   const n = dimensions(city);
+   if (
+     !exact(s, [
+@@ -183,11 +187,14 @@
+     !exact(s.counters, COUNTERS)
+   )
+     invalid();
++  const totals = { garbage: 0, medical: 0, police: 0, fire: 0, stored: totalStored(city) };
+   for (const key of FIELD_KEYS) {
+     const a = s[key];
+     if (!Array.isArray(a) || a.length !== n || Object.keys(a).length !== n)
+       invalid();
+-    for (const v of a) if (!integer(v)) invalid();
++    let total = 0;
++    for (const v of a) { if (!integer(v)) invalid(); total += v; }
++    totals[key] = total;
+   }
+   for (const v of Object.values(s.counters))
+     if (!integer(v, 0, COUNTER_MAX)) invalid();
+@@ -223,6 +230,7 @@
+       (v.kind === "fire" && (v.payload !== 0 || v.capacity !== 0))
+     )
+       invalid();
++    totals[v.kind] += v.payload;
+     ids.add(v.id);
+     vehicles.set(v.id, v);
+     if (v.path.length) {
+@@ -303,7 +311,12 @@
+     s.counters.recoveredOre > Math.floor(s.counters.processedWaste / 10)
+   )
+     invalid();
+-  if (!Object.values(conservation(s, city)).every(Boolean)) invalid();
++  totals.conservation = conservation(s, totals);
++  if (!Object.values(totals.conservation).every(Boolean)) invalid();
++  return totals;
++}
++export function validateServices(s, city, options) {
++  inspectServices(s, city, options);
+   return true;
+ }
+ function servicesOf(city) {
+@@ -392,21 +405,32 @@
+   );
+ }
+ /**
+- * One ephemeral road snapshot and lazy FIFO BFS frontier per start for this tick.
++ * Bounded road-topology cache and lazy FIFO BFS frontier per start across ticks.
++ * Every tick and same-tick extinguishment compares the full active-road mask;
++ * topology changes discard all frontiers. No vehicle/case/material state is cached.
+  * Packed Int32 values retain predecessor(+1,low11bits) and discovery rank; a
+  * Uint16 queue resumes only as far as each query needs. At most128 start entries
+  * (also capped by map size) retain <=~1MiB at1280tiles; eviction changes no route.
+  * Reconstructed route arrays never alias a frontier or another vehicle path.
+  */
+-function createRouteContext(city) {
+-  const size = city.tiles.length,
+-    adjacent = Array.from({ length: size }, (_, i) => neighbors(i, city));
+-  const mask = new Uint8Array(size),
+-    trees = new Map(),
+-    limit = Math.min(128, size);
++const routeCaches = new WeakMap();
++function createRouteContext(city, identity = city) {
++  const size = city.tiles.length, limit = Math.min(128, size);
++  let cache = routeCaches.get(identity);
++  if (!cache || cache.width !== city.width || cache.size !== size) {
++    cache = { width: city.width, size,
++      adjacent: Array.from({ length: size }, (_, i) => neighbors(i, city)),
++      mask: new Uint8Array(size), trees: new Map() };
++    routeCaches.set(identity, cache);
++  }
++  const { adjacent, mask, trees } = cache;
+   function invalidate() {
+-    for (let i = 0; i < size; i++) mask[i] = road(city, i) ? 1 : 0;
+-    trees.clear();
++    let changed = false;
++    for (let i = 0; i < size; i++) {
++      const value = road(city, i) ? 1 : 0;
++      if (mask[i] !== value) { changed = true; mask[i] = value; }
++    }
++    if (changed) trees.clear();
+   }
+   invalidate();
+   return {
+@@ -673,20 +697,16 @@
+   v.destination = candidates[0].p.index;
+   return true;
+ }
+-function collectAdjacent(city, v) {
++function reservedGarbageTargets(s, taskId) {
++  const reserved = new Set();
++  for (const t of s.tasks) if (t.kind === "garbage" &&
++    t.status !== "queued" && t.status !== "completed" && t.id !== taskId)
++    reserved.add(t.target);
++  return reserved;
++}
++function collectAdjacent(city, v, reserved) {
+   if (v.kind !== "garbage" || v.payload >= v.capacity) return;
+-  const s = city.services,
+-    reserved = new Set(
+-      s.tasks
+-        .filter(
+-          (t) =>
+-            t.kind === "garbage" &&
+-            t.status !== "queued" &&
+-            t.status !== "completed" &&
+-            t.id !== v.taskId,
+-        )
+-        .map((t) => t.target),
+-    );
++  const s = city.services;
+   for (const i of [v.position, ...neighbors(v.position, city)]) {
+     if (reserved.has(i)) continue;
+     let take = Math.min(v.capacity - v.payload, s.waste[i]);
+@@ -702,7 +722,7 @@
+     if (v.payload >= v.capacity) break;
+   }
+ }
+-function arriveOutbound(city, v, list, routes) {
++function arriveOutbound(city, v, list, routes, reserved) {
+   const s = city.services,
+     t = s.tasks.find((t) => t.id === v.taskId);
+   if (!t) return;
+@@ -721,7 +741,7 @@
+     const take = Math.min(v.capacity, s.crimes[target]);
+     s.crimes[target] -= take;
+     v.payload += take;
+-  } else collectAdjacent(city, v);
++  } else collectAdjacent(city, v, reserved);
+   v.status = "returning";
+   t.status = "returning";
+   returnRoute(city, v, list, routes);
+@@ -767,6 +787,7 @@
+     budgets = new Map(list.map((p) => [p.index, p.processing]));
+   for (const v of s.vehicles) {
+     if (v.status === "idle") continue;
++    const reserved = v.kind === "garbage" ? reservedGarbageTargets(s, v.taskId) : null;
+     let budget = v.kind === "garbage" ? 32 : 8,
+       guard = 0;
+     if (v.status === "returning") returnRoute(city, v, list, routes);
+@@ -784,7 +805,7 @@
+     }
+     while (v.status !== "idle" && guard++ < city.tiles.length * 2 + 4) {
+       if (!v.path.length) break;
+-      collectAdjacent(city, v);
++      collectAdjacent(city, v, reserved);
+       if (
+         v.status === "outbound" &&
+         v.kind === "garbage" &&
+@@ -797,7 +818,7 @@
+       }
+       if (v.cursor === v.path.length - 1) {
+         if (v.status === "outbound") {
+-          arriveOutbound(city, v, list, routes);
++          arriveOutbound(city, v, list, routes, reserved);
+           continue;
+         }
+         const p = byIndex.get(v.destination);
+@@ -870,11 +891,12 @@
+   }
+ }
+ export function serviceReport(city, m = {}) {
+-  const s = servicesOf(city),
+-    uncollectedWaste = sum(s.waste) + s.looseWaste,
+-    carriedWaste = cargo(s, "garbage"),
+-    untreatedPatients = sum(s.patients) + sum(s.beds) + cargo(s, "medical"),
+-    unresolvedCrimes = sum(s.crimes) + sum(s.custody) + cargo(s, "police"),
++  const s = city.services || createServices(city),
++    totals = inspectServices(s, city, { stable: false }),
++    uncollectedWaste = totals.waste + s.looseWaste,
++    carriedWaste = totals.garbage,
++    untreatedPatients = totals.patients + totals.beds + totals.medical,
++    unresolvedCrimes = totals.crimes + totals.custody + totals.police,
+     population = Math.max(
+       1,
+       Number.isFinite(m.population)
+@@ -906,37 +928,63 @@
+     uncollectedWaste,
+     carriedWaste,
+     pendingWaste: uncollectedWaste + carriedWaste,
+-    storedWaste: totalStored(city),
++    storedWaste: totals.stored,
+     processedWaste: s.counters.processedWaste,
+     collectedWaste: s.counters.collectedWaste,
+     untreatedPatients,
+-    waitingPatients: sum(s.patients),
+-    admittedPatients: sum(s.beds),
+-    carriedPatients: cargo(s, "medical"),
++    waitingPatients: totals.patients,
++    admittedPatients: totals.beds,
++    carriedPatients: totals.medical,
+     treatedPatients: s.counters.treatedPatients,
+     unresolvedCrimes,
+-    waitingCrimes: sum(s.crimes),
+-    custody: sum(s.custody),
+-    carriedCrimes: cargo(s, "police"),
++    waitingCrimes: totals.crimes,
++    custody: totals.custody,
++    carriedCrimes: totals.police,
+     resolvedCrimes: s.counters.resolvedCrimes,
+     healthPenalty: Math.min(60, (untreatedPatients / population) * 100),
+     crimePenalty: Math.min(60, (unresolvedCrimes / population) * 100),
+-    conservation: conservation(s, city),
++    conservation: totals.conservation,
+     counters: { ...s.counters },
+   };
+ }
+-export function advanceServices(city, m = {}) {
++/** Capture an independently owned, validated service report for a read-only phase.
++ * Later city mutations cannot alter this snapshot. Population-dependent penalties
++ * are recomputed from each call's current metrics; no live state is trusted by identity.
++ */
++export function createServiceReportSnapshot(city) {
++  const base = serviceReport(city);
++  const defaultPopulation = city.tiles.reduce((n, t) =>
++    n + (["residential", "tower"].includes(t.type) ? t.occupancy : 0), 0);
++  return (m = {}) => {
++    const population = Math.max(1, Number.isFinite(m.population) ? m.population : defaultPopulation);
++    return { ...base,
++      vehicles: base.vehicles.map(v => ({ ...v })),
++      conservation: { ...base.conservation }, counters: { ...base.counters },
++      healthPenalty: Math.min(60, (base.untreatedPatients / population) * 100),
++      crimePenalty: Math.min(60, (base.unresolvedCrimes / population) * 100) };
++  };
++}
++// The validated schema has scalar records and five numeric arrays. Copy those
++// explicit fields without invoking the general structured-clone traversal.
++function cloneServices(source) {
++  return { ...source,
++    waste: source.waste.slice(), patients: source.patients.slice(),
++    crimes: source.crimes.slice(), beds: source.beds.slice(), custody: source.custody.slice(),
++    counters: { ...source.counters }, tasks: source.tasks.map(t => ({ ...t })),
++    vehicles: source.vehicles.map(v => ({ ...v, path: v.path.slice() })) };
++}
++export function advanceServices(city, m = {}, { report = true } = {}) {
+   const source = servicesOf(city);
+   if (source.lastMonth === city.month)
+-    return { ...serviceReport(city, m), changed: false };
++    return { ...(report ? serviceReport(city, m) : {}), changed: false };
+   const work = {
+     ...city,
+-    services: structuredClone(source),
++    services: cloneServices(source),
+     tiles: city.tiles.map((t) => ({ ...t })),
+     inventory: { ...city.inventory },
+     backlogs: { ...city.backlogs },
+   };
+-  const routes = createRouteContext(work),
++  const routes = createRouteContext(work, city),
+     list = providers(work, m);
+   generate(work, m);
+   treatCases(work, list);
+@@ -959,7 +1007,7 @@
+         work.services.looseWaste +
+         cargo(work.services, "garbage"),
+     );
+-  return { ...serviceReport(city, m), changed: true };
++  return { ...(report ? serviceReport(city, m) : {}), changed: true };
+ }
+ export function serviceAction(city, a) {
+   if (
+@@ -972,7 +1020,7 @@
+   )
+     return fail("Choose a valid medical or crime incident of1–100 cases.");
+   const source = servicesOf(city),
+-    s = structuredClone(source),
++    s = cloneServices(source),
+     i = a.y * city.width + a.x,
+     key = a.kind === "medical" ? "patients" : "crimes",
+     c = a.kind === "medical" ? "createdPatients" : "createdCrimes";
+@@ -991,7 +1039,7 @@
+   if (!integer(index, 0, city.tiles.length - 1))
+     return fail("Choose a valid demolition tile.");
+   const source = servicesOf(city),
+-    s = structuredClone(source),
++    s = cloneServices(source),
+     tile = city.tiles[index];
+   try {
+     addField(s.waste, index, integer(tile.stored) ? tile.stored : 0);

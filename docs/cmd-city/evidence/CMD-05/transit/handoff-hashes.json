@@ -1,0 +1,11 @@
+{
+  "static/cmd-city/transit.mjs": "a8d3c084f68ce4e1e83f0ab934d4c1ea6170692aaeec14ca4264b3723fb46b6d",
+  "static/cmd-city/content.mjs": "eeb7c498b9ecec04da0f44cda1215ae47f88e756185ad87fe1036b0931e8c008",
+  "static/cmd-city/view.mjs": "4d4d1721db4ce9b4eb56e776cabb007e1ceb609a8ad31069dca24450ecc763c4",
+  "static/cmd-city/game.mjs": "b74a922e90fa60eb08a6dc9578eb37ffb4902b68c5d805fc43814108ec282c73",
+  "templates/cmd_city.html": "43e61c8b58295e6960b07285b1acd58a1a5604f4f41919f47dbb3fbbda48dc42",
+  "tests/city/transit.test.mjs": "51dd6ca251a6aa89454bd75ab43da1f4b1ef1ef2bb89712938761e1b2c16e3a9",
+  "tests/city/transit-integration.test.mjs": "cf48e08815bea1e49dbfa0d3b24eaaa02fd05651b167edb5f44949c1ba45bea9",
+  "tests/city/transit-fixture.mjs": "618b7cfce13b780a949c7469cbf576d6676c6dd6a90b087376df4615dd455579",
+  "tests/browser/cmd-city-transit.spec.js": "c2c663b0ba0c1815580d487a4352b48362e9f3ca39f031067f763f7e2df70223"
+}

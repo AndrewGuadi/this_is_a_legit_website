@@ -1,0 +1,38 @@
+{
+  "command": "node tests/city/future-migration.mjs",
+  "results": [
+    {
+      "sha": "a80d994ec27309d50b490735fce52dac6f6c44f7",
+      "oldVersion": 1,
+      "cityMonth": 3,
+      "regionMonth": 2,
+      "citySourceSHA256": "4576a794a77243e864da6c48e17c9600fa5959049dcddcdaeaa323d679460b71",
+      "regionSourceSHA256": "2af7bc9e0ec3ebf2eb6f2e7e5de4c4e082a9dee7f7cf63825d97cd79a7d71fee",
+      "currentCityBytes": 222991,
+      "currentRegionBytes": 668913,
+      "status": "PASS"
+    },
+    {
+      "sha": "0eb19f8f89ba03459f3c41172e7c53fa7316746a",
+      "oldVersion": 2,
+      "cityMonth": 3,
+      "regionMonth": 2,
+      "citySourceSHA256": "77a5f5dc1e6733593c6dd6de3d67c8921af95294a3fd133eebf6990f4749d6ba",
+      "regionSourceSHA256": "184158478812cdbdc0a12a4144fa08a4cad08d1c8cc9f955edcc348a730852b9",
+      "currentCityBytes": 223016,
+      "currentRegionBytes": 669018,
+      "status": "PASS"
+    },
+    {
+      "sha": "3c33c764a7548d81aa84988688caabeabe47d545",
+      "oldVersion": 3,
+      "cityMonth": 3,
+      "regionMonth": 2,
+      "citySourceSHA256": "a47811ab6d9c258d4d9fc3a4456cbaa21979eff63638fa319760d182b76eccc2",
+      "regionSourceSHA256": "5a1c0585a91d08f7a3f1f8f0de7451ba18ee8770a749819ff6f9502aaaef1801",
+      "currentCityBytes": 228666,
+      "currentRegionBytes": 685113,
+      "status": "PASS"
+    }
+  ]
+}

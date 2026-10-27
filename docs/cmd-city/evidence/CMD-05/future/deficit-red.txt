@@ -1,0 +1,47 @@
+✔ migration retains canonical tower population and legacy capacity with complete strict state (2.909149ms)
+✔ floor actions charge once, enforce occupied capacity, limits, research and closure (1.489844ms)
+✔ mixed floors have distinct finite capacities and internal utility dependence without report writes (1.540911ms)
+✔ corporate production consumes real finite oil and ore and books bounded product sales once (2.45576ms)
+✔ closed, disconnected or unstaffed corporate facilities cannot produce or conjure demand (2.4154ms)
+✔ research requires actual staffed institute and educated employed middle/high wealth adults (0.47847ms)
+✔ strict validation rejects altered keys, ledgers, indexes, floor counts and non-finite values (1.292406ms)
+✔ reconciliation removes demolished tower floors without losing corporate stock and initializes new towers (0.838629ms)
+✔ removing essential internal power disables dependent tower uses when external supply is absent (0.952681ms)
+✔ stored composite cannot sell through a closed or unstaffed corporate network (1.098154ms)
+✔ strict current state rejects ledgers beyond real stock and canonical floor bounds (0.993232ms)
+✔ invalid research, unknown actions, crowns, maximum floors and insufficient cash are atomic (1.357112ms)
+✔ progression overflow and invalid inventory reject before any mutation (1.198483ms)
+✔ research does not reuse last-month wages or disconnected households as current skilled workers (0.466884ms)
+✔ corporate report site ledger cannot mutate state or hide emitted production (0.680041ms)
+✖ free floor shutdown remains available during a treasury deficit (2.086923ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 15
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 172.833214
+
+✖ failing tests:
+
+test at tests/city/future.test.mjs:381:1
+✖ free floor shutdown remains available during a treasury deficit (2.086923ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  false !== true
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/future.test.mjs:385:10)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

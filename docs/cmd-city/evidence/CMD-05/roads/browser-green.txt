@@ -1,0 +1,8 @@
+
+Running 3 tests using 1 worker
+
+  ✓  1 [chromium-1440] › tests/browser/cmd-city-roads.spec.js:21:1 › road shape previews cancel without spending and a confirmed straight plan builds exactly once (6.8s)
+  ✓  2 [chromium-1440] › tests/browser/cmd-city-roads.spec.js:37:1 › road preview rejects invalid coordinates and Escape cancels without building (1.5s)
+  ✓  3 [chromium-1440] › tests/browser/cmd-city-roads.spec.js:41:1 › touch endpoint selection previews a road and canceled touch cannot commit (1.4s)
+
+  3 passed (12.5s)

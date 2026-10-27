@@ -1,0 +1,61 @@
+✔ planning creates bounded zeroed derived loads and never mutates the authoritative city (11.465948ms)
+✔ a connected rail path with two distinct accessible stations carries actual passengers (6.296323ms)
+✔ disconnected rail segments, one station and tracks without stations serve nobody (4.856512ms)
+✔ disabled, burning or road-disconnected stations are ineligible (3.278438ms)
+✔ catchments are bounded and one shared station cannot pretend to be a route (2.87872ms)
+✔ rail capacity is reserved across repeated callers sharing the same track (1.478057ms)
+✔ buses need two exchanges and a genuine connected road path, reducing car equivalents (2.800568ms)
+✔ bus capacity is shared across overlapping trips without inventing passengers (1.05694ms)
+✔ bus path cannot jump over missing tiles, diagonals or disconnected roads (9.922351ms)
+✔ invalid requests and invalid endpoint indices leave every derived load unchanged (9.496692ms)
+✔ planning snapshots network eligibility rather than retaining writable source references (1.641929ms)
+✔ rail is preferred when both a valid bus and rail route serve a journey (0.731178ms)
+✔ station modules increase aggregate throughput across different rail branches without raising edge capacity (2.832539ms)
+✔ saturated rail edges do not hide an available alternate track path (3.493293ms)
+✔ a disabled or burning bus exchange cannot provide service (6.543954ms)
+✔ streetcar assigns real demand on its connected network with finite shared segments and endpoints (7.502325ms)
+✔ streetcar rejects disconnected or demolished paths and inaccessible/closed/burning endpoints (3.667267ms)
+✔ streetcar module capacity never raises a shared segment's capacity (0.896796ms)
+✔ ferry assigns real demand on its connected network with finite shared segments and endpoints (3.041853ms)
+✔ ferry rejects disconnected or demolished paths and inaccessible/closed/burning endpoints (5.85525ms)
+✔ ferry module capacity never raises a shared segment's capacity (0.638325ms)
+✔ maglev assigns real demand on its connected network with finite shared segments and endpoints (2.009727ms)
+✔ maglev rejects disconnected or demolished paths and inaccessible/closed/burning endpoints (2.42015ms)
+✔ maglev module capacity never raises a shared segment's capacity (0.659556ms)
+✔ ferry terminals cannot teleport across land and a water bridge preserves navigation (1.393116ms)
+✔ future movement requires completed maglev research, even for imported infrastructure (3.806969ms)
+✔ streetcar a single shared track or water tile cannot be reserved repeatedly beyond capacity (1.299426ms)
+✔ ferry a single shared track or water tile cannot be reserved repeatedly beyond capacity (0.701339ms)
+✔ maglev a single shared track or water tile cannot be reserved repeatedly beyond capacity (0.735658ms)
+✖ rail shares one track tile's 400 passenger capacity across repeated module-expanded station requests (1.722163ms)
+ℹ tests 30
+ℹ suites 0
+ℹ pass 29
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 262.744667
+
+✖ failing tests:
+
+test at tests/city/transit.test.mjs:330:1
+✖ rail shares one track tile's 400 passenger capacity across repeated module-expanded station requests (1.722163ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+  
+  350 !== 50
+  
+      at TestContext.<anonymous> (file:///tmp/cmd-city-work/tests/city/transit.test.mjs:334:9)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1402:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:974:18)
+      at Test.postRun (node:internal/test_runner/test:1542:19)
+      at Test.run (node:internal/test_runner/test:1467:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: 350,
+    expected: 50,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }

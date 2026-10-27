@@ -1,0 +1,30 @@
+✔ creation preserves warehouse ownership without duplicating stock or inventing opening deliveries (9.98468ms)
+✔ actual staffed industrial production enters producer stock once; repeated hook is inert (14.662561ms)
+✔ closed, burning, unstaffed, unserved and unpowered producers generate no goods (17.697031ms)
+✔ warehouse cargo travels a real bounded path before a shop receives inventory (8.433137ms)
+✔ shared shop unloading is finite and goods remain aboard during partial deliveries (4.780272ms)
+✔ purchases consume only physically delivered shop stock and do not debit warehouse again (8.599138ms)
+✔ blocked roads hold real cargo and repairs restore its delivery (12.385995ms)
+✔ closing a destination returns its cargo over roads instead of teleporting or losing it (3.426072ms)
+✔ freight shares remaining road capacity with commuters and other freight (3.679641ms)
+✔ zero utilities or a closed gateway cannot dispatch warehouse freight (2.416425ms)
+✔ external warehouse transfer records only actual bounded stock and preserves money (1.841018ms)
+✔ demolition conserves producer and retail stock into explicit recovered goods (1.520441ms)
+✔ recall retains cargo and rejects malformed or missing vehicle actions without state changes (14.549526ms)
+✔ a tower shop uses explicitly supplied staffed monthly retail throughput (5.034548ms)
+✔ reporting is pure and returns defensive paths and stock/load arrays (4.765054ms)
+✔ strict validation rejects malformed keys, clocks, stocks, quantities and broken conservation (2.230187ms)
+✔ strict validation rejects malformed in-flight route/cursor/id/payload relationships (5.897836ms)
+✔ counter overflow refuses monthly production atomically (3.246518ms)
+✔ destroying the road under a loaded recalled truck preserves its position and cargo until repair (5.465841ms)
+✔ rotating shop admission eventually serves every shop under a finite shared fleet (153.867741ms)
+✔ producer stock bounds preserve actual accepted production without wrapping or losing prior goods (1.974795ms)
+✔ a demolished producer and full warehouse recover returned cargo into explicit loose goods (10.992172ms)
+ℹ tests 22
+ℹ suites 0
+ℹ pass 22
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 444.433189

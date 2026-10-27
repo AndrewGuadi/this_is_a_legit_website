@@ -1,0 +1,14 @@
+{
+  "sourceBaseline": "61bbe2df9acf6a6ae3620038212f8bf4841fec50",
+  "realBaselineRegionMonth": 3,
+  "legacyCities": 3,
+  "migratedVersions": [
+    2,
+    2,
+    2
+  ],
+  "allLegacyFieldsPreserved": true,
+  "pendingShipmentPreserved": true,
+  "deliveredOnce": true,
+  "deterministicNextMonth": true
+}

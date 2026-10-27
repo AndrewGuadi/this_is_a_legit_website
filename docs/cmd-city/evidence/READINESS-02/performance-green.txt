@@ -1,0 +1,23 @@
+✔ nearest road search consumes a destination collection only once (4.753168ms)
+✔ private draft months do not serialize an unused source rollback journal (90.236471ms)
+✔ shared lazy frontiers preserve single/multiple root order, discovery ties and exact predecessor paths (3.114741ms)
+✔ topology invalidation handles closures, reopening and fires while retaining disconnected road islands (0.388976ms)
+✔ frontier memory remains capped after more roots than the LRU capacity (13.123154ms)
+✔ an accepted near-limit city rejects an ASCII or escaped rename without losing exportability (699.938737ms)
+✔ ordinary byte-safe actions preserve city identity and remain exactly exportable (19.876865ms)
+✔ a city month either remains exportable or rejects with every source field preserved (307.846913ms)
+✔ a city action cannot cross the region wrapper budget even when its individual city still fits (1777.8357ms)
+✔ near-limit regional shipment preserves stock cash shipments project and events on rejection (1803.318187ms)
+✔ near-limit regional contribute preserves stock cash shipments project and events on rejection (1611.482944ms)
+✔ region switching and monthly advancement retain exportability or reject the whole region atomically (1800.549345ms)
+✔ legacy migration rejects near-limit states whose exact compact export cannot fit (143.542865ms)
+✔ a nondefault floor encoding cannot cross the city byte budget through a free floor toggle (306.049648ms)
+✔ legacy child cities that fit individually cannot exceed the region limit after migration (1694.030108ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 15
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 10291.373273

@@ -1,0 +1,144 @@
+{
+  "base": "7aa0a1e062e19b92559b7ed5ee230a8dbdeafc29",
+  "worktree": "/tmp/cmd05-future-integration",
+  "files": [
+    {
+      "path": "docs/cmd-city/FUTURE_CONTRACT.md",
+      "sha256": "d87f63a8171bdf6fe6cbdee77beef21b14240c970a3cd720d53f6e1aa75ac72d",
+      "bytes": 19231,
+      "new": false
+    },
+    {
+      "path": "static/cmd-city/content.mjs",
+      "sha256": "4b6e411bbb3ab5d75080a5b38e8a86ca2d188a2078580bafbfbfa9b4e903ec67",
+      "bytes": 12201,
+      "new": false
+    },
+    {
+      "path": "static/cmd-city/core.mjs",
+      "sha256": "9849d63c0a785191ca9bc5e8b8dcd3ad43668c30cc70e8802c6772083ab43d09",
+      "bytes": 69092,
+      "new": false
+    },
+    {
+      "path": "static/cmd-city/future.mjs",
+      "sha256": "d96316bd68a29ad4a88b3408e9a57bd4f80dcd0ff8f49eec7d5a1e4b20e5299a",
+      "bytes": 20763,
+      "new": false
+    },
+    {
+      "path": "static/cmd-city/game.css",
+      "sha256": "040c5c89ae16b3b2315b0c6ee92599d2898351788b1389291b80cfde3b8e9f8d",
+      "bytes": 31703,
+      "new": false
+    },
+    {
+      "path": "static/cmd-city/game.mjs",
+      "sha256": "64af01968e5b76c12d36a818521a6a22757882b589d2824ac65671fd719be7a1",
+      "bytes": 73494,
+      "new": false
+    },
+    {
+      "path": "static/cmd-city/households.mjs",
+      "sha256": "6ea9b7b4fcb63d26c4d3c7f8014cfb6e8597b21ae7797d647807bc9e977ebc24",
+      "bytes": 36794,
+      "new": false
+    },
+    {
+      "path": "static/cmd-city/region.mjs",
+      "sha256": "de429ef787d6c133dcd8673d6a6f91a36129609ead5c9a6309cc7731f20eb8e1",
+      "bytes": 14181,
+      "new": false
+    },
+    {
+      "path": "static/cmd-city/save.mjs",
+      "sha256": "d4f284ddaf3821ecb2af66ebb7a832e9363b0c83fb18702a4a93e727efceae88",
+      "bytes": 10099,
+      "new": false
+    },
+    {
+      "path": "static/cmd-city/view.mjs",
+      "sha256": "b8ede9f9be9fc4b4c2674be03012417876cbda1729906de34a40aae53232be5a",
+      "bytes": 22612,
+      "new": false
+    },
+    {
+      "path": "templates/cmd_city.html",
+      "sha256": "097cbb360c68807db1021d3eedcf982d196c31363c0af21cae030065fd37f09e",
+      "bytes": 33392,
+      "new": false
+    },
+    {
+      "path": "tests/browser/cmd-city-future.spec.js",
+      "sha256": "36dc1d6a1b172c64b652b59b6a58a831dd5c93b5fd2c78a6f974c3eee7717761",
+      "bytes": 3914,
+      "new": true
+    },
+    {
+      "path": "tests/browser/cmd-city-residents.spec.js",
+      "sha256": "3da73ec73a20f68178d94b2920dee1bafd0b68e819e9f2cc0ebb8ce6716de6e6",
+      "bytes": 11584,
+      "new": false
+    },
+    {
+      "path": "tests/browser/cmd-city.spec.js",
+      "sha256": "9b9613e1191a876c75e152beb45c02f3e0546f4b54b1d07b36a7a6f448c8e8b4",
+      "bytes": 12040,
+      "new": false
+    },
+    {
+      "path": "tests/city/benchmark.mjs",
+      "sha256": "640063334ceafb459ce867f582a41ad2d4bd7f8a0640e8eacae7badd133963b3",
+      "bytes": 2073,
+      "new": false
+    },
+    {
+      "path": "tests/city/employment-fairness.test.mjs",
+      "sha256": "2b1f457a56158f278abaea25e1aca869e095951f835773204717732b2208cc90",
+      "bytes": 2538,
+      "new": false
+    },
+    {
+      "path": "tests/city/future-integration.test.mjs",
+      "sha256": "aa646dcbbca914a9da4539ec66281eb8b9fc9d14370338de6cf36b5adb6708cb",
+      "bytes": 10675,
+      "new": true
+    },
+    {
+      "path": "tests/city/future-migration.mjs",
+      "sha256": "20da5e36f475b3ffc690ac970db3de98db8fc80584d369a92cc55ab6ab1e322c",
+      "bytes": 3067,
+      "new": true
+    },
+    {
+      "path": "tests/city/progression.test.mjs",
+      "sha256": "ca8c5ed621f13e06f508eb2fbfa1cda06a74983037c5daf5fd11b69bc20322d4",
+      "bytes": 18915,
+      "new": false
+    },
+    {
+      "path": "tests/city/residents-integration.test.mjs",
+      "sha256": "a53f5c364dffdfd754c33fd3d8193252445cd5ccdbaaf7fd93e84d4fbd5741bc",
+      "bytes": 19101,
+      "new": false
+    },
+    {
+      "path": "tests/city/save-clock.test.mjs",
+      "sha256": "a7ec2a669af7f06174871d682d3f2bacad3e3e13eca6ee03119fab5b430b5f44",
+      "bytes": 3186,
+      "new": false
+    },
+    {
+      "path": "tests/city/size-budget.test.mjs",
+      "sha256": "2f8cd2f21e266607e1a16911c03a6c9dbb6679d1a33bedf4903b1c08f3b68b3b",
+      "bytes": 9518,
+      "new": false
+    },
+    {
+      "path": "tests/city/sustained-benchmark.mjs",
+      "sha256": "a3a55276c477fd5d8e13b0912a862d4d3005caaabe7bde2946788658303adc3a",
+      "bytes": 10042,
+      "new": false
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+✔ nearest road search consumes a destination collection only once (3.731681ms)
+✔ private draft months do not serialize an unused source rollback journal (73.835261ms)
+✔ shared lazy frontiers preserve single/multiple root order, discovery ties and exact predecessor paths (2.31778ms)
+✔ topology invalidation handles closures, reopening and fires while retaining disconnected road islands (0.247293ms)
+✔ frontier memory remains capped after more roots than the LRU capacity (10.684061ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 179.822699

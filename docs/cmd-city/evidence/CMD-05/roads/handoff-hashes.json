@@ -1,0 +1,15 @@
+{
+  "static/cmd-city/roads.mjs": "5c9f1fa9872ed8b1252b72fa73cb30759b31343c1e4f8d8fa5ab2b362fc740f2",
+  "static/cmd-city/transit.mjs": "9b2355ba33c7a9b6fb5d8356f3404475edc4dfbfb7d45abe190e29ae8028bf34",
+  "static/cmd-city/content.mjs": "b024608b31a8d1303d6623f6fed5ebfb6603b31748ae73abe1b5e04657533f6e",
+  "static/cmd-city/view.mjs": "1b5015b46939e606392c3ba13cb2d17b606254b250620cb8ef22c78f69124cdd",
+  "static/cmd-city/game.mjs": "6f04f5bea31955f83828ef0bde9d86f5a2ce4038210506b1aa14177898289a53",
+  "static/cmd-city/game.css": "dd91a21eb34dd39d03f251fd8c73b75c19d9574f91aefb2018490e1b7533beb2",
+  "templates/cmd_city.html": "49e8c291ba63465f8eafed500e7132ebcfcbbe21bae46c7b5c71a1a7b44c8545",
+  "tests/city/roads.test.mjs": "701d3699bb73b9a352e18df3c9bfbe0d44a13c53a0d8a3f456d97a1547540921",
+  "tests/city/transit.test.mjs": "39c7b55f15983760019efaf45c3d67e696c9b41a29f7d1c59debf7d2123a82a9",
+  "tests/city/transit-integration.test.mjs": "d891be7b7906d0edd565ac27d9d5a947315eefebb0612451e5d2c0053fdd5e9e",
+  "tests/city/transit-fixture.mjs": "bd9a16d57d5e1cfdfed23d1aa68989a07a480de2ed1d692f68f2ca53d2031079",
+  "tests/browser/cmd-city-roads.spec.js": "c7c7ed77d3a0675c00b316cb41a0e7eb01687e25af006ae871f183f3b04beb1a",
+  "tests/browser/cmd-city-transit.spec.js": "69178af0f0da1d808f4059476d8a0482455f7b504177143a526004674fa90e3f"
+}

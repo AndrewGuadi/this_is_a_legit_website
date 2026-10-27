@@ -1,0 +1,68 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+[WebServer] WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+[WebServer]  * Running on http://127.0.0.1:5081
+[WebServer] Press CTRL+C to quit
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:34:47] "GET / HTTP/1.1" 200 -
+
+Running 1 test using 1 worker
+
+(node:33) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:34:49] "GET /games/cmd-city HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:34:49] "GET /static/cmd-city/game.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:34:49] "GET /static/cmd-city/game.css HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:34:49] "GET /static/cmd-city/save.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:34:49] "GET /static/cmd-city/core.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:34:49] "GET /static/cmd-city/content.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:34:49] "GET /static/cmd-city/region.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:34:49] "GET /static/cmd-city/clock.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:34:49] "GET /static/cmd-city/view.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:34:49] "GET /static/cmd-city/roads.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:34:49] "GET /static/cmd-city/civic.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:34:49] "GET /static/cmd-city/services.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:34:49] "GET /static/cmd-city/households.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:34:49] "GET /static/cmd-city/environment.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:34:49] "GET /static/cmd-city/transit.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [26/Oct/2026 02:34:49] "GET /static/cmd-city/future.mjs HTTP/1.1" 200 -
+  ✘  1 [chromium-390] › tests/browser/cmd-city-future.spec.js:6:1 › mixed tower floors change real capacity and survive export; occupied homes cannot be removed (9.4s)
+
+
+  1) [chromium-390] › tests/browser/cmd-city-future.spec.js:6:1 › mixed tower floors change real capacity and survive export; occupied homes cannot be removed 
+
+    Error: expect(locator).toBeVisible() failed
+
+    Locator: locator('#future-inspector')
+    Expected: visible
+    Timeout: 7000ms
+    Error: element(s) not found
+
+    Call log:
+      - Expect "toBeVisible" locator('#future-inspector') with timeout 7000ms
+      - waiting for locator('#future-inspector')
+
+
+      10 |  await page.goto('/games/cmd-city');await page.getByRole('button',{name:'City settings',exact:true}).click();await page.locator('#import-city').setInputFiles({name:'future.json',mimeType:'application/json',buffer:Buffer.from(serializeCity(c))});await page.getByRole('dialog').getByRole('button',{name:'Import city',exact:true}).click();await expect(page.locator('#city-message')).toContainText('Imported city');
+      11 |  await page.getByLabel('Column (0–39)').fill('7');await page.getByLabel('Row (0–31)').fill('15');await page.getByRole('button',{name:'Inspect tile',exact:true}).click();
+    > 12 |  await expect(page.locator('#future-inspector')).toBeVisible();await page.locator('#future-inspector summary').click();await expect(page.locator('#tower-floor-list > li')).toHaveCount(2);
+         |                                                  ^
+      13 |  await page.getByLabel('New floor use').selectOption('shops');await page.getByRole('button',{name:'Add tower floor',exact:true}).click();await expect(page.locator('#tower-floor-list > li')).toHaveCount(3);await expect(page.locator('#tower-summary')).toContainText('180 / 180 residents');
+      14 |  await expect(page.getByRole('button',{name:'Remove floor 1',exact:true})).toBeDisabled();await page.getByRole('button',{name:'Close floor 3',exact:true}).click();await expect(page.getByRole('button',{name:'Open floor 3',exact:true})).toBeVisible();
+      15 |  await page.getByRole('button',{name:'Open floor 3',exact:true}).click();await expect(page.getByRole('button',{name:'Close floor 3',exact:true})).toBeVisible();
+        at /tmp/cmd05-future-integration/tests/browser/cmd-city-future.spec.js:12:50
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/cmd-city-future-mixed-towe-dcb9f-ied-homes-cannot-be-removed-chromium-390/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/cmd-city-future-mixed-towe-dcb9f-ied-homes-cannot-be-removed-chromium-390/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/cmd-city-future-mixed-towe-dcb9f-ied-homes-cannot-be-removed-chromium-390/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/cmd-city-future-mixed-towe-dcb9f-ied-homes-cannot-be-removed-chromium-390/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium-390] › tests/browser/cmd-city-future.spec.js:6:1 › mixed tower floors change real capacity and survive export; occupied homes cannot be removed 

@@ -1,0 +1,452 @@
+Actual behavioral/corrective executions, excerpts only; trailing whitespace normalized. No setup or formatter error counts as behavioral RED.
+
+
+SOURCE: dev_docs/evidence/CMD-03/households/red.txt
+✖ new per-home cohorts exactly partition actual population and begin low wealth (1.963137ms)
+✖ migration starts at current month with no invented past learning (0.412837ms)
+✖ growth reconciliation adds declared external capital without inventing residents or municipal money (0.965289ms)
+✖ departures proportionally remove private cash, educated adults and uncollected debt (0.247253ms)
+✖ demolition clears the departed home without transferring its private wallet to treasury (0.380509ms)
+✖ reports virtually reconcile changed occupants but never mutate any source state or RNG (1.331368ms)
+✖ private wages come only from actual routed employment and ledger cash reconciles (0.394951ms)
+✖ unemployed households receive no ghost wage income (0.839364ms)
+✖ private-wallet saturation records capped external wages without overflow or hidden loss (0.35345ms)
+✖ shopping consumes actual shared goods and household money along a real road path (0.33278ms)
+✖ a broken physical road prevents shopping even if aggregate access and coverage say yes (0.277488ms)
+✖ closed, burning, unstaffed or unsupplied shops do not sell (0.526424ms)
+✖ all homes share finite shop capacity and finite goods without overselling (0.222327ms)
+✖ poor wallets never overspend and unpaid residential taxes remain explicit arrears (0.216037ms)
+✖ actual sales are private merchant receipts, never municipal sales revenue (0.256878ms)
+✔ schools and universities share finite enrollment slots instead of granting coverage-based education (0.396964ms)
+✖ adult graduation requires twelve attended months, with no retrospective migration credit (0.229077ms)
+✖ coverage alone or an interruption cannot graduate untrained adults (0.614604ms)
+✖ land value alone cannot promote a poor uneducated unemployed household (0.26502ms)
+[... excerpt omitted ...]
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+
+SOURCE: dev_docs/evidence/CMD-03/households/traffic/red.txt
+✔ new per-home cohorts exactly partition actual population and begin low wealth (9.285548ms)
+✔ migration starts at current month with no invented past learning (1.764565ms)
+✔ growth reconciliation adds declared external capital without inventing residents or municipal money (3.567787ms)
+✔ departures proportionally remove private cash, educated adults and uncollected debt (0.850671ms)
+✔ demolition clears the departed home without transferring its private wallet to treasury (0.730634ms)
+✔ reports virtually reconcile changed occupants but never mutate any source state or RNG (4.301637ms)
+✔ private wages come only from actual routed employment and ledger cash reconciles (4.726992ms)
+✔ unemployed households receive no ghost wage income (3.961516ms)
+✔ private-wallet saturation records capped external wages without overflow or hidden loss (1.674503ms)
+✔ shopping consumes actual shared goods and household money along a real road path (2.363296ms)
+✔ a broken physical road prevents shopping even if aggregate access and coverage say yes (3.730337ms)
+✔ closed, burning, unstaffed or unsupplied shops do not sell (8.24722ms)
+✔ all homes share finite shop capacity and finite goods without overselling (1.351859ms)
+✔ poor wallets never overspend and unpaid residential taxes remain explicit arrears (0.986581ms)
+✔ actual sales are private merchant receipts, never municipal sales revenue (0.912312ms)
+✔ schools and universities share finite enrollment slots instead of granting coverage-based education (2.748403ms)
+✔ adult graduation requires twelve attended months, with no retrospective migration credit (9.012927ms)
+✔ coverage alone or an interruption cannot graduate untrained adults (13.065517ms)
+✔ land value alone cannot promote a poor uneducated unemployed household (3.969198ms)
+[... excerpt omitted ...]
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+
+SOURCE: dev_docs/evidence/CMD-03/services/red.txt
+✖ service migration allocates legacy backlog once and never duplicates stored landfill stock (2.375774ms)
+✖ validator is strict about array sizes quantities IDs references paths and stable clock (0.871322ms)
+✖ reports are pure and opening occupancy generates persistent local bins once per month (4.722446ms)
+✖ fire response requires actual arrival along a road and does not teleport by coverage (5.981308ms)
+✔ disconnected fire incidents remain unserved rather than receiving radius service (0.416553ms)
+✖ garbage pickup creates cargo and storage only changes after a real return arrival (0.812525ms)
+✖ broken return roads retain cargo and restore movement after repair (0.53034ms)
+✖ closed home facility cannot swallow garbage; cargo reroutes to an operational alternative (0.533695ms)
+✖ recycling deliveries conserve cargo and bound ore output at its inventory capacity (0.526084ms)
+✖ medical pickup and bed admission precede finite later treatment (0.525713ms)
+✖ crime pickup respects finite custody and cases resolve only after return and processing (0.586372ms)
+✖ zero funding or absent real drivers prevents dispatch without deleting cases (0.613152ms)
+✖ demolition preserves stored waste admitted patients and custody before clearing source (0.268565ms)
+✔ invalid incidents cannot mutate RNG cash queues or IDs (11.676266ms)
+✖ congestion reduces movement budget and save state retains actual adjacent paths (0.471674ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 2
+ℹ fail 13
+[... excerpt omitted ...]
+  }
+
+test at tests/city/services.test.mjs:26:1
+✖ congestion reduces movement budget and save state retains actual adjacent paths (0.471674ms)
+  TypeError: Cannot read properties of undefined (reading 'position')
+      at TestContext.<anonymous> (file:///workspace/scratch/bf6bfb751ccd/cmduniverse/tests/city/services.test.mjs:26:455)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7)
+
+
+SOURCE: dev_docs/evidence/CMD-03/integration/red.log
+✖ city schema3 creates aligned conserved households and finite service state after starter construction (2.40032ms)
+✖ actual routed adult cohorts bound each home assignment and provider positions are staffed (12.204371ms)
+✖ adult composition affects routing cache without changing raw home occupancy (6.693995ms)
+✖ prefinance household receipts book actual paid taxes once with exactly reconciling municipal and private ledgers (14.367582ms)
+✖ legacy taxes set every wealth class while class-specific actions need Finance and a supplied Hall (0.598811ms)
+✖ real shops consume only purchased bundles and booked shopping loads persist across save and pure reports (12.14929ms)
+✖ routed school attendance is finite and actual service workers limit enrollment (12.395181ms)
+✖ a nearby station cannot extinguish a remote fire by radius before a road vehicle arrives (11.012628ms)
+✖ actual fire arrival prevents that months casualties and stored waste is preserved if a facility burns down (9.084562ms)
+✖ garbage remains in bins until actual road collection and demolition preserves old landfill material (9.433485ms)
+✖ admitted patient and custody cases survive whole-core demolition without money or case duplication (0.688973ms)
+✖ legacy1 and legacy2 migration retain old fields and add only declared new demographic and service baselines (45.533881ms)
+✖ schema3 rejects partial new subsystems, malformed cross-tile cohorts, material identities and unsupported versions (6.746464ms)
+✖ new state roundtrip preserves deterministic future and every city in legacy regional wrapper migrates independently (108.790111ms)
+✖ near-bound service failure preserves the entire city and whole region including earlier shipment deliveries (17.415434ms)
+ℹ tests 15
+ℹ suites 0
+ℹ pass 0
+ℹ fail 15
+[... excerpt omitted ...]
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: false,
+    code: 'ERR_ASSERTION',
+    actual: undefined,
+    expected: undefined,
+    operator: 'throws',
+    diff: 'simple'
+  }
+
+
+SOURCE: dev_docs/evidence/CMD-03/integration/hospital-red.log
+✖ hospital fleet and throughput require all twelve configured staff rather than treating eight as full (23.434091ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 115.415336
+
+✖ failing tests:
+
+test at tests/city/services.test.mjs:39:1
+✖ hospital fleet and throughput require all twelve configured staff rather than treating eight as full (23.434091ms)
+  AssertionError [ERR_ASSERTION]: The expression evaluated to a falsy value:
+
+    assert.ok(serviceReport(partial.city).totalFleet<serviceReport(full.city).totalFleet)
+
+      at TestContext.<anonymous> (file:///workspace/scratch/bf6bfb751ccd/cmduniverse/tests/city/services.test.mjs:39:355)
+[... excerpt omitted ...]
+      at TestContext.<anonymous> (file:///workspace/scratch/bf6bfb751ccd/cmduniverse/tests/city/services.test.mjs:39:355)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: false,
+    expected: true,
+    operator: '==',
+    diff: 'simple'
+  }
+
+
+SOURCE: dev_docs/evidence/CMD-03/integration/closed-roads-red.log
+✖ closed and burning road flags invalidate physical access and wages rather than leaving cached ghost routes (40.559687ms)
+✖ an accepted closed gateway can reopen through a road action and restores actual service access (38.307414ms)
+✖ burnout of a protected gateway preserves its legal road type and permits a saveable recovered connection (19.792021ms)
+✖ a closed gateway prevents new regional commitments while already reserved shipments remain conserved (28.385996ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 0
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 255.450873
+
+✖ failing tests:
+
+test at tests/city/residents-integration.test.mjs:478:1
+✖ closed and burning road flags invalidate physical access and wages rather than leaving cached ghost routes (40.559687ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+[... excerpt omitted ...]
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+
+SOURCE: dev_docs/evidence/CMD-03/integration/household-bound-red.log
+✖ rare accepted household pending-accounting bounds cannot make a successful demolition unsaveable (17.884701ms)
+ℹ tests 1
+ℹ suites 0
+ℹ pass 0
+ℹ fail 1
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 102.218689
+
+✖ failing tests:
+
+test at tests/city/residents-integration.test.mjs:38:1
+✖ rare accepted household pending-accounting bounds cannot make a successful demolition unsaveable (17.884701ms)
+  AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+  true !== false
+
+      at TestContext.<anonymous> (file:///workspace/scratch/bf6bfb751ccd/cmduniverse/tests/city/residents-integration.test.mjs:38:367)
+[... excerpt omitted ...]
+      at TestContext.<anonymous> (file:///workspace/scratch/bf6bfb751ccd/cmduniverse/tests/city/residents-integration.test.mjs:38:367)
+      at Test.runInAsyncScope (node:async_hooks:227:14)
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.start (node:internal/test_runner/test:1242:17)
+      at startSubtestAfterBootstrap (node:internal/test_runner/harness:387:17) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+
+SOURCE: dev_docs/evidence/CMD-03/integration/size-budget-red.log
+✖ an accepted near-limit city rejects an ASCII or escaped rename without losing exportability (84.747244ms)
+✔ ordinary byte-safe actions preserve city identity and remain exactly exportable (14.002359ms)
+✔ a city month either remains exportable or rejects with every source field preserved (165.497534ms)
+✖ a city action cannot cross the region wrapper budget even when its individual city still fits (666.138468ms)
+✖ near-limit regional shipment preserves stock cash shipments project and events on rejection (653.735171ms)
+✖ near-limit regional contribute preserves stock cash shipments project and events on rejection (760.740395ms)
+✔ region switching and monthly advancement retain exportability or reject the whole region atomically (907.600637ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 3
+ℹ fail 4
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3368.477326
+
+✖ failing tests:
+
+test at tests/city/size-budget.test.mjs:39:1
+[... excerpt omitted ...]
+      at Test.run (node:internal/test_runner/test:1382:25)
+      at Test.processPendingSubtests (node:internal/test_runner/test:960:18)
+      at Test.postRun (node:internal/test_runner/test:1522:19)
+      at Test.run (node:internal/test_runner/test:1447:12)
+      at async Test.processPendingSubtests (node:internal/test_runner/test:960:7) {
+    generatedMessage: true,
+    code: 'ERR_ASSERTION',
+    actual: true,
+    expected: false,
+    operator: 'strictEqual',
+    diff: 'simple'
+  }
+
+
+SOURCE: dev_docs/evidence/CMD-03/integration/size-budget-green.log
+✔ an accepted near-limit city rejects an ASCII or escaped rename without losing exportability (313.285079ms)
+✔ ordinary byte-safe actions preserve city identity and remain exactly exportable (15.749698ms)
+✔ a city month either remains exportable or rejects with every source field preserved (154.121918ms)
+✔ a city action cannot cross the region wrapper budget even when its individual city still fits (698.017613ms)
+✔ near-limit regional shipment preserves stock cash shipments project and events on rejection (737.360616ms)
+✔ near-limit regional contribute preserves stock cash shipments project and events on rejection (657.552154ms)
+✔ region switching and monthly advancement retain exportability or reject the whole region atomically (751.160189ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3453.946469
+[... excerpt omitted ...]
+✔ a city action cannot cross the region wrapper budget even when its individual city still fits (698.017613ms)
+✔ near-limit regional shipment preserves stock cash shipments project and events on rejection (737.360616ms)
+✔ near-limit regional contribute preserves stock cash shipments project and events on rejection (657.552154ms)
+✔ region switching and monthly advancement retain exportability or reject the whole region atomically (751.160189ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3453.946469
+
+
+SOURCE: dev_docs/evidence/CMD-03/ui/red.log
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> legit-research-browser-verification@1.0.0 test:browser
+> playwright test tests/browser/cmd-city-residents.spec.js --project=chromium-1440
+
+[WebServer] WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+[WebServer]  * Running on http://127.0.0.1:5081
+[WebServer] Press CTRL+C to quit
+[WebServer] 127.0.0.1 - - [25/Oct/2026 14:59:35] "GET / HTTP/1.1" 200 -
+
+Running 3 tests using 1 worker
+
+(node:33) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 127.0.0.1 - - [25/Oct/2026 14:59:36] "GET /games/cmd-city HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 14:59:36] "GET /static/cmd-city/game.css HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 14:59:36] "GET /static/cmd-city/game.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 14:59:36] "GET /static/cmd-city/content.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 14:59:36] "GET /static/cmd-city/core.mjs HTTP/1.1" 200 -
+[... excerpt omitted ...]
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/cmd-city-residents-deliber-b1c98-d-conserve-queues-and-cargo-chromium-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/cmd-city-residents-deliber-b1c98-d-conserve-queues-and-cargo-chromium-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  3 failed
+    [chromium-1440] › tests/browser/cmd-city-residents.spec.js:26:1 › resident cohorts, shopping and private budgets reflect actual booked state and survive import
+    [chromium-1440] › tests/browser/cmd-city-residents.spec.js:49:1 › Finance gates class rates while bulk rates remain available and booked receipts use the selected classes
+    [chromium-1440] › tests/browser/cmd-city-residents.spec.js:69:1 › deliberate medical and crime cases dispatch saved road vehicles and conserve queues and cargo
+
+
+SOURCE: dev_docs/evidence/CMD-03/ui/green-first.log
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> legit-research-browser-verification@1.0.0 test:browser
+> playwright test tests/browser/cmd-city-residents.spec.js --project=chromium-1440
+
+[WebServer] WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+[WebServer]  * Running on http://127.0.0.1:5081
+[WebServer] Press CTRL+C to quit
+[WebServer] 127.0.0.1 - - [25/Oct/2026 15:07:02] "GET / HTTP/1.1" 200 -
+
+Running 3 tests using 1 worker
+
+(node:34) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 127.0.0.1 - - [25/Oct/2026 15:07:03] "GET /games/cmd-city HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 15:07:03] "GET /static/cmd-city/game.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 15:07:03] "GET /static/cmd-city/game.css HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 15:07:03] "GET /static/cmd-city/region.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 15:07:03] "GET /static/cmd-city/core.mjs HTTP/1.1" 200 -
+[... excerpt omitted ...]
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/cmd-city-residents-deliber-b1c98-d-conserve-queues-and-cargo-chromium-1440/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/cmd-city-residents-deliber-b1c98-d-conserve-queues-and-cargo-chromium-1440/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  2 failed
+    [chromium-1440] › tests/browser/cmd-city-residents.spec.js:26:1 › resident cohorts, shopping and private budgets reflect actual booked state and survive import
+    [chromium-1440] › tests/browser/cmd-city-residents.spec.js:69:1 › deliberate medical and crime cases dispatch saved road vehicles and conserve queues and cargo
+  1 passed (17.7s)
+
+
+SOURCE: dev_docs/evidence/CMD-03/ui/closed-road-red.log
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> legit-research-browser-verification@1.0.0 test:browser
+> playwright test tests/browser/cmd-city-residents.spec.js --project=chromium-390 -g closed gateway
+
+[WebServer] WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+[WebServer]  * Running on http://127.0.0.1:5081
+[WebServer] Press CTRL+C to quit
+[WebServer] 127.0.0.1 - - [25/Oct/2026 15:16:33] "GET / HTTP/1.1" 200 -
+
+Running 1 test using 1 worker
+
+(node:33) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 127.0.0.1 - - [25/Oct/2026 15:16:34] "GET /games/cmd-city HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 15:16:34] "GET /static/cmd-city/game.css HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 15:16:34] "GET /static/cmd-city/game.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 15:16:34] "GET /static/cmd-city/content.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 15:16:34] "GET /static/cmd-city/core.mjs HTTP/1.1" 200 -
+[... excerpt omitted ...]
+    Error Context: test-results/cmd-city-residents-a-valid-10e1b-control-and-restores-access-chromium-390/error-context.md
+
+    attachment #3: trace (application/zip) ─────────────────────────────────────────────────────────
+    test-results/cmd-city-residents-a-valid-10e1b-control-and-restores-access-chromium-390/trace.zip
+    Usage:
+
+        npx playwright show-trace test-results/cmd-city-residents-a-valid-10e1b-control-and-restores-access-chromium-390/trace.zip
+
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+  1 failed
+    [chromium-390] › tests/browser/cmd-city-residents.spec.js:91:1 › a valid imported closed gateway can be reopened through its road control and restores access
+
+
+SOURCE: dev_docs/evidence/CMD-03/ui/closed-road-green.log
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> legit-research-browser-verification@1.0.0 test:browser
+> playwright test tests/browser/cmd-city-residents.spec.js --project=chromium-390 --project=chromium-1440 -g closed gateway
+
+[WebServer] WARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.
+[WebServer]  * Running on http://127.0.0.1:5081
+[WebServer] Press CTRL+C to quit
+[WebServer] 127.0.0.1 - - [25/Oct/2026 15:17:16] "GET / HTTP/1.1" 200 -
+
+Running 2 tests using 1 worker
+
+(node:33) Warning: The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.
+(Use `node --trace-warnings ...` to show where the warning was created)
+[WebServer] 127.0.0.1 - - [25/Oct/2026 15:17:16] "GET /games/cmd-city HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 15:17:16] "GET /static/cmd-city/game.css HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 15:17:16] "GET /static/cmd-city/game.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 15:17:16] "GET /static/cmd-city/content.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 15:17:16] "GET /static/cmd-city/core.mjs HTTP/1.1" 200 -
+[... excerpt omitted ...]
+[WebServer] 127.0.0.1 - - [25/Oct/2026 15:17:18] "GET /static/cmd-city/clock.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 15:17:18] "GET /static/cmd-city/view.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 15:17:18] "GET /static/cmd-city/content.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 15:17:18] "GET /static/cmd-city/civic.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 15:17:18] "GET /static/cmd-city/region.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 15:17:18] "GET /static/cmd-city/households.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 15:17:18] "GET /static/cmd-city/services.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 15:17:18] "GET /static/cmd-city/environment.mjs HTTP/1.1" 200 -
+[WebServer] 127.0.0.1 - - [25/Oct/2026 15:17:18] "GET /static/cmd-city/transit.mjs HTTP/1.1" 200 -
+  ✓  2 [chromium-1440] › tests/browser/cmd-city-residents.spec.js:91:1 › a valid imported closed gateway can be reopened through its road control and restores access (1.0s)
+
+  2 passed (3.6s)

@@ -1,0 +1,8 @@
+
+Running 3 tests using 1 worker
+
+  ✓  1 [chromium-1440] › tests/browser/cmd-city-transit.spec.js:18:37 › streetcar construction connects assigned commuters, exports and recovers after terminal closure (5.6s)
+  ✓  2 [chromium-1440] › tests/browser/cmd-city-transit.spec.js:18:37 › ferry construction connects assigned commuters, exports and recovers after terminal closure (2.8s)
+  ✓  3 [chromium-1440] › tests/browser/cmd-city-transit.spec.js:18:37 › maglev construction connects assigned commuters, exports and recovers after terminal closure (3.1s)
+
+  3 passed (15.2s)

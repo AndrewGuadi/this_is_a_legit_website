@@ -1,0 +1,21 @@
+
+Running 16 tests using 1 worker
+
+  ✓   1 [chromium-360] › tests/browser/cmd-city-roads.spec.js:50:1 › road shape previews cancel without spending and a confirmed straight plan builds exactly once (4.9s)
+  ✓   2 [chromium-360] › tests/browser/cmd-city-roads.spec.js:113:1 › road preview rejects invalid coordinates and Escape cancels without building (1.2s)
+  ✓   3 [chromium-360] › tests/browser/cmd-city-roads.spec.js:132:1 › touch endpoint selection previews a road and canceled touch cannot commit (1.7s)
+  ✓   4 [chromium-360] › tests/browser/cmd-city-roads.spec.js:192:1 › canceling a large road build keeps the complete exported region unchanged and leaves controls usable (2.2s)
+  ✓   5 [chromium-390] › tests/browser/cmd-city-roads.spec.js:50:1 › road shape previews cancel without spending and a confirmed straight plan builds exactly once (5.0s)
+  ✓   6 [chromium-390] › tests/browser/cmd-city-roads.spec.js:113:1 › road preview rejects invalid coordinates and Escape cancels without building (1.4s)
+  ✓   7 [chromium-390] › tests/browser/cmd-city-roads.spec.js:132:1 › touch endpoint selection previews a road and canceled touch cannot commit (1.9s)
+  ✓   8 [chromium-390] › tests/browser/cmd-city-roads.spec.js:192:1 › canceling a large road build keeps the complete exported region unchanged and leaves controls usable (3.1s)
+  ✓   9 [chromium-768] › tests/browser/cmd-city-roads.spec.js:50:1 › road shape previews cancel without spending and a confirmed straight plan builds exactly once (4.8s)
+  ✓  10 [chromium-768] › tests/browser/cmd-city-roads.spec.js:113:1 › road preview rejects invalid coordinates and Escape cancels without building (1.5s)
+  ✓  11 [chromium-768] › tests/browser/cmd-city-roads.spec.js:132:1 › touch endpoint selection previews a road and canceled touch cannot commit (1.8s)
+  ✓  12 [chromium-768] › tests/browser/cmd-city-roads.spec.js:192:1 › canceling a large road build keeps the complete exported region unchanged and leaves controls usable (2.1s)
+  ✓  13 [chromium-1440] › tests/browser/cmd-city-roads.spec.js:50:1 › road shape previews cancel without spending and a confirmed straight plan builds exactly once (5.0s)
+  ✓  14 [chromium-1440] › tests/browser/cmd-city-roads.spec.js:113:1 › road preview rejects invalid coordinates and Escape cancels without building (1.4s)
+  ✓  15 [chromium-1440] › tests/browser/cmd-city-roads.spec.js:132:1 › touch endpoint selection previews a road and canceled touch cannot commit (1.6s)
+  ✓  16 [chromium-1440] › tests/browser/cmd-city-roads.spec.js:192:1 › canceling a large road build keeps the complete exported region unchanged and leaves controls usable (2.5s)
+
+  16 passed (45.4s)
