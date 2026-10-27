@@ -1,0 +1,181 @@
+{
+  "scenario": "Schema3 fully built 40x32 finite-water sustained workload",
+  "synthetic": true,
+  "modelOverrides": false,
+  "midRunReplenishment": false,
+  "months": 120,
+  "node": "v24.22.1",
+  "cpu": "AMD EPYC 9V74 80-Core Processor",
+  "platform": "linux x64",
+  "cpuCount": 9,
+  "tiles": 1280,
+  "typeCounts": {
+    "avenue": 560,
+    "clinic": 12,
+    "commercial": 120,
+    "industrial": 80,
+    "park": 257,
+    "police": 6,
+    "recycling": 8,
+    "residential": 200,
+    "school": 12,
+    "sewage": 8,
+    "townHall": 1,
+    "water": 8,
+    "wind": 8
+  },
+  "wind": "E",
+  "setup": "200 full24-person west/upwind homes;120 full12-position localshops;80 full18-position east/downwind industries;gateway-connected griddedavenues;8each wind/pump/sewage/recycling modules3;financed actualupkeep;initial1m goods and1m finitewater.",
+  "initial": {
+    "population": 4800,
+    "workers": 2800,
+    "jobs": 3304,
+    "employed": 2318,
+    "health": 80,
+    "happiness": 71.29728571428572,
+    "crime": 31.025,
+    "education": 0,
+    "utilities": {
+      "power": {
+        "supply": 16000,
+        "demand": 8470,
+        "ratio": 1
+      },
+      "water": {
+        "supply": 20000,
+        "demand": 7835,
+        "ratio": 1
+      },
+      "sewage": {
+        "supply": 20000,
+        "demand": 7680,
+        "ratio": 1
+      },
+      "waste": {
+        "supply": 24000,
+        "demand": 7680,
+        "ratio": 1
+      }
+    },
+    "cash": 1000000000,
+    "groundwater": 1000000,
+    "goods": 1000000,
+    "deliveredWaterContamination": 0,
+    "airExposure": 0,
+    "groundMaximum": 0,
+    "backlog": {
+      "sewage": 0,
+      "waste": 0
+    },
+    "warnings": [
+      "Road bottleneck: upgrade loaded roads or add an alternate route."
+    ],
+    "month": 0
+  },
+  "final": {
+    "population": 4508,
+    "workers": 2613,
+    "jobs": 3304,
+    "employed": 2531,
+    "health": 53.599999999999994,
+    "happiness": 77.40106697282815,
+    "crime": 26.09835438193647,
+    "education": 0,
+    "utilities": {
+      "power": {
+        "supply": 16000,
+        "demand": 8178,
+        "ratio": 1
+      },
+      "water": {
+        "supply": 20000,
+        "demand": 7543,
+        "ratio": 1
+      },
+      "sewage": {
+        "supply": 20000,
+        "demand": 7388,
+        "ratio": 1
+      },
+      "waste": {
+        "supply": 24000,
+        "demand": 83898,
+        "ratio": 0
+      }
+    },
+    "cash": 1077581646,
+    "groundwater": 90047,
+    "goods": 926011,
+    "deliveredWaterContamination": 4,
+    "airExposure": 0,
+    "groundMaximum": 1000,
+    "backlog": {
+      "sewage": 0,
+      "waste": 76510
+    },
+    "warnings": [
+      "Waste shortage: 0% of occupied demand served.",
+      "Road bottleneck: upgrade loaded roads or add an alternate route.",
+      "76510 waste units await actual road collection/return. One month of generation is buffered; processing capacity alone does not clear bins."
+    ],
+    "month": 120
+  },
+  "populationRange": {
+    "min": 4385,
+    "max": 4800
+  },
+  "workerRange": {
+    "min": 2552,
+    "max": 2800
+  },
+  "jobRange": {
+    "min": 3304,
+    "max": 3304
+  },
+  "employmentRange": {
+    "min": 2318,
+    "max": 2621
+  },
+  "medianMs": 12.778377499999976,
+  "p95Ms": 26.738824999999963,
+  "maxMs": 87.41377400000002,
+  "sustained": true,
+  "sustainedCriterion": "Every month retains at least90% of initialpopulation; no source changes or resource/populationrefreshes.",
+  "serialization": {
+    "initialValid": true,
+    "finalValid": true,
+    "initialBytes": 273291,
+    "finalBytes": 301105
+  },
+  "markers": {
+    "initial": {
+      "month": 0,
+      "environmentLastMonth": -1,
+      "civicLastMonth": 0,
+      "householdsLastMonth": 0,
+      "servicesLastMonth": -1
+    },
+    "final": {
+      "month": 120,
+      "environmentLastMonth": 119,
+      "civicLastMonth": 120,
+      "householdsLastMonth": 120,
+      "servicesLastMonth": 119
+    }
+  },
+  "sourceHashes": {
+    "static/cmd-city/core.mjs": "a9ff5dd2b86954dafcb45f2b8775fc9ef1a73c55b3715ef52f3406aedae4eff8",
+    "static/cmd-city/content.mjs": "4b6e411bbb3ab5d75080a5b38e8a86ca2d188a2078580bafbfbfa9b4e903ec67",
+    "static/cmd-city/environment.mjs": "306c468ed132d41518cb954fc4887fbbef326eca07bb17d0bdd3064fe9d5a507",
+    "static/cmd-city/civic.mjs": "81f6c9e2f43b5e9b2cf9e4c2b1711095ab2e5d0757f262ef11c8b5407f0e23cb",
+    "static/cmd-city/households.mjs": "16f065b2570790e967696afaf6658945ed26e3f8d9ad66c9b254eb73995e6fb6",
+    "static/cmd-city/services.mjs": "a313073ad3b3bdbf6d720ad10cedda207dc2066d1fbe9fcba9d38c7066ac32b4",
+    "static/cmd-city/save.mjs": "dd7ec5a96c5ee01460d2cacf7c4fe4054081f12d4e95fc78dc9806fe5b082143",
+    "tests/city/sustained-benchmark.mjs": "a3a55276c477fd5d8e13b0912a862d4d3005caaabe7bde2946788658303adc3a"
+  },
+  "limitations": [
+    "Synthetic initialcapital/assets/stocks, notprogression proof.",
+    "Node CPU measurements, notbrowser render or physicalphone proof.",
+    "A sustained workload result does not establish fullfeatureequivalence or predict everypossible city layout."
+  ]
+}
