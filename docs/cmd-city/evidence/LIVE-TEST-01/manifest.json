@@ -1,0 +1,28 @@
+{
+  "revision": "3aa4062b56996509417c1dee1a4801ba3bfe94f6",
+  "previous_known_revision": "1f43187",
+  "files": {
+    "static/arcade-art/cmd-city.svg": "1e0210f9a4ba4ea739a7482913c86254f37c35fcf4e3a268504b0c9e28d6cd6c",
+    "static/cmd-city/civic.mjs": "81f6c9e2f43b5e9b2cf9e4c2b1711095ab2e5d0757f262ef11c8b5407f0e23cb",
+    "static/cmd-city/clock.mjs": "753fa07ceb01228eb63fe7d8f0727db79801df99663bf990aa4a7300f09fbedb",
+    "static/cmd-city/commerce.mjs": "1796cc19b83bdff8a4fa15ac74c33838665705c15955d37a71e0d7b2806ffe1b",
+    "static/cmd-city/content.mjs": "4b6e411bbb3ab5d75080a5b38e8a86ca2d188a2078580bafbfbfa9b4e903ec67",
+    "static/cmd-city/core.mjs": "d5964efd30a9f4717dae57d644add2c7db8d7eff65a9d828a734b33a79c02143",
+    "static/cmd-city/environment.mjs": "306c468ed132d41518cb954fc4887fbbef326eca07bb17d0bdd3064fe9d5a507",
+    "static/cmd-city/future.mjs": "d96316bd68a29ad4a88b3408e9a57bd4f80dcd0ff8f49eec7d5a1e4b20e5299a",
+    "static/cmd-city/game.css": "365b65967bf72c52318e8959499caaa98703f25fe314ce14266412af32f3cb06",
+    "static/cmd-city/game.mjs": "1d945aee157f19805f1b9e5f141fa50eddf4276aa903e9491f14d29d4c5a62ee",
+    "static/cmd-city/households.mjs": "16f065b2570790e967696afaf6658945ed26e3f8d9ad66c9b254eb73995e6fb6",
+    "static/cmd-city/region.mjs": "de429ef787d6c133dcd8673d6a6f91a36129609ead5c9a6309cc7731f20eb8e1",
+    "static/cmd-city/road-network.mjs": "6172650a2ab975a1c5f8e9f4b729f250582f74b61af3cad973f2f8faa9d1356d",
+    "static/cmd-city/roads.mjs": "5c9f1fa9872ed8b1252b72fa73cb30759b31343c1e4f8d8fa5ab2b362fc740f2",
+    "static/cmd-city/save.mjs": "dd7ec5a96c5ee01460d2cacf7c4fe4054081f12d4e95fc78dc9806fe5b082143",
+    "static/cmd-city/services.mjs": "a313073ad3b3bdbf6d720ad10cedda207dc2066d1fbe9fcba9d38c7066ac32b4",
+    "static/cmd-city/transit.mjs": "9b2355ba33c7a9b6fb5d8356f3404475edc4dfbfb7d45abe190e29ae8028bf34",
+    "static/cmd-city/view.mjs": "b8ede9f9be9fc4b4c2674be03012417876cbda1729906de34a40aae53232be5a",
+    "templates/arcade.html": "7e607e0a3581c9ed37c4c3d37fd963cc71902e23a94fc787b41aab697e8b8dbc",
+    "templates/cmd_city.html": "03de68f785fb31bd6024f43aa254237e89e06929d60ffcabb4b319a7d291e619",
+    "game_catalog.py": "c642581d45b78371d7045e08c97e9c34a2ef8b19da1516ff053caa35d438a229",
+    "app.py": "18395769c250ce66ff2eb54716629e5c3c5d27e9e5fe6ea583795fbb9226e299"
+  }
+}

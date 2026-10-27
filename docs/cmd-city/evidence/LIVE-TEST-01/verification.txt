@@ -1,0 +1,26 @@
+MATCH 200 static/arcade-art/cmd-city.svg
+MATCH 200 static/cmd-city/civic.mjs
+MATCH 200 static/cmd-city/clock.mjs
+MATCH 200 static/cmd-city/commerce.mjs
+MATCH 200 static/cmd-city/content.mjs
+MATCH 200 static/cmd-city/core.mjs
+MATCH 200 static/cmd-city/environment.mjs
+MATCH 200 static/cmd-city/future.mjs
+MATCH 200 static/cmd-city/game.css
+MATCH 200 static/cmd-city/game.mjs
+MATCH 200 static/cmd-city/households.mjs
+MATCH 200 static/cmd-city/region.mjs
+MATCH 200 static/cmd-city/road-network.mjs
+MATCH 200 static/cmd-city/roads.mjs
+MATCH 200 static/cmd-city/save.mjs
+MATCH 200 static/cmd-city/services.mjs
+MATCH 200 static/cmd-city/transit.mjs
+MATCH 200 static/cmd-city/view.mjs
+PAGE OK 200 games/cmd-city
+PAGE OK 200 games/neon-breaker
+PAGE OK 200 games/circuit-match
+PAGE OK 200 games/blockbound-first-light
+PAGE OK 200 games/infinite-tic-tac-toe
+PAGE OK 200 forms
+PAGE OK 200 /
+VERIFIED 3aa4062b56996509417c1dee1a4801ba3bfe94f6 18 exact public asset hashes
