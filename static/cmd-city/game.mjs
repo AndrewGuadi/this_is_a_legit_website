@@ -345,7 +345,10 @@ function updateFutureSelection() {
       type: "future",
       action: { type: "addFloor", index, use: select.value },
     });
-  $("tower-floor-list").replaceChildren(
+  const floorList = $("tower-floor-list");
+  const focusedFloorControl = floorList.contains(document.activeElement)
+    ? document.activeElement.id : null;
+  floorList.replaceChildren(
     ...tower.floors.map((f) => {
       const row = document.createElement("li"),
         label = document.createElement("strong"),
@@ -357,6 +360,8 @@ function updateFutureSelection() {
           tower.housingCapacity - 90 < tower.population;
       label.textContent = `${f.index + 1}. ${floorNames[f.use]} · ${!f.enabled ? "Closed" : f.operating ? "Operating" : "Waiting for service or staff"}${f.use === "homes" ? ` · ${f.residents} residents` : ""}`;
       toggle.type = remove.type = "button";
+      toggle.id = `tower-${index}-floor-${f.index}-toggle`;
+      remove.id = `tower-${index}-floor-${f.index}-remove`;
       toggle.textContent = `${f.enabled ? "Close" : "Open"} floor ${f.index + 1}`;
       toggle.disabled = locked;
       toggle.onclick = () =>
@@ -386,6 +391,11 @@ function updateFutureSelection() {
       return row;
     }),
   );
+  if (focusedFloorControl) {
+    const replacement = document.getElementById(focusedFloorControl);
+    (replacement && !replacement.disabled
+      ? replacement : panel.querySelector("summary")).focus({ preventScroll: true });
+  }
 }
 function renderUtilities() {
   const labels = {
@@ -1221,11 +1231,12 @@ function act(action) {
 }
 function selectTile(tile, reveal = false) {
   if (!tile) return;
+  const changed = !selected || selected.x !== tile.x || selected.y !== tile.y;
   selected = tile;
   updateInspector();
   dirty = true;
   if (reveal) view.ensureVisible(selected);
-  $("home-inspector").open =
+  if (changed) $("home-inspector").open =
     !!metrics.households?.homes[selected.y * city.width + selected.x];
 }
 function performTool(tile) {

@@ -61,8 +61,8 @@ class ObservationTests(unittest.TestCase):
         self.assertEqual(home.status_code,200)
         self.assertIn(b'LEGIT',home.data)
         self.assertIn(b'href="/forms"',home.data)
-        self.assertEqual(len(GAMES),9)
-        self.assertEqual({g['slug'] for g in GAMES if g['status']=='playable'}, {'neon-breaker','cmd-city'})
+        self.assertEqual(len(GAMES),11)
+        self.assertEqual(GAMES[0]['status'],'playable')
         for game in GAMES:
             route='/games/'+game['slug']
             response=self.client.get(route)
@@ -70,9 +70,20 @@ class ObservationTests(unittest.TestCase):
             if game['slug'] == 'cmd-city':
                 self.assertIn(b'id="city-map"', response.data)
                 self.assertIn(b'/static/cmd-city/game.mjs', response.data)
-            elif game['slug'] == 'neon-breaker':
+            elif game['slug'] == 'infinite-tic-tac-toe':
+                self.assertIn(b'data-cell="8"',response.data)
+                self.assertIn(b'Two players on one device',response.data)
+                self.assertIn(b'moves are never saved or sent',response.data)
+                self.assertEqual(response.headers['Content-Security-Policy'].count("script-src 'self'"),1)
+            elif game['status'] == 'playable':
                 self.assertIn(b'<canvas',response.data)
-                self.assertIn(b'Nothing is sent to a server',response.data)
+                if game['slug'] in ('neon-breaker', 'circuit-match'):
+                    self.assertIn(b'Nothing is sent to a server',response.data)
+                else:
+                    self.assertIn(b'C core',response.data)
+                    self.assertIn(b'commercial ROM',response.data)
+                    self.assertIn("connect-src 'self'",response.headers['Content-Security-Policy'])
+                    self.assertIn("wasm-unsafe-eval",response.headers['Content-Security-Policy'])
             else:
                 self.assertIn(b'not a playable release',response.data)
                 self.assertNotIn(b'<canvas',response.data)

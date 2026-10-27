@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+ <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+ <meta name="description" content="Play Blockbound: First Light, an original C-powered blocky 3D city adventure. Meet residents, recover light shards, and wake the harbor beacon.">
+ <title>Play Blockbound: First Light — Legit Arcade</title>
+ <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23152e36'/%3E%3Cpath d='M16 3 25 16 16 29 7 16Z' fill='%23b8f3d7'/%3E%3C/svg%3E">
+ <link rel="stylesheet" href="{{ url_for('static',filename='arcade.css') }}">
+ <link rel="stylesheet" href="{{ url_for('static',filename='blockbound/game.css') }}">
+ <script type="module" src="{{ url_for('static',filename='blockbound/game.mjs') }}"></script>
+</head>
+<body class="blockbound-page">
+ <a class="skip" href="#main">Skip to content</a>
+ <header class="shell header"><a class="logo" href="/"><span aria-hidden="true">↗</span> LEGIT<span class="logo-light">ARCADE</span></a><nav aria-label="Main navigation"><a href="/#games">All games</a><a href="#how-to-play">How to play</a></nav></header>
+ <main id="main" tabindex="-1" class="blockbound-shell">
+  <div class="blockbound-heading"><div><p class="eyebrow"><span class="sun-dot" aria-hidden="true"></span> ORIGINAL 09 / C + WEBASSEMBLY</p><h1>BLOCKBOUND<span>FIRST LIGHT</span></h1></div><p class="blockbound-tagline">A little city.<br><strong>A light worth finding.</strong></p></div>
+  <section id="blockbound-game" aria-label="Blockbound: First Light game" data-state="loading">
+   <div class="blockbound-cabinet">
+    <div class="blockbound-hud"><div><span class="hud-label">Light shards</span><strong><span id="shard-count">0</span> / 3</strong></div><div class="objective-hud"><span class="hud-label">Current objective</span><strong id="objective">Find the three light shards</strong></div><div class="resident-hud"><span class="hud-label">Residents met</span><strong><span id="resident-count">0</span> / 3</strong></div></div>
+    <div id="city-view" class="city-view" tabindex="0" role="group" aria-label="First Light city view. W A S D moves. Arrow keys move and turn. E or Space interacts. P pauses." aria-describedby="keyboard-help">
+     <canvas id="city-canvas" width="320" height="180" aria-label="Blocky three-dimensional harbor city. Quest status and dialogue are provided as text below.">Blockbound requires Canvas, WebAssembly, and JavaScript.</canvas>
+     <div class="city-overlay" id="city-overlay"><span id="overlay-kicker">AN ORIGINAL BLOCK-BUILT ADVENTURE</span><h2 id="overlay-title">First Light<br>needs you.</h2><p id="overlay-copy">Explore the harbor, meet three residents, and return their lost light to the beacon.</p></div>
+    </div>
+    <div class="dialogue"><span class="dialogue-mark" aria-hidden="true">✦</span><p id="dialogue-text">The city is waking. Start your walk when you are ready.</p><span id="interaction-prompt"></span></div>
+    <div class="touch-controls" aria-label="Touch game controls">
+     <div class="touch-cluster"><span>Move</span><button type="button" data-input="1" aria-label="Move forward">▲</button><div><button type="button" data-input="4" aria-label="Step left">◀</button><button type="button" data-input="2" aria-label="Move backward">▼</button><button type="button" data-input="8" aria-label="Step right">▶</button></div></div>
+     <button type="button" id="touch-interact" class="touch-interact">Interact</button>
+     <div class="touch-cluster"><span>Look</span><div><button type="button" data-input="16" aria-label="Turn left">↶</button><button type="button" data-input="32" aria-label="Turn right">↷</button></div></div>
+    </div>
+    <div class="blockbound-controls"><button id="game-action" class="action-button" type="button" disabled>Loading city…</button><button id="sound" type="button" aria-pressed="false">Sound off</button><button id="restart" type="button">Restart walk</button></div>
+    <div class="blockbound-foot"><p id="game-status" role="status" aria-live="polite">Compiling the view…</p><span class="cabinet-id" aria-hidden="true">LA—009 <span>●</span></span></div>
+   </div>
+   <noscript><p class="fallback">JavaScript and WebAssembly are required to play. The other site pages remain available.</p></noscript>
+   <div class="blockbound-meta"><span>One original city <span aria-hidden="true">/</span> No account. No downloads.</span><span>C core · WebAssembly · Canvas</span></div>
+  </section>
+  <section id="how-to-play" class="blockbound-guide" aria-labelledby="guide-title"><div><p class="eyebrow">YOUR FIRST WALK THROUGH FIRST LIGHT</p><h2 id="guide-title">Follow the glow.<br>Bring it home.</h2><p>Three golden light shards are tucked around the harbor. Face a shard or resident and interact when the prompt appears. The northern beacon wakes only when all three shards are found.</p></div><div class="guide-controls"><div><span class="guide-number">01</span><div><h3>Walk & look</h3><p id="keyboard-help"><kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> move and step sideways. Arrow Up/Down moves; Arrow Left/Right turns. Touch controls work on smaller screens.</p></div></div><div><span class="guide-number">02</span><div><h3>Meet & recover</h3><p><kbd>E</kbd> or <kbd>Space</kbd> talks to a nearby resident, collects a shard, or uses the beacon. <kbd>P</kbd> or <kbd>Esc</kbd> pauses.</p></div></div><div><span class="guide-number">03</span><div><h3>Original by design</h3><p>This compact city, its residents, and its artwork are original. It does not use a commercial ROM, copied map, or branded character art. Sound is optional and starts off unless you enabled it before.</p></div></div></div></section>
+  <p class="access-note">Accessibility: keyboard controls, touch controls, reduced-motion support, text dialogue, and readable quest status are included. Navigating the 3D city requires vision; this game does not offer equivalent nonvisual play.</p>
+ </main>
+ <dialog id="restart-dialog" aria-labelledby="restart-title" aria-describedby="restart-copy"><form method="dialog"><p class="eyebrow">BACK TO THE BEGINNING?</p><h2 id="restart-title">Restart this walk?</h2><p id="restart-copy">Your shards and resident introductions will be reset. Keep walking to preserve this visit.</p><div><button value="cancel" autofocus>Keep walking</button><button value="restart" class="action-button">Start a new walk</button></div></form></dialog>
+ <footer class="shell footer"><div class="footer-bottom"><span>© Authentic Dynamics LLC · Original games</span><div><a href="/">Back to the arcade</a><a href="/forms">Form research</a><a href="/terms">Terms & privacy</a></div></div><p class="research-note">Game play sends no research observations. Our separate form-research area records interaction metadata disclosed on its forms.</p></footer>
+</body></html>

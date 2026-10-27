@@ -1,10 +1,13 @@
 # Legit Arcade
 
-An arcade with **CMD City**, a playable city-simulation development candidate, **Neon Breaker**, an original three-stage brick breaker, seven planned game concepts, and a secondary form-research area. CMD City runs locally in the browser and includes connected infrastructure, zoning, employment, transport, finite resources, city finances and three-city cooperation. Government, pollution and recovery now connect to household budgets, wealth-class taxes, staffed education, actual shopping and road-routed public-service vehicles. It is **not yet feature-equivalent to SimCity (2013) plus Cities of Tomorrow**; see [parity target](docs/cmd-city/PARITY_TARGET.md), [current status](docs/cmd-city/PARITY_STATUS_03.md), [latest continuation verification](docs/cmd-city/VERIFICATION_04.md), and [independent review: REVISE, 85.5/100](docs/cmd-city/TODD_REVIEW_04.md).
+The catalog includes **Neon Breaker**, **Circuit Match**, **Blockbound: First Light**, **Infinite Tic-Tac-Toe**, and the **CMD City alpha**, alongside six planned concepts. Infinite Tic-Tac-Toe is local two-player play on one device. Forms remain at `/forms` and `/apply/<kind>`; the investigator workspace is `/admin/login`.
+
+CMD City runs locally in the browser with connected infrastructure, zoning, employment, transport, finite resources, finances and three-city cooperation. It is not yet feature-equivalent to SimCity (2013) plus Cities of Tomorrow. The first-release readiness work defers parity additions; see [parity target](docs/cmd-city/PARITY_TARGET.md) and [current readiness evidence](docs/cmd-city/evidence/READINESS-02/ROUND.md). Performance and review gates still block production release.
 
 Open `/games/cmd-city` after starting the Flask app. Cities begin paused. Inspect, build, then resume; save/export includes all three regional cities. All gameplay stays on-device. Direct Codex implementation was explicitly approved by Andrew for CMD City; independent review and normal release gates remain. This source branch does not itself establish a production deployment.
 
-Run `npm run test:game` for both game suites, `npm run test:browser` for browser checks, and `node tests/city/benchmark.mjs` for the synthetic dense-map measurement. A repository-local `.venv` with requirements is sufficient for Flask. For static visual QA, `python tests/city/build_preview.py` renders the actual templates into ignored `dev_docs/city-preview`; never deploy the synthetic preview fixture. Production continues to use the existing Flask/PythonAnywhere entrypoint.
+Run `npm run test:game` for the game suites, `npm run test:browser` for browser checks, and `node tests/city/benchmark.mjs` for the synthetic dense-map measurement. A repository-local `.venv` with requirements is sufficient for Flask. For static visual QA, `python tests/city/build_preview.py` renders the actual templates into ignored `dev_docs/city-preview`; never deploy the synthetic preview fixture. Production continues to use the existing Flask/PythonAnywhere entrypoint.
+
 
 Game status is tracked in `game_catalog.py`; see [game roadmap](docs/GAME_ROADMAP.md) and [first-game brief](docs/FIRST_GAME_BRIEF.md). Catalog visits do not create observation records. Neon Breaker uses native Canvas and local modules, with no game telemetry or third-party requests. Optional best-score storage stays on the device.
 
@@ -33,6 +36,10 @@ Open `/games/neon-breaker` on the running app. Arrow keys or A/D move, Space lau
 Run `npm run test:game` for deterministic simulation checks and `npm run test:browser` for browser, touch-emulation and accessibility checks (install dependencies with `npm ci` and `npx playwright install chromium`). Use the project Python environment so the browser fixture can import Flask. For a local synthetic preview without production data, run `python tests/browser/server.py` and open `http://127.0.0.1:5081/games/neon-breaker`. Never deploy that fixture server.
 
 The owner authorized direct Codex implementation with a separate local TODD reviewer on 2026-10-20. See [implementation contract](docs/neon-breaker-contract.md). Browser emulation does not establish physical-phone performance.
+
+## Blockbound: First Light
+
+Open `/games/blockbound-first-light` for an original blocky 3D city adventure written in C and compiled to a small, dependency-free WebAssembly module. Explore First Light, speak with three residents, recover three light shards, and activate the northern beacon. The checked-in base64-encoded WebAssembly lets the arcade run without a C toolchain. Rebuild it with `python scripts/build_blockbound.py` using Zig or clang+lld; see [the game guide](docs/BLOCKBOUND.md) for controls, architecture, and native test commands. No commercial ROM, copied map, branded character art, account, telemetry, or external runtime service is used.
 
 ## Evidence
 

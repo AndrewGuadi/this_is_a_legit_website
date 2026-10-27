@@ -2054,7 +2054,7 @@ export function advanceMonth(s) {
     throw Error(
       "This city has reached its supported month limit. Export it or create a new region.",
     );
-  const journal = JSON.stringify(s);
+  let journal;
   let mutated = false;
   try {
     if (monthNeedsDraft(s)) {
@@ -2068,6 +2068,7 @@ export function advanceMonth(s) {
       Object.assign(s, draft);
       return result;
     }
+    journal = JSON.stringify(s);
     mutated = true;
     const result = simulateMonth(s);
     assertCitySaveBudget(s);

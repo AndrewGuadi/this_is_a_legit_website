@@ -88,18 +88,24 @@ export function roadTopology(city, identity = city) {
       nearest(start, goals) {
         if (!mask[start] || !goals.length) return null;
         const entry = this.tree([start], String(start));
-        const best = () => {
-          let goal = -1,
-            rank = size + 1;
-          for (const i of goals)
-            if (entry.rank[i] >= 0 && entry.rank[i] < rank) {
-              goal = i;
-              rank = entry.rank[i];
-            }
-          return goal;
-        };
-        let goal = best();
-        while (goal < 0 && this.step(entry)) goal = best();
+        // Inspect destinations once. Reused frontiers usually already contain
+        // the answer; otherwise inspect only newly discovered queue entries.
+        let goal = -1, bestRank = size + 1;
+        const targets = new Set();
+        for (const next of goals) {
+          targets.add(next);
+          if (entry.rank[next] >= 0 && entry.rank[next] < bestRank) {
+            goal = next;
+            bestRank = entry.rank[next];
+          }
+        }
+        let cursor = entry.tail;
+        while (goal < 0 && this.step(entry)) {
+          while (cursor < entry.tail) {
+            const next = entry.queue[cursor++];
+            if (targets.has(next)) { goal = next; break; }
+          }
+        }
         return goal < 0 ? null : { entry, goal };
       },
       // Bounded diagnostics for tests; no mutable frontier is exposed here.
